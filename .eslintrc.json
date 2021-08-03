@@ -1,0 +1,100 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "project": "./tsconfig.json",
+    "useJSXTextNode": true
+  },
+  "plugins": ["@typescript-eslint", "prettier"],
+  "extends": [
+    "react-app",
+    "react-app/jest",
+    "airbnb",
+    "airbnb-typescript",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+    "plugin:prettier/recommended",
+    "plugin:import/errors"
+  ],
+  "overrides": [
+    {
+      "files": ["**/*.stories.*"],
+      "rules": {
+        "import/no-anonymous-default-export": "off"
+      }
+    }
+  ],
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx", ".json"],
+        "paths": ["."]
+      }
+    }
+  },
+  "rules": {
+    "sort-imports": 0,
+    "import/order": [
+      2,
+      {
+        "alphabetize": { "order": "asc" },
+        "newlines-between": "always",
+        "pathGroups": [
+          {
+            "pattern": "react",
+            "group": "builtin"
+          }
+        ]
+      }
+    ],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": ["**/*tests.ts", "**/*.stories.tsx", "**/*.test.tsx"]
+      }
+    ],
+    "@typescript-eslint/naming-convention": "off",
+    "@typescript-eslint/no-unused-vars": ["error"],
+    "prettier/prettier": "error",
+    "max-len": ["error", { "code": 100 }],
+    "prefer-promise-reject-errors": ["off"],
+    "react/jsx-filename-extension": ["off"],
+    "react/prop-types": ["off"],
+    "react/no-unescaped-entities": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/no-array-index-key": "off",
+    "react/require-default-props": "off",
+    "no-return-assign": ["off"],
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/ban-types": "off",
+    "@typescript-eslint/lines-between-class-members": [
+      "error",
+      "always",
+      { "exceptAfterSingleLine": true }
+    ],
+    "import/no-unresolved": "off",
+    "import/extensions": "off",
+    "react/react-in-jsx-scope": "off", // React 17 doesn't require
+    "react/jsx-uses-react": "off",
+    "jsx-a11y/label-has-associated-control": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "import/no-cycle": "off", // @ToFix
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/no-noninteractive-element-interactions": "off",
+    "no-underscore-dangle": "off",
+    "newline-after-var": "error",
+    "no-param-reassign": [
+      "error",
+      { "props": true, "ignorePropertyModificationsFor": ["state"] }
+    ],
+    "import/prefer-default-export": "off"
+  }
+}

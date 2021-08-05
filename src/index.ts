@@ -1,5 +1,5 @@
-import fetch from "isomorphic-unfetch";
-import qs from "query-string";
+import fetch from 'isomorphic-unfetch';
+import qs from 'query-string';
 
 import type {
   KeyString,
@@ -7,21 +7,23 @@ import type {
   ChekoutSessionPayload,
   CheckoutSessionResult,
   Order,
-} from "./types";
+} from './types';
 import {
   isValidPublicApiKey,
   isValidSecretApiKey,
   isValidCheckoutPayload,
-} from "./utils";
+} from './utils';
 
-const API_PREFIX = "https://api.smartpay.co/checkout";
-const CHECKOUT_URL = "https://checkout.smartpay.ninja";
+const API_PREFIX = 'https://api.smartpay.co/checkout';
+const CHECKOUT_URL = 'https://checkout.smartpay.ninja';
 
-const POST = "POST";
-const PUT = "PUT";
-const DELETE = "DELETE";
+const POST = 'POST';
+// const PUT = 'PUT';
+// const DELETE = 'DELETE';
 
-type Method = "GET" | "POST" | "PUT" | "DELETE";
+const SUCCEEDED = 'succeeded';
+
+type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 class SmartPay {
   _secretKey: KeyString;
@@ -31,15 +33,15 @@ class SmartPay {
 
   constructor(key: KeyString, options: SmartPayOptions = {}) {
     if (!key) {
-      throw new Error("Secret API Key is required.");
+      throw new Error('Secret API Key is required.');
     }
 
     if (!isValidSecretApiKey(key)) {
-      throw new Error("Secret API Key is invalid.");
+      throw new Error('Secret API Key is invalid.');
     }
 
     if (options.publicKey && !isValidPublicApiKey(options.publicKey)) {
-      throw new Error("Public API Key is invalid.");
+      throw new Error('Public API Key is invalid.');
     }
 
     this._secretKey = key;
@@ -48,13 +50,14 @@ class SmartPay {
     this._checkoutURL = options.checkoutURL || CHECKOUT_URL;
   }
 
-  request(endpoint: string, method: Method = "GET", payload?: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  request(endpoint: string, method: Method = 'GET', payload?: any) {
     return fetch(`${this._apiPrefix}${endpoint}`, {
       method,
       headers: {
         Authorization: `Bearer ${this._secretKey}`,
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
       body: payload ? JSON.stringify(payload) : null,
     }).then((response) => {
@@ -70,19 +73,19 @@ class SmartPay {
     payload: ChekoutSessionPayload
   ): Promise<CheckoutSessionResult> {
     if (!isValidCheckoutPayload(payload)) {
-      throw new Error("Checkout Payload is invalid.");
+      throw new Error('Checkout Payload is invalid.');
     }
 
     // Call API to create checkout session
-    return this.request("/sessions", POST, payload);
+    return this.request('/sessions', POST, payload);
   }
 
   isOrderAuthorized(orderId: string): Promise<boolean> {
-    return this.getOrder(orderId).then((order) => order.status === "succeeded");
+    return this.getOrder(orderId).then((order) => order.status === SUCCEEDED);
   }
 
   getOrders(): Promise<Order[]> {
-    return this.request("/orders");
+    return this.request('/orders');
   }
 
   getOrder(orderId: string): Promise<Order> {
@@ -103,11 +106,11 @@ class SmartPay {
 
   setPublicKey(publicKey: KeyString) {
     if (!publicKey) {
-      throw new Error("Public API Key is required.");
+      throw new Error('Public API Key is required.');
     }
 
     if (!isValidPublicApiKey(publicKey)) {
-      throw new Error("Public API Key is invalid.");
+      throw new Error('Public API Key is invalid.');
     }
 
     this._publicKey = publicKey;
@@ -115,11 +118,11 @@ class SmartPay {
 
   generateRedirectionTarget(checkoutSessionId: string): string {
     if (!checkoutSessionId) {
-      throw new Error("Checkout Session ID is required.");
+      throw new Error('Checkout Session ID is required.');
     }
 
     if (!this._publicKey) {
-      throw new Error("Public API Key is required.");
+      throw new Error('Public API Key is required.');
     }
 
     const params = {

@@ -1,7 +1,6 @@
-import { validate } from "jtd";
+import { validate } from 'jtd';
 
-import payloadSchema from "./schemas/payload-schema";
-
+import payloadSchema from './schemas/payload-schema';
 import type { KeyString, ChekoutSessionPayload } from './types';
 
 const publicKeyRegExp = /^pk_(test|live)_[0-9a-zA-Z]+$/;

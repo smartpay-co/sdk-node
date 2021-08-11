@@ -23,3 +23,23 @@ export const isValidOrderId = (orderId: string) => {
 export const isValidCheckoutPayload = (payload: ChekoutSessionPayload) => {
   return validate(payloadSchema, payload);
 };
+
+export const normalizeCheckoutPayload = (input: ChekoutSessionPayload) => {
+  const payload = { ...input };
+
+  if (!payload.currency) {
+    payload.currency = input.lineItems[0].currency;
+  }
+
+  if (!payload.amount) {
+    payload.amount = input.lineItems.reduce((sum, item) => {
+      if (item.currency !== payload.currency) {
+        throw new Error('Currency of all items should be the same.');
+      }
+
+      return sum + item.price;
+    }, 0);
+  }
+
+  return payload;
+};

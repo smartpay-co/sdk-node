@@ -12,6 +12,7 @@ import {
   isValidPublicApiKey,
   isValidSecretApiKey,
   isValidCheckoutPayload,
+  normalizeCheckoutPayload,
 } from './utils';
 
 const API_PREFIX = 'https://api.smartpay.co/checkout';
@@ -21,7 +22,7 @@ const POST = 'POST';
 // const PUT = 'PUT';
 // const DELETE = 'DELETE';
 
-const SUCCEEDED = 'succeeded';
+export const STATUS_SUCCEEDED = 'succeeded';
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
@@ -77,11 +78,22 @@ class SmartPay {
     }
 
     // Call API to create checkout session
-    return this.request('/sessions', POST, payload);
+    return this.request(
+      '/sessions',
+      POST,
+      normalizeCheckoutPayload(payload)
+    ).then((session) => {
+      // eslint-disable-next-line no-param-reassign
+      session.checkoutURL = this.getSessionURL(session);
+
+      return session;
+    });
   }
 
   isOrderAuthorized(orderId: string): Promise<boolean> {
-    return this.getOrder(orderId).then((order) => order.status === SUCCEEDED);
+    return this.getOrder(orderId).then(
+      (order) => order.status === STATUS_SUCCEEDED
+    );
   }
 
   getOrders(): Promise<Order[]> {
@@ -116,7 +128,7 @@ class SmartPay {
     this._publicKey = publicKey;
   }
 
-  generateRedirectionTarget(checkoutSessionId: string): string {
+  getSessionURL(checkoutSessionId: string): string {
     if (!checkoutSessionId) {
       throw new Error('Checkout Session ID is required.');
     }

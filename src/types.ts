@@ -32,7 +32,7 @@ export type ConsumerData = {
   reference?: string;
 };
 
-export type OrderItem = {
+export type lineItem = {
   name: string;
   description: string;
   image?: string;
@@ -42,9 +42,10 @@ export type OrderItem = {
 };
 
 export type ChekoutSessionPayload = {
-  amount: number;
-  consumerData: ConsumerData;
-  orderItems: OrderItem[];
+  amount?: number;
+  currency?: string;
+  consumerData?: ConsumerData;
+  lineItems: lineItem[];
 };
 
 export type CheckoutSessionResult = {

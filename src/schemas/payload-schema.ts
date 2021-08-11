@@ -1,103 +1,107 @@
-import { Schema } from "jtd";
+import { Schema } from 'jtd';
 
 const payloadSchema = {
   properties: {
+    lineItems: {
+      elements: {
+        properties: {
+          currency: {
+            type: 'string',
+          },
+          name: {
+            type: 'string',
+          },
+          price: {
+            type: 'uint32',
+          },
+          quantity: {
+            type: 'uint8',
+          },
+        },
+        optionalProperties: {
+          description: {
+            type: 'string',
+          },
+          image: {
+            type: 'string',
+          },
+        },
+      },
+    },
+  },
+  optionalProperties: {
     amount: {
-      type: "uint32",
+      type: 'uint32',
+    },
+    currency: {
+      type: 'string',
     },
     consumerData: {
       properties: {
         address: {
           properties: {
             administrativeArea: {
-              type: "string",
+              type: 'string',
             },
             country: {
-              type: "string",
+              type: 'string',
             },
             line1: {
-              type: "string",
+              type: 'string',
             },
             postalCode: {
-              type: "string",
+              type: 'string',
             },
           },
           optionalProperties: {
             line2: {
-              type: "string",
+              type: 'string',
             },
             line3: {
-              type: "string",
+              type: 'string',
             },
             line4: {
-              type: "string",
+              type: 'string',
             },
             line5: {
-              type: "string",
+              type: 'string',
             },
             locality: {
-              type: "string",
+              type: 'string',
             },
             subLocality: {
-              type: "string",
+              type: 'string',
             },
           },
         },
         emailAddress: {
-          type: "string",
+          type: 'string',
         },
         name1: {
-          type: "string",
+          type: 'string',
         },
         name2: {
-          type: "string",
+          type: 'string',
         },
         phoneNumber: {
-          type: "string",
+          type: 'string',
         },
       },
       optionalProperties: {
         name1Kana: {
-          type: "string",
+          type: 'string',
         },
         name2Kana: {
-          type: "string",
+          type: 'string',
         },
         dateOfBirth: {
-          type: "string",
+          type: 'string',
         },
         legalGender: {
-          type: "string",
+          type: 'string',
         },
         reference: {
-          type: "string",
-        },
-      },
-    },
-    orderItems: {
-      elements: {
-        properties: {
-          currency: {
-            type: "string",
-          },
-
-          name: {
-            type: "string",
-          },
-          price: {
-            type: "uint32",
-          },
-          quantity: {
-            type: "uint8",
-          },
-        },
-        optionalProperties: {
-          description: {
-            type: "string",
-          },
-          image: {
-            type: "string",
-          },
+          type: 'string',
         },
       },
     },

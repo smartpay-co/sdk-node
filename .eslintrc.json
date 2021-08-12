@@ -4,7 +4,7 @@
     "ecmaFeatures": {
       "jsx": true
     },
-    "project": "./tsconfig.json",
+    "project": "./tsconfig-eslint.json",
     "useJSXTextNode": true
   },
   "plugins": ["@typescript-eslint", "prettier"],
@@ -57,7 +57,7 @@
     "import/no-extraneous-dependencies": [
       "error",
       {
-        "devDependencies": ["**/*tests.ts", "**/*.stories.tsx", "**/*.test.tsx"]
+        "devDependencies": ["test/**/*"]
       }
     ],
     "@typescript-eslint/naming-convention": "off",

@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -9,24 +10,33 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-import { validate } from 'jtd';
-import checkoutPayloadSchema from './schemas/checkout-payload.js';
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.normalizeCheckoutPayload = exports.isValidCheckoutPayload = exports.isValidOrderId = exports.isValidSecretApiKey = exports.isValidPublicApiKey = void 0;
+var jtd_1 = require("jtd");
+var checkout_payload_js_1 = __importDefault(require("./schemas/checkout-payload.js"));
 var publicKeyRegExp = /^pk_(test|live)_[0-9a-zA-Z]+$/;
 var secretKeyRegExp = /^sk_(test|live)_[0-9a-zA-Z]+$/;
 var orderIdRegExp = /^order_[0-9a-zA-Z]+$/;
-export var isValidPublicApiKey = function (apiKey) {
+var isValidPublicApiKey = function (apiKey) {
     return publicKeyRegExp.test(apiKey);
 };
-export var isValidSecretApiKey = function (apiKey) {
+exports.isValidPublicApiKey = isValidPublicApiKey;
+var isValidSecretApiKey = function (apiKey) {
     return secretKeyRegExp.test(apiKey);
 };
-export var isValidOrderId = function (orderId) {
+exports.isValidSecretApiKey = isValidSecretApiKey;
+var isValidOrderId = function (orderId) {
     return orderIdRegExp.test(orderId);
 };
-export var isValidCheckoutPayload = function (payload) {
-    return validate(checkoutPayloadSchema, payload);
+exports.isValidOrderId = isValidOrderId;
+var isValidCheckoutPayload = function (payload) {
+    return jtd_1.validate(checkout_payload_js_1.default, payload);
 };
-export var normalizeCheckoutPayload = function (input) {
+exports.isValidCheckoutPayload = isValidCheckoutPayload;
+var normalizeCheckoutPayload = function (input) {
     var payload = __assign({}, input);
     if (!payload.currency) {
         payload.currency = input.lineItems[0].currency;
@@ -41,3 +51,4 @@ export var normalizeCheckoutPayload = function (input) {
     }
     return payload;
 };
+exports.normalizeCheckoutPayload = normalizeCheckoutPayload;

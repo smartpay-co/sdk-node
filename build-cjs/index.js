@@ -1,22 +1,28 @@
-import fetch from 'isomorphic-unfetch';
-import qs from 'query-string';
-import { isValidPublicApiKey, isValidSecretApiKey, isValidCheckoutPayload, normalizeCheckoutPayload, } from './utils.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.STATUS_SUCCEEDED = void 0;
+var isomorphic_unfetch_1 = __importDefault(require("isomorphic-unfetch"));
+var query_string_1 = __importDefault(require("query-string"));
+var utils_js_1 = require("./utils.js");
 var API_PREFIX = 'https://api.smartpay.co/checkout';
 var CHECKOUT_URL = 'https://checkout.smartpay.ninja';
 var POST = 'POST';
 // const PUT = 'PUT';
 // const DELETE = 'DELETE';
-export var STATUS_SUCCEEDED = 'succeeded';
+exports.STATUS_SUCCEEDED = 'succeeded';
 var Smartpay = /** @class */ (function () {
     function Smartpay(key, options) {
         if (options === void 0) { options = {}; }
         if (!key) {
             throw new Error('Secret API Key is required.');
         }
-        if (!isValidSecretApiKey(key)) {
+        if (!utils_js_1.isValidSecretApiKey(key)) {
             throw new Error('Secret API Key is invalid.');
         }
-        if (options.publicKey && !isValidPublicApiKey(options.publicKey)) {
+        if (options.publicKey && !utils_js_1.isValidPublicApiKey(options.publicKey)) {
             throw new Error('Public API Key is invalid.');
         }
         this._secretKey = key;
@@ -27,7 +33,7 @@ var Smartpay = /** @class */ (function () {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Smartpay.prototype.request = function (endpoint, method, payload) {
         if (method === void 0) { method = 'GET'; }
-        return fetch("" + this._apiPrefix + endpoint, {
+        return isomorphic_unfetch_1.default("" + this._apiPrefix + endpoint, {
             method: method,
             headers: {
                 Authorization: "Bearer " + this._secretKey,
@@ -44,18 +50,18 @@ var Smartpay = /** @class */ (function () {
     };
     Smartpay.prototype.createCheckoutSession = function (payload) {
         var _this = this;
-        if (!isValidCheckoutPayload(payload)) {
+        if (!utils_js_1.isValidCheckoutPayload(payload)) {
             throw new Error('Checkout Payload is invalid.');
         }
         // Call API to create checkout session
-        return this.request('/sessions', POST, normalizeCheckoutPayload(payload)).then(function (session) {
+        return this.request('/sessions', POST, utils_js_1.normalizeCheckoutPayload(payload)).then(function (session) {
             // eslint-disable-next-line no-param-reassign
             session.checkoutURL = _this.getSessionURL(session);
             return session;
         });
     };
     Smartpay.prototype.isOrderAuthorized = function (orderId) {
-        return this.getOrder(orderId).then(function (order) { return order.status === STATUS_SUCCEEDED; });
+        return this.getOrder(orderId).then(function (order) { return order.status === exports.STATUS_SUCCEEDED; });
     };
     Smartpay.prototype.getOrders = function () {
         return this.request('/orders');
@@ -76,7 +82,7 @@ var Smartpay = /** @class */ (function () {
         if (!publicKey) {
             throw new Error('Public API Key is required.');
         }
-        if (!isValidPublicApiKey(publicKey)) {
+        if (!utils_js_1.isValidPublicApiKey(publicKey)) {
             throw new Error('Public API Key is invalid.');
         }
         this._publicKey = publicKey;
@@ -92,11 +98,11 @@ var Smartpay = /** @class */ (function () {
             session: session.id,
             key: this._publicKey,
         };
-        return qs.stringifyUrl({
+        return query_string_1.default.stringifyUrl({
             url: this._checkoutURL + "/login",
             query: params,
         });
     };
     return Smartpay;
 }());
-export default Smartpay;
+exports.default = Smartpay;

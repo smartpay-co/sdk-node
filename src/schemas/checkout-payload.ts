@@ -1,6 +1,6 @@
 import { Schema } from 'jtd';
 
-const payloadSchema = {
+const checkoutPayloadSchema = {
   properties: {
     lineItems: {
       elements: {
@@ -108,4 +108,4 @@ const payloadSchema = {
   },
 } as Schema;
 
-export default payloadSchema;
+export default checkoutPayloadSchema;

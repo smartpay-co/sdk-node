@@ -1,6 +1,6 @@
 import { validate } from 'jtd';
 
-import payloadSchema from './schemas/payload-schema';
+import checkoutPayloadSchema from './schemas/checkout-payload.js';
 import type { KeyString, ChekoutSessionPayload } from './types';
 
 const publicKeyRegExp = /^pk_(test|live)_[0-9a-zA-Z]+$/;
@@ -21,7 +21,7 @@ export const isValidOrderId = (orderId: string) => {
 };
 
 export const isValidCheckoutPayload = (payload: ChekoutSessionPayload) => {
-  return validate(payloadSchema, payload);
+  return validate(checkoutPayloadSchema, payload);
 };
 
 export const normalizeCheckoutPayload = (input: ChekoutSessionPayload) => {

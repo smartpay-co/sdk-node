@@ -13,7 +13,7 @@ import {
   isValidSecretApiKey,
   isValidCheckoutPayload,
   normalizeCheckoutPayload,
-} from './utils';
+} from './utils.js';
 
 const API_PREFIX = 'https://api.smartpay.co/checkout';
 const CHECKOUT_URL = 'https://checkout.smartpay.ninja';
@@ -26,7 +26,7 @@ export const STATUS_SUCCEEDED = 'succeeded';
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
-class SmartPay {
+class Smartpay {
   _secretKey: KeyString;
   _publicKey?: KeyString;
   _apiPrefix: string;
@@ -128,9 +128,9 @@ class SmartPay {
     this._publicKey = publicKey;
   }
 
-  getSessionURL(checkoutSessionId: string): string {
-    if (!checkoutSessionId) {
-      throw new Error('Checkout Session ID is required.');
+  getSessionURL(session: CheckoutSessionResult): string {
+    if (!session) {
+      throw new Error('Checkout Session is required.');
     }
 
     if (!this._publicKey) {
@@ -138,7 +138,7 @@ class SmartPay {
     }
 
     const params = {
-      session: checkoutSessionId,
+      session: session.id,
       key: this._publicKey,
     };
 
@@ -149,4 +149,4 @@ class SmartPay {
   }
 }
 
-export default SmartPay;
+export default Smartpay;

@@ -66,7 +66,8 @@
         "images": { "elements": { "type": "string" } },
         "reference": { "type": "string" },
         "url": { "type": "string" }
-      }
+      },
+      "additionalProperties": true
     },
     "order": {
       "properties": {
@@ -79,9 +80,16 @@
           },
           "optionalProperties": {
             "addressType": { "type": "string" }
-          }
+          },
+          "additionalProperties": true
         }
-      }
+      },
+      "optionalProperties": {
+        "captureMethod": { "type": "string" },
+        "confirmationMethod": { "type": "string" },
+        "coupons": { "elements": { "type": "string" } }
+      },
+      "additionalProperties": true
     },
     "customer": {
       "optionalProperties": {

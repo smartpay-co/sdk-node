@@ -3,7 +3,7 @@ import test from 'tape';
 import Smartpay from '../build/index.js';
 
 const API_PREFIX = 'https://api.smartpay.re/smartpayments';
-const CHECKOUT_URL = 'https://checkout.smartpay.co';
+const CHECKOUT_URL = 'https://checkout.smartpay.re';
 
 const TEST_SECRET_KEY = 'sk_test_a7SlBkzf44tzdQoTwm6FrW';
 const TEST_PUBLIC_KEY = 'pk_test_1m2ySnST0aYi6QM0GlKP0n';
@@ -14,13 +14,12 @@ test('Create Live Checkout Session', async function testCreateCheckoutSession(t)
   const smartpay = new Smartpay(TEST_SECRET_KEY, {
     publicKey: TEST_PUBLIC_KEY,
     apiPrefix: API_PREFIX,
+    checkoutURL: CHECKOUT_URL,
   });
 
   const payload = {
-    customer: {
-      email: 'authorized@smartpay.co',
-    },
-
+    currency: 'JPY',
+    amount: 0,
     items: [
       {
         name: 'レブロン 18 LOW',
@@ -44,8 +43,6 @@ test('Create Live Checkout Session', async function testCreateCheckoutSession(t)
   };
 
   const { data: session } = await smartpay.createCheckoutSession(payload);
-
-  console.log(session);
 
   t.ok(session.id.length > 0);
 });

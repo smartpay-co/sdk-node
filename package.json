@@ -20,8 +20,12 @@
     "schema": "jtd-codegen src/schemas/checkout-session-payload.jtd.json --typescript-out src/schemas",
     "build:esm": "tsc --build tsconfig.json",
     "build:cjs": "tsc --build tsconfig-cjs.json",
-    "build": "npm run build:esm && npm run build:cjs",
-    "test": "npm run build && tape test/nock.js && tape test/plain.js"
+    "build": "yarn build:esm && yarn build:cjs",
+    "pretest": "yarn build",
+    "test:unit": "tape test/unit.js",
+    "test:nock": "tape test/nock.js",
+    "test:live": "tape test/live.js",
+    "test": "yarn test:unit && yarn test:nock && yarn test:live"
   },
   "repository": {
     "type": "git",

@@ -36,6 +36,7 @@ export const isValidCheckoutSessionPayload = (
   return validate(
     checkoutSessionPayloadSchema as Schema,
     JSON.parse(JSON.stringify(payload))
+    // payload
   );
 };
 
@@ -48,7 +49,7 @@ export const normalizeCheckoutSessionPayload = (
   // If not setting any currency in orderData
   // We take the currency in first line item
   if (!orderData.currency) {
-    orderData.currency = orderData.lineItemData[0].priceData.currency;
+    orderData.currency = orderData.lineItemData[0]?.priceData?.currency;
   }
 
   const { currency } = orderData;
@@ -67,3 +68,36 @@ export const normalizeCheckoutSessionPayload = (
 
   return payload;
 };
+
+export const DEFAULT_ERROR_MESSAGES: {
+  [key: string]: string;
+} = {
+  'request.invalid': 'Input parameter or payload is invalid',
+  'request.malformed': 'Input payload in malformed, could not be decoded',
+  unexpected_error: 'Unexpected error occured',
+};
+
+export const errorObj = (
+  errorCode: string,
+  message?: string,
+  details?: any
+) => ({
+  error: {
+    errorCode,
+    message:
+      message ||
+      DEFAULT_ERROR_MESSAGES[errorCode] ||
+      DEFAULT_ERROR_MESSAGES.unexpected_error,
+    details,
+  },
+});
+
+export const errorResult = (code: string, message?: string, details?: any) =>
+  Promise.resolve(errorObj(code, message, details));
+
+export const jtdErrorToDetail = (errors: any[], prefix?: string) =>
+  errors.map((error) =>
+    error.instancePath && error.schemaPath
+      ? `${prefix}.${error.instancePath.join('.')} is invalid`
+      : error
+  );

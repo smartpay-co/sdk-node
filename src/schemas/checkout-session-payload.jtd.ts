@@ -80,7 +80,13 @@ export default {
           optionalProperties: {
             addressType: { type: 'string' },
           },
+          additionalProperties: true,
         },
+      },
+      optionalProperties: {
+        captureMethod: { type: 'string' },
+        confirmationMethod: { type: 'string' },
+        coupons: { elements: { type: 'string' } },
       },
     },
     customer: {

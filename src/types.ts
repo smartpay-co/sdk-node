@@ -281,13 +281,18 @@ export type Refund = {
 };
 
 export interface Result<T> {
-  status: number;
+  statusCode?: number;
   error?: {
-    message: string;
-    code: string;
+    errorCode: string;
+    message?: string;
     detail?: any;
   };
   data?: T;
 }
+
+export type JTDError = {
+  instancePath: string[];
+  schemaPath: string[];
+};
 
 export {};

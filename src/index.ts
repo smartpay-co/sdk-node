@@ -20,6 +20,9 @@ import {
   isValidPaymentId,
   isValidCheckoutSessionPayload,
   normalizeCheckoutSessionPayload,
+  errorObj,
+  errorResult,
+  jtdErrorToDetail,
 } from './utils.js';
 
 const API_PREFIX = 'https://api.smartpay.co/smartpayments/';
@@ -73,43 +76,68 @@ class Smartpay {
       body: payload ? JSON.stringify(payload) : null,
     })
       .then((response) => {
-        if (!response.ok) {
-          return response.json().then((data) => ({
-            status: response.status,
+        return response
+          .json()
+          .then((data) => {
+            return response.ok
+              ? {
+                  statusCode: response.status,
+                  data,
+                }
+              : {
+                  statusCode: response.status,
+                  error: {
+                    errorCode: data.errorCode,
+                    message: data.message,
+                    details: data.details,
+                  },
+                };
+          })
+          .catch(() => ({
+            statusCode: response.status,
             error: {
-              message: response.statusText,
-              code: '',
+              errorCode: 'unexpected_error',
+              message: '',
             },
-            data,
           }));
-        }
-
-        return response.json().then((data) => ({
-          status: response.status,
-          data,
-        }));
       })
       .catch((error) => ({
-        status: -1,
+        statusCode: -1,
         error: {
+          errorCode: 'unexpected_error',
           message: error.message,
-          code: '',
         },
       }));
   }
 
-  createCheckoutSession(payload: ChekoutSessionPayloadFlat) {
+  static normalizeCheckoutSessionPayload(payload: ChekoutSessionPayloadFlat) {
     const normalizedPayload = normalizeCheckoutSessionPayload(payload);
     const errors = isValidCheckoutSessionPayload(
       normalizedPayload as ChekoutSessionPayload
     );
 
     if (errors.length) {
+      return {
+        error: errorObj(
+          'request.invalid',
+          'Payload invalid',
+          jtdErrorToDetail(errors, 'payload')
+        ),
+      };
+    }
+
+    return {
+      data: normalizedPayload,
+    };
+  }
+
+  createCheckoutSession(payload: ChekoutSessionPayloadFlat) {
+    const { data: normalizedPayload, error } =
+      Smartpay.normalizeCheckoutSessionPayload(payload);
+
+    if (error) {
       return Promise.resolve({
-        error: {
-          message: 'Payload Malformed',
-          code: 'payload_malformed',
-        },
+        error,
       });
     }
 
@@ -121,9 +149,14 @@ class Smartpay {
     );
 
     return req.then((result) => {
-      if (result.data) {
-        // eslint-disable-next-line no-param-reassign
-        result.data.checkoutURL = this.getSessionURL(result.data);
+      const session = result.data;
+
+      if (session) {
+        const sessionURLResult = this.getSessionURL(session);
+
+        if (sessionURLResult.data) {
+          session.checkoutURL = sessionURLResult.data;
+        }
       }
 
       return result;
@@ -144,7 +177,7 @@ class Smartpay {
 
   getOrder(orderId: string): Promise<Result<Order>> {
     if (!isValidOrderId(orderId)) {
-      throw new Error('Order ID is invalid.');
+      return errorResult('request.invalid', 'Order ID is invalid');
     }
 
     return this.request(`/orders/${orderId}`);
@@ -152,7 +185,7 @@ class Smartpay {
 
   getPayments(orderId: string): Promise<Result<Payment[]>> {
     if (!isValidOrderId(orderId)) {
-      throw new Error('Order ID is invalid.');
+      return errorResult('request.invalid', 'Order ID is invalid');
     }
 
     return this.request(`/orders/${orderId}/payments`);
@@ -160,7 +193,7 @@ class Smartpay {
 
   getPayment(paymentId: string): Promise<Result<Payment>> {
     if (!isValidPaymentId(paymentId)) {
-      throw new Error('Payment ID is invalid.');
+      return errorResult('request.invalid');
     }
 
     return this.request(`/payments/${paymentId}`);
@@ -170,15 +203,21 @@ class Smartpay {
     const { payment, currency } = payload;
 
     if (!payment) {
-      throw new Error('Payment ID(payment) is required.');
+      return errorResult('request.invalid', 'Payload invalid', [
+        'payload.payment is required',
+      ]);
     }
 
     if (!isValidPaymentId(payment)) {
-      throw new Error('Payment ID is invalid.');
+      return errorResult('request.invalid', 'Payload invalid', [
+        'payload.payment is invalid',
+      ]);
     }
 
     if (!currency) {
-      throw new Error('Currency is required.');
+      return errorResult('request.invalid', 'Payload invalid', [
+        'payload.currency is invalid',
+      ]);
     }
 
     return this.request(`/refunds/`, POST, payload);
@@ -186,23 +225,25 @@ class Smartpay {
 
   setPublicKey(publicKey: KeyString) {
     if (!publicKey) {
-      throw new Error('Public API Key is required.');
+      return errorObj('request.invalid');
     }
 
     if (!isValidPublicApiKey(publicKey)) {
-      throw new Error('Public API Key is invalid.');
+      return errorObj('request.invalid', 'Public Key is required');
     }
 
     this._publicKey = publicKey;
+
+    return {};
   }
 
-  getSessionURL(session: CheckoutSession): string {
+  getSessionURL(session: CheckoutSession): Result<string> {
     if (!session) {
-      throw new Error('Checkout Session is required.');
+      return errorObj('request.invalid', 'Session is invalid');
     }
 
     if (!this._publicKey) {
-      throw new Error('Public API Key is required.');
+      return errorObj('request.invalid', 'Public Key is required');
     }
 
     const params = {
@@ -210,10 +251,12 @@ class Smartpay {
       key: this._publicKey,
     };
 
-    return qs.stringifyUrl({
-      url: `${this._checkoutURL}/login`,
-      query: params,
-    });
+    return {
+      data: qs.stringifyUrl({
+        url: `${this._checkoutURL}/login`,
+        query: params,
+      }),
+    };
   }
 }
 

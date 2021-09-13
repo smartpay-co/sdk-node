@@ -27,20 +27,25 @@ test('Create Fake Checkout Session', async function testCreateCheckoutSession(t)
   const smartpay = new Smartpay(TEST_SECRET_KEY, {
     publicKey: TEST_PUBLIC_KEY,
     apiPrefix: API_PREFIX,
+    checkoutURL: CHECKOUT_URL,
   });
 
   const payload = {
     items: [
       {
         name: 'レブロン 18 LOW',
-        priceAmount: 19250,
+        amount: 19250,
         currency: 'JPY',
         quantity: 1,
       },
     ],
-
-    // Your internal reference of the order
-    reference: 'order_ref_1234567',
+    shipping: {
+      line1: 'line1',
+      locality: 'locality',
+      postalCode: '123',
+      country: 'JP',
+    },
+    reference: 'order_ref_1234567', // Your internal reference of the order
     successURL: 'https://smartpay.co',
     cancelURL: 'https://smartpay.co',
   };
@@ -48,19 +53,4 @@ test('Create Fake Checkout Session', async function testCreateCheckoutSession(t)
 
   t.equal(session.id, FAKE_SESSION.id);
   t.ok(scope.isDone());
-});
-
-test('Get Session URL', function testGetSessionURL(t) {
-  t.plan(3);
-
-  const smartpay = new Smartpay(TEST_SECRET_KEY, {
-    publicKey: TEST_PUBLIC_KEY,
-    checkoutURL: CHECKOUT_URL,
-  });
-
-  const sessionURL = smartpay.getSessionURL(FAKE_SESSION);
-
-  t.ok(sessionURL.indexOf(CHECKOUT_URL) === 0);
-  t.ok(sessionURL.indexOf(`key=${TEST_PUBLIC_KEY}`) > 0);
-  t.ok(sessionURL.indexOf(`session=${FAKE_SESSION.id}`) > 0);
 });

@@ -17,7 +17,7 @@
   "types": "./build/index.d.ts",
   "scripts": {
     "format": "prettier --write 'src/**/*.ts'",
-    "schema": "jtd-codegen src/schemas/checkout-session-payload.jtd.json --typescript-out src/schemas",
+    "schemas": "./scripts/schemas.sh",
     "build:esm": "tsc --build tsconfig.json",
     "build:cjs": "tsc --build tsconfig-cjs.json",
     "build": "yarn build:esm && yarn build:cjs",

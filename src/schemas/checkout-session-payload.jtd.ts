@@ -16,6 +16,7 @@ export default {
         subLocality: { type: 'string' },
         addressType: { type: 'string' },
       },
+      additionalProperties: true,
     },
     product: {
       properties: {
@@ -67,6 +68,7 @@ export default {
         reference: { type: 'string' },
         url: { type: 'string' },
       },
+      additionalProperties: true,
     },
     order: {
       properties: {
@@ -88,6 +90,7 @@ export default {
         confirmationMethod: { type: 'string' },
         coupons: { elements: { type: 'string' } },
       },
+      additionalProperties: true,
     },
     customer: {
       optionalProperties: {
@@ -123,6 +126,5 @@ export default {
 
     reference: { type: 'string' },
   },
-
   additionalProperties: true,
 };

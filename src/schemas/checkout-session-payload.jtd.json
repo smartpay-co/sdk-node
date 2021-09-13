@@ -15,7 +15,8 @@
         "administrativeArea": { "type": "string" },
         "subLocality": { "type": "string" },
         "addressType": { "type": "string" }
-      }
+      },
+      "additionalProperties": true
     },
     "product": {
       "properties": {
@@ -125,6 +126,5 @@
 
     "reference": { "type": "string" }
   },
-
   "additionalProperties": true
 }

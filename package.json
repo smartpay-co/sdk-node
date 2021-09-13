@@ -17,10 +17,11 @@
   "types": "./build/index.d.ts",
   "scripts": {
     "format": "prettier --write 'src/**/*.ts'",
+    "schema": "jtd-codegen src/schemas/checkout-session-payload.jtd.json --typescript-out src/schemas",
     "build:esm": "tsc --build tsconfig.json",
     "build:cjs": "tsc --build tsconfig-cjs.json",
     "build": "npm run build:esm && npm run build:cjs",
-    "test": "npm run build && tape test/*"
+    "test": "npm run build && tape test/nock.js && tape test/plain.js"
   },
   "repository": {
     "type": "git",

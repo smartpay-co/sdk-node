@@ -5,17 +5,24 @@ import type {
   KeyString,
   SmartPayOptions,
   ChekoutSessionPayload,
-  CheckoutSessionResult,
+  RefundPayload,
+  CheckoutSession,
   Order,
+  Payment,
+  Refund,
+  Result,
+  ChekoutSessionPayloadFlat,
 } from './types';
 import {
   isValidPublicApiKey,
   isValidSecretApiKey,
-  isValidCheckoutPayload,
-  normalizeCheckoutPayload,
+  isValidOrderId,
+  isValidPaymentId,
+  isValidCheckoutSessionPayload,
+  normalizeCheckoutSessionPayload,
 } from './utils.js';
 
-const API_PREFIX = 'https://api.smartpay.co/checkout';
+const API_PREFIX = 'https://api.smartpay.co/smartpayments/';
 const CHECKOUT_URL = 'https://checkout.smartpay.ninja';
 
 const POST = 'POST';
@@ -23,6 +30,9 @@ const POST = 'POST';
 // const DELETE = 'DELETE';
 
 export const STATUS_SUCCEEDED = 'succeeded';
+export const STATUS_REJECTED = 'rejected';
+export const STATUS_FAILED = 'failed';
+export const STATUS_REQUIRES_AUTHORIZATION = 'requires_authorization';
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
@@ -56,65 +66,123 @@ class Smartpay {
     return fetch(`${this._apiPrefix}${endpoint}`, {
       method,
       headers: {
-        Authorization: `Bearer ${this._secretKey}`,
+        Authorization: `Basic ${this._secretKey}`,
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
       body: payload ? JSON.stringify(payload) : null,
-    }).then((response) => {
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
+    })
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((data) => ({
+            status: response.status,
+            error: {
+              message: response.statusText,
+              code: '',
+            },
+            data,
+          }));
+        }
 
-      return response.json();
-    });
+        return response.json().then((data) => ({
+          status: response.status,
+          data,
+        }));
+      })
+      .catch((error) => ({
+        status: -1,
+        error: {
+          message: error.message,
+          code: '',
+        },
+      }));
   }
 
-  createCheckoutSession(
-    payload: ChekoutSessionPayload
-  ): Promise<CheckoutSessionResult> {
-    if (!isValidCheckoutPayload(payload)) {
-      throw new Error('Checkout Payload is invalid.');
+  createCheckoutSession(payload: ChekoutSessionPayloadFlat) {
+    const normalizedPayload = normalizeCheckoutSessionPayload(payload);
+    const errors = isValidCheckoutSessionPayload(
+      normalizedPayload as ChekoutSessionPayload
+    );
+
+    if (errors.length) {
+      return Promise.resolve({
+        error: {
+          message: 'Payload Malformed',
+          code: 'payload_malformed',
+        },
+      });
     }
 
     // Call API to create checkout session
-    return this.request(
-      '/sessions',
+    const req: Promise<Result<CheckoutSession>> = this.request(
+      '/checkout/sessions',
       POST,
-      normalizeCheckoutPayload(payload)
-    ).then((session) => {
-      // eslint-disable-next-line no-param-reassign
-      session.checkoutURL = this.getSessionURL(session);
+      normalizedPayload
+    );
 
-      return session;
+    return req.then((result) => {
+      if (result.data) {
+        // eslint-disable-next-line no-param-reassign
+        result.data.checkoutURL = this.getSessionURL(result.data);
+      }
+
+      return result;
     });
   }
 
-  isOrderAuthorized(orderId: string): Promise<boolean> {
-    return this.getOrder(orderId).then(
-      (order) => order.status === STATUS_SUCCEEDED
-    );
+  isOrderAuthorized(orderId: string): Promise<Result<boolean>> {
+    return this.getOrder(orderId).then((result) => {
+      const order = result.data;
+
+      if (order) {
+        return { ...result, data: order.status === STATUS_SUCCEEDED };
+      }
+
+      return { ...result, data: undefined };
+    });
   }
 
-  getOrders(): Promise<Order[]> {
-    return this.request('/orders');
-  }
+  getOrder(orderId: string): Promise<Result<Order>> {
+    if (!isValidOrderId(orderId)) {
+      throw new Error('Order ID is invalid.');
+    }
 
-  getOrder(orderId: string): Promise<Order> {
     return this.request(`/orders/${orderId}`);
   }
 
-  // captureOrder(orderId: string, amount: number) {
-  //   return this.request(`/orders/${orderId}/capture`, POST, { amount });
-  // }
+  getPayments(orderId: string): Promise<Result<Payment[]>> {
+    if (!isValidOrderId(orderId)) {
+      throw new Error('Order ID is invalid.');
+    }
 
-  refundOrder(orderId: string, amount: number) {
-    return this.request(`/orders/${orderId}/refund`, POST, { amount });
+    return this.request(`/orders/${orderId}/payments`);
   }
 
-  // cancelOrder(orderId: string) {
-  //   return this.request(`/orders/${orderId}/cancel`, POST);
-  // }
+  getPayment(paymentId: string): Promise<Result<Payment>> {
+    if (!isValidPaymentId(paymentId)) {
+      throw new Error('Payment ID is invalid.');
+    }
+
+    return this.request(`/payments/${paymentId}`);
+  }
+
+  refundPayment(payload: RefundPayload): Promise<Result<Refund>> {
+    const { payment, currency } = payload;
+
+    if (!payment) {
+      throw new Error('Payment ID(payment) is required.');
+    }
+
+    if (!isValidPaymentId(payment)) {
+      throw new Error('Payment ID is invalid.');
+    }
+
+    if (!currency) {
+      throw new Error('Currency is required.');
+    }
+
+    return this.request(`/refunds/`, POST, payload);
+  }
 
   setPublicKey(publicKey: KeyString) {
     if (!publicKey) {
@@ -128,7 +196,7 @@ class Smartpay {
     this._publicKey = publicKey;
   }
 
-  getSessionURL(session: CheckoutSessionResult): string {
+  getSessionURL(session: CheckoutSession): string {
     if (!session) {
       throw new Error('Checkout Session is required.');
     }

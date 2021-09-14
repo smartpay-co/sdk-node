@@ -127,7 +127,7 @@ export const normalizeLineItemData = ({
 });
 
 export const normalizeLineItemDataList = (list: LineItemDataFlat[] = []) =>
-  list.map((item) => normalizeLineItemData(item));
+  Array.isArray(list) ? list.map((item) => normalizeLineItemData(item)) : [];
 
 export const normalizeOrderData = ({
   amount,

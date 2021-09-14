@@ -29,7 +29,7 @@ test('Get Session URL', function testGetSessionURL(t) {
 test('Test Validate Checkout Session Payload', function testGetSessionURL(t) {
   t.plan(2);
 
-  const payload = {
+  const payload1 = {
     shipping: {
       line1: 'line1',
       locality: 'locality',
@@ -43,8 +43,29 @@ test('Test Validate Checkout Session Payload', function testGetSessionURL(t) {
     cancelURL: 'https://smartpay.co',
   };
 
-  const { error: error1 } = Smartpay.normalizeCheckoutSessionPayload(payload);
+  const { error: error1 } = Smartpay.normalizeCheckoutSessionPayload(payload1);
 
-  t.ok(error1.error?.details.length > 0);
-  t.equal(error1.error?.details[0], 'payload.orderData is invalid');
+  t.ok(error1.details?.includes('payload.orderData is invalid'));
+
+  const payload2 = {
+    shipping: {
+      line1: 'line1',
+      locality: 'locality',
+      postalCode: '123',
+      country: 'JP',
+    },
+
+    items: [],
+
+    // Your internal reference of the order
+    reference: 'order_ref_1234567',
+    successURL: 'https://smartpay.co',
+    cancelURL: 'https://smartpay.co',
+  };
+
+  const { error: error2 } = Smartpay.normalizeCheckoutSessionPayload(payload2);
+
+  t.ok(
+    error2.details?.includes('payload.orderData.lineItemnData is required.')
+  );
 });

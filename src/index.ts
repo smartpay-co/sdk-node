@@ -22,7 +22,7 @@ import {
   normalizeCheckoutSessionPayload,
   errorObj,
   errorResult,
-  jtdErrorToDetail,
+  jtdErrorToDetails,
 } from './utils.js';
 
 const API_PREFIX = 'https://api.smartpay.co/smartpayments/';
@@ -110,20 +110,20 @@ class Smartpay {
       }));
   }
 
-  static normalizeCheckoutSessionPayload(payload: ChekoutSessionPayloadFlat) {
+  static normalizeCheckoutSessionPayload(
+    payload: ChekoutSessionPayloadFlat
+  ): Result<ChekoutSessionPayload> {
     const normalizedPayload = normalizeCheckoutSessionPayload(payload);
     const errors = isValidCheckoutSessionPayload(
       normalizedPayload as ChekoutSessionPayload
     );
 
     if (errors.length) {
-      return {
-        error: errorObj(
-          'request.invalid',
-          'Payload invalid',
-          jtdErrorToDetail(errors, 'payload')
-        ),
-      };
+      return errorObj(
+        'request.invalid',
+        'Payload invalid',
+        jtdErrorToDetails(errors, 'payload')
+      );
     }
 
     return {

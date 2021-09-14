@@ -68,8 +68,8 @@ export type ProductData = {
 
 export type PriceData = {
   productData: ProductData;
-  amount: number;
-  currency: string;
+  amount?: number; // required, leave the validation to server side
+  currency?: string; // required, leave the validation to server side
   label?: string;
   description?: string;
   metadata?: MetaData;
@@ -119,8 +119,8 @@ export type ShippingInfo = {
 };
 
 export type OrderData = {
-  amount: number;
-  currency: string;
+  amount?: number;
+  currency?: string;
   captureMethod?: 'automatic' | 'manual';
   confirmationMethod?: 'automatic' | 'manual';
   coupons?: string[];
@@ -280,19 +280,23 @@ export type Refund = {
   metadata?: MetaData;
 };
 
+export type JTDError = {
+  instancePath: string[];
+  schemaPath: string[];
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ErrorDetail = any;
+export type ErrorDetails = ErrorDetail[];
+
 export interface Result<T> {
   statusCode?: number;
   error?: {
     errorCode: string;
     message?: string;
-    detail?: any;
+    details?: ErrorDetails;
   };
   data?: T;
 }
-
-export type JTDError = {
-  instancePath: string[];
-  schemaPath: string[];
-};
 
 export {};

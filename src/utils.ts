@@ -6,6 +6,7 @@ import type {
   KeyString,
   ChekoutSessionPayload,
   ChekoutSessionPayloadFlat,
+  ErrorDetails,
 } from './types';
 
 const publicKeyRegExp = /^pk_(test|live)_[0-9a-zA-Z]+$/;
@@ -33,11 +34,17 @@ export const isValidPaymentId = (paymentId: string) => {
 export const isValidCheckoutSessionPayload = (
   payload: ChekoutSessionPayload
 ) => {
-  return validate(
+  const errors = validate(
     checkoutSessionPayloadSchema as Schema,
     JSON.parse(JSON.stringify(payload))
     // payload
-  );
+  ) as ErrorDetails;
+
+  if (payload.orderData.lineItemData.length === 0) {
+    errors.push('payload.orderData.lineItemnData is required.');
+  }
+
+  return errors;
 };
 
 export const normalizeCheckoutSessionPayload = (
@@ -80,7 +87,7 @@ export const DEFAULT_ERROR_MESSAGES: {
 export const errorObj = (
   errorCode: string,
   message?: string,
-  details?: any
+  details?: ErrorDetails
 ) => ({
   error: {
     errorCode,
@@ -92,10 +99,13 @@ export const errorObj = (
   },
 });
 
-export const errorResult = (code: string, message?: string, details?: any) =>
-  Promise.resolve(errorObj(code, message, details));
+export const errorResult = (
+  code: string,
+  message?: string,
+  details?: ErrorDetails
+) => Promise.resolve(errorObj(code, message, details));
 
-export const jtdErrorToDetail = (errors: any[], prefix?: string) =>
+export const jtdErrorToDetails = (errors: ErrorDetails, prefix?: string) =>
   errors.map((error) =>
     error.instancePath && error.schemaPath
       ? `${prefix}.${error.instancePath.join('.')} is invalid`

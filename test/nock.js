@@ -49,7 +49,7 @@ test('Create Fake Checkout Session', async function testCreateCheckoutSession(t)
     successURL: 'https://smartpay.co',
     cancelURL: 'https://smartpay.co',
   };
-  const { data: session } = await smartpay.createCheckoutSession(payload);
+  const session = await smartpay.createCheckoutSession(payload);
 
   t.equal(session.id, FAKE_SESSION.id);
   t.ok(scope.isDone());

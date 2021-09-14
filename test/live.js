@@ -42,7 +42,7 @@ test('Create Live Checkout Session', async function testCreateCheckoutSession(t)
     cancelURL: 'https://smartpay.co',
   };
 
-  const { data: session } = await smartpay.createCheckoutSession(payload);
+  const session = await smartpay.createCheckoutSession(payload);
 
   t.ok(session.id.length > 0);
 });

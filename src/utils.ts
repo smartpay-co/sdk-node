@@ -16,6 +16,31 @@ const checkoutSessionIDRegExp = /^checkout_(test|live)_[0-9a-zA-Z]+$/;
 const orderIDRegExp = /^order_(test|live)_[0-9a-zA-Z]+$/;
 const paymentIDRegExp = /^payment_(test|live)_[0-9a-zA-Z]+$/;
 
+export class SmartError extends Error {
+  statusCode?: number;
+  errorCode: string;
+  details?: ErrorDetails;
+
+  constructor({
+    message,
+    statusCode,
+    errorCode,
+    details,
+  }: {
+    message?: string;
+    statusCode?: number;
+    errorCode: string;
+    details?: ErrorDetails;
+  }) {
+    super(message);
+    this.message = message || errorCode;
+    this.name = 'SmartError';
+    this.statusCode = statusCode;
+    this.errorCode = errorCode;
+    this.details = details;
+  }
+}
+
 export const isValidPublicApiKey = (apiKey: KeyString) => {
   return publicKeyRegExp.test(apiKey);
 };
@@ -74,7 +99,10 @@ export const normalizeCheckoutSessionPayload = (
         return sum + (priceData.amount || 0);
       }
 
-      throw new Error('Amount of the order is required.');
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        details: ['payload.orderData.lineItemData[].currency is invalid'],
+      });
     }, 0);
   }
 
@@ -88,27 +116,6 @@ export const DEFAULT_ERROR_MESSAGES: {
   'request.malformed': 'Input payload in malformed, could not be decoded',
   unexpected_error: 'Unexpected error occured',
 };
-
-export const errorObj = (
-  errorCode: string,
-  message?: string,
-  details?: ErrorDetails
-) => ({
-  error: {
-    errorCode,
-    message:
-      message ||
-      DEFAULT_ERROR_MESSAGES[errorCode] ||
-      DEFAULT_ERROR_MESSAGES.unexpected_error,
-    details,
-  },
-});
-
-export const errorResult = (
-  code: string,
-  message?: string,
-  details?: ErrorDetails
-) => Promise.resolve(errorObj(code, message, details));
 
 export const jtdErrorToDetails = (errors: ErrorDetails, prefix?: string) =>
   errors.map((error) =>

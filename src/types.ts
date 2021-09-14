@@ -289,14 +289,4 @@ export type JTDError = {
 export type ErrorDetail = any;
 export type ErrorDetails = ErrorDetail[];
 
-export interface Result<T> {
-  statusCode?: number;
-  error?: {
-    errorCode: string;
-    message?: string;
-    details?: ErrorDetails;
-  };
-  data?: T;
-}
-
 export {};

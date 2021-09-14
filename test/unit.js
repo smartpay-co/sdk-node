@@ -19,7 +19,7 @@ test('Get Session URL', function testGetSessionURL(t) {
     checkoutURL: CHECKOUT_URL,
   });
 
-  const { data: sessionURL } = smartpay.getSessionURL(FAKE_SESSION);
+  const sessionURL = smartpay.getSessionURL(FAKE_SESSION);
 
   t.ok(sessionURL.indexOf(CHECKOUT_URL) === 0);
   t.ok(sessionURL.indexOf(`key=${TEST_PUBLIC_KEY}`) > 0);
@@ -43,9 +43,11 @@ test('Test Validate Checkout Session Payload', function testGetSessionURL(t) {
     cancelURL: 'https://smartpay.co',
   };
 
-  const { error: error1 } = Smartpay.normalizeCheckoutSessionPayload(payload1);
-
-  t.ok(error1.details?.includes('payload.orderData is invalid'));
+  try {
+    Smartpay.normalizeCheckoutSessionPayload(payload1);
+  } catch (error1) {
+    t.ok(error1.details?.includes('payload.orderData is invalid'));
+  }
 
   const payload2 = {
     shipping: {
@@ -63,9 +65,11 @@ test('Test Validate Checkout Session Payload', function testGetSessionURL(t) {
     cancelURL: 'https://smartpay.co',
   };
 
-  const { error: error2 } = Smartpay.normalizeCheckoutSessionPayload(payload2);
-
-  t.ok(
-    error2.details?.includes('payload.orderData.lineItemnData is required.')
-  );
+  try {
+    Smartpay.normalizeCheckoutSessionPayload(payload2);
+  } catch (error2) {
+    t.ok(
+      error2.details?.includes('payload.orderData.lineItemnData is required.')
+    );
+  }
 });

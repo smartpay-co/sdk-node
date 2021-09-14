@@ -1,7 +1,7 @@
 import { validate, Schema } from 'jtd';
 
-import { normalizeCheckoutSessionPayload as fromLooseCheckoutSessionPayload } from './payload.js';
-import checkoutSessionPayloadSchema from './schemas/checkout-session-payload.jtd.js';
+import { normalizeCheckoutSessionPayload as fromLooseCheckoutSessionPayload } from './payload';
+import checkoutSessionPayloadSchema from './schemas/checkout-session-payload.jtd';
 import type {
   KeyString,
   ChekoutSessionPayload,
@@ -12,8 +12,9 @@ import type {
 const publicKeyRegExp = /^pk_(test|live)_[0-9a-zA-Z]+$/;
 const secretKeyRegExp = /^sk_(test|live)_[0-9a-zA-Z]+$/;
 
-const orderIdRegExp = /^order_(test|live)_[0-9a-zA-Z]+$/;
-const paymentIdRegExp = /^payment_(test|live)_[0-9a-zA-Z]+$/;
+const checkoutSessionIDRegExp = /^checkout_(test|live)_[0-9a-zA-Z]+$/;
+const orderIDRegExp = /^order_(test|live)_[0-9a-zA-Z]+$/;
+const paymentIDRegExp = /^payment_(test|live)_[0-9a-zA-Z]+$/;
 
 export const isValidPublicApiKey = (apiKey: KeyString) => {
   return publicKeyRegExp.test(apiKey);
@@ -23,12 +24,16 @@ export const isValidSecretApiKey = (apiKey: KeyString) => {
   return secretKeyRegExp.test(apiKey);
 };
 
-export const isValidOrderId = (orderId: string) => {
-  return orderIdRegExp.test(orderId);
+export const isValidCheckoutSessionID = (checkoutSessionID: string) => {
+  return checkoutSessionIDRegExp.test(checkoutSessionID);
 };
 
-export const isValidPaymentId = (paymentId: string) => {
-  return paymentIdRegExp.test(paymentId);
+export const isValidOrderID = (orderID: string) => {
+  return orderIDRegExp.test(orderID);
+};
+
+export const isValidPaymentID = (paymentID: string) => {
+  return paymentIDRegExp.test(paymentID);
 };
 
 export const isValidCheckoutSessionPayload = (
@@ -61,7 +66,7 @@ export const normalizeCheckoutSessionPayload = (
 
   const { currency } = orderData;
 
-  if (!orderData.amount) {
+  if (orderData.amount == null) {
     orderData.amount = orderData.lineItemData.reduce((sum, item) => {
       const { priceData } = item;
 

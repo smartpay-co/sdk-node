@@ -16,14 +16,14 @@ import type {
 import {
   isValidPublicApiKey,
   isValidSecretApiKey,
-  isValidOrderId,
-  isValidPaymentId,
+  isValidOrderID,
+  isValidPaymentID,
   isValidCheckoutSessionPayload,
   normalizeCheckoutSessionPayload,
   errorObj,
   errorResult,
   jtdErrorToDetails,
-} from './utils.js';
+} from './utils';
 
 const API_PREFIX = 'https://api.smartpay.co/smartpayments/';
 const CHECKOUT_URL = 'https://checkout.smartpay.ninja';
@@ -176,7 +176,7 @@ class Smartpay {
   }
 
   getOrder(orderId: string): Promise<Result<Order>> {
-    if (!isValidOrderId(orderId)) {
+    if (!isValidOrderID(orderId)) {
       return errorResult('request.invalid', 'Order ID is invalid');
     }
 
@@ -184,7 +184,7 @@ class Smartpay {
   }
 
   getPayments(orderId: string): Promise<Result<Payment[]>> {
-    if (!isValidOrderId(orderId)) {
+    if (!isValidOrderID(orderId)) {
       return errorResult('request.invalid', 'Order ID is invalid');
     }
 
@@ -192,7 +192,7 @@ class Smartpay {
   }
 
   getPayment(paymentId: string): Promise<Result<Payment>> {
-    if (!isValidPaymentId(paymentId)) {
+    if (!isValidPaymentID(paymentId)) {
       return errorResult('request.invalid');
     }
 
@@ -208,7 +208,7 @@ class Smartpay {
       ]);
     }
 
-    if (!isValidPaymentId(payment)) {
+    if (!isValidPaymentID(payment)) {
       return errorResult('request.invalid', 'Payload invalid', [
         'payload.payment is invalid',
       ]);

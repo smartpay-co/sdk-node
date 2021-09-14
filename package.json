@@ -1,25 +1,27 @@
 {
-  "name": "smartpay-sdk-nodejs",
+  "name": "@smartpay/sdk-node",
   "type": "module",
   "engines": {
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
   },
   "version": "0.0.1",
   "description": "Smartpay SDK NodeJS",
-  "main": "build-cjs/index.js",
+  "main": "./build/cjs/index.cjs",
+  "module": "./build/esm/index.js",
   "exports": {
     ".": [
       {
-        "default": "./build/index.js"
+        "import": "./build/esm/index.js",
+        "require": "./build/cjs/index.cjs"
       }
     ]
   },
-  "types": "./build/index.d.ts",
+  "types": "./build/esm/index.d.ts",
   "scripts": {
     "format": "prettier --write 'src/**/*.ts'",
     "schemas": "./scripts/schemas.sh",
-    "build:esm": "tsc --build tsconfig.json",
-    "build:cjs": "tsc --build tsconfig-cjs.json",
+    "build:esm": "node --experimental-json-modules build.js",
+    "build:cjs": "node build.cjs",
     "build": "yarn build:esm && yarn build:cjs",
     "pretest": "yarn build",
     "test:unit": "tape test/unit.js",
@@ -37,7 +39,7 @@
     "sdk",
     "node"
   ],
-  "author": "Smartpay",
+  "author": "Smartpay Solutions PTE. LTD.",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/smartpay-co/checkout-sdk/issues"
@@ -46,6 +48,8 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.4.1",
     "@typescript-eslint/parser": "^4.28.2",
+    "esbuild": "^0.12.28",
+    "esbuild-plugin-d.ts": "^1.0.6",
     "eslint": "^7.2.0",
     "eslint-config-airbnb": "18.2.1",
     "eslint-config-airbnb-typescript": "^12.3.1",

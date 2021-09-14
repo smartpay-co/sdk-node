@@ -1,7 +1,7 @@
 import nock from 'nock';
 import test from 'tape';
 
-import Smartpay from '../build/index.js';
+import Smartpay from '../build/esm/index.js';
 
 const API_PREFIX = 'https://api.smartpay.re/smartpayments';
 const CHECKOUT_URL = 'https://checkout.smartpay.co';

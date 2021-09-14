@@ -1,6 +1,6 @@
 import test from 'tape';
 
-import Smartpay from '../build/index.js';
+import Smartpay from '../build/esm/index.js';
 
 const CHECKOUT_URL = 'https://checkout.smartpay.co';
 

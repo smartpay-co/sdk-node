@@ -1,4 +1,6 @@
 src/*
+test/*
+scripts/*
 node_modules
 .eslintrc
 .prettierrc
@@ -7,3 +9,4 @@ build.cjs
 tsconfig.json
 tsconfig-cjs.json
 tsconfig-eslint.json
+yarn-error.log

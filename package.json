@@ -73,5 +73,8 @@
     "isomorphic-unfetch": "^3.1.0",
     "jtd": "^0.1.1",
     "query-string": "^7.0.1"
+  },
+  "directories": {
+    "test": "test"
   }
 }

@@ -18,8 +18,6 @@ test('Create Live Checkout Session', async function testCreateCheckoutSession(t)
   });
 
   const payload = {
-    currency: 'JPY',
-    amount: 19250,
     items: [
       {
         name: 'レブロン 18 LOW',

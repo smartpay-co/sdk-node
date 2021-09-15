@@ -120,6 +120,8 @@ export const DEFAULT_ERROR_MESSAGES: {
 export const jtdErrorToDetails = (errors: ErrorDetails, prefix?: string) =>
   errors.map((error) =>
     error.instancePath && error.schemaPath
-      ? `${prefix}.${error.instancePath.join('.')} is invalid`
+      ? `${prefix}.${error.instancePath.join('.')} is invalid (${
+          error.schemaPath
+        })`
       : error
   );

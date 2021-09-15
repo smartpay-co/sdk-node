@@ -24,7 +24,7 @@ import {
 } from './utils';
 
 const API_PREFIX = 'https://api.smartpay.co/smartpayments/';
-const CHECKOUT_URL = 'https://checkout.smartpay.ninja';
+const CHECKOUT_URL = 'https://checkout.smartpay.co';
 
 const POST = 'POST';
 // const PUT = 'PUT';
@@ -74,6 +74,14 @@ class Smartpay {
         },
         body: payload ? JSON.stringify(payload) : null,
       })
+        // Netowork issue
+        .catch((error) => {
+          throw new SmartError({
+            errorCode: 'unexpected_error',
+            statusCode: -1,
+            message: error.message,
+          });
+        })
         .then((response) => {
           return (
             response
@@ -98,14 +106,6 @@ class Smartpay {
                 });
               })
           );
-        })
-        // Netowork issue
-        .catch((error) => {
-          throw new SmartError({
-            errorCode: 'unexpected_error',
-            statusCode: -1,
-            message: error.message,
-          });
         })
     );
   }

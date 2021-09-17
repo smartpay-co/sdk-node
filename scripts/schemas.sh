@@ -3,6 +3,7 @@
 FILES=src/schemas/*.json
 
 for f in $FILES; do
-  printf '%s %s\n' "export default " "$(cat $f)" > src/schemas/$(basename -s .json $f).ts
-  npx prettier --write src/schemas/$(basename -s .json $f).ts
+  OUT=src/schemas/$(basename -s .json $f).ts
+  printf '%s %s\n' "export default " "$(cat $f)" > $OUT
+  npx prettier --write $OUT
 done

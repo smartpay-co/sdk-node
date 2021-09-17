@@ -100,7 +100,7 @@ export const normalizeLineItemData = ({
   priceDescription,
   priceMetadata,
 }: LineItemDataFlat) => ({
-  price,
+  price: typeof price === 'string' ? price : undefined,
   priceData: normalizePriceData(
     priceData || {
       productData: {
@@ -114,7 +114,9 @@ export const normalizeLineItemData = ({
         description: productDescription,
         metadata: productMetadata,
       },
-      amount,
+      amount:
+        // eslint-disable-next-line no-nested-ternary
+        amount != null ? amount : typeof price === 'number' ? price : undefined,
       currency,
       label,
       description: priceDescription,

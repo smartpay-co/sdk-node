@@ -21,7 +21,7 @@ test('Create Live Checkout Session', async function testCreateCheckoutSession(t)
     items: [
       {
         name: 'レブロン 18 LOW',
-        amount: 19250,
+        price: 19250,
         currency: 'JPY',
         quantity: 1,
       },

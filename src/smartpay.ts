@@ -17,13 +17,13 @@ import {
   isValidSecretApiKey,
   isValidOrderID,
   isValidPaymentID,
-  isValidCheckoutSessionPayload,
+  validateCheckoutSessionPayload,
   normalizeCheckoutSessionPayload,
   jtdErrorToDetails,
   SmartError,
 } from './utils';
 
-const API_PREFIX = 'https://api.smartpay.co/smartpayments/';
+const API_PREFIX = 'https://api.smartpay.co/smartpayments';
 const CHECKOUT_URL = 'https://checkout.smartpay.co';
 
 const POST = 'POST';
@@ -114,7 +114,7 @@ class Smartpay {
     payload: ChekoutSessionPayloadFlat
   ): ChekoutSessionPayload {
     const normalizedPayload = normalizeCheckoutSessionPayload(payload);
-    const errors = isValidCheckoutSessionPayload(
+    const errors = validateCheckoutSessionPayload(
       normalizedPayload as ChekoutSessionPayload
     );
 

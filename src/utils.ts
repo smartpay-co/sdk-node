@@ -61,7 +61,7 @@ export const isValidPaymentID = (paymentID: string) => {
   return paymentIDRegExp.test(paymentID);
 };
 
-export const isValidCheckoutSessionPayload = (
+export const validateCheckoutSessionPayload = (
   payload: ChekoutSessionPayload
 ) => {
   const errors = validate(

@@ -5,18 +5,12 @@ import type {
   KeyString,
   SmartPayOptions,
   ChekoutSessionPayload,
-  RefundPayload,
   CheckoutSession,
-  Order,
-  Payment,
-  Refund,
   ChekoutSessionPayloadFlat,
 } from './types';
 import {
   isValidPublicApiKey,
   isValidSecretApiKey,
-  isValidOrderID,
-  isValidPaymentID,
   validateCheckoutSessionPayload,
   normalizeCheckoutSessionPayload,
   jtdErrorToDetails,
@@ -151,75 +145,6 @@ class Smartpay {
 
       return session;
     });
-  }
-
-  isOrderAuthorized(orderId: string): Promise<boolean> {
-    return this.getOrder(orderId).then(
-      (order) => order.status === STATUS_SUCCEEDED
-    );
-  }
-
-  getOrder(orderId: string): Promise<Order> {
-    if (!isValidOrderID(orderId)) {
-      throw new SmartError({
-        errorCode: 'request.invalid',
-        message: 'Order ID is invalid',
-      });
-    }
-
-    return this.request(`/orders/${orderId}`);
-  }
-
-  getPayments(orderId: string): Promise<Payment[]> {
-    if (!isValidOrderID(orderId)) {
-      throw new SmartError({
-        errorCode: 'request.invalid',
-        message: 'Order ID is invalid',
-      });
-    }
-
-    return this.request(`/orders/${orderId}/payments`);
-  }
-
-  getPayment(paymentId: string): Promise<Payment> {
-    if (!isValidPaymentID(paymentId)) {
-      throw new SmartError({
-        errorCode: 'request.invalid',
-        message: 'Payment ID is invalid',
-      });
-    }
-
-    return this.request(`/payments/${paymentId}`);
-  }
-
-  refundPayment(payload: RefundPayload): Promise<Refund> {
-    const { payment, currency } = payload;
-
-    if (!payment) {
-      throw new SmartError({
-        errorCode: 'request.invalid',
-        message: 'Payload invalid',
-        details: ['payload.payment is required'],
-      });
-    }
-
-    if (!isValidPaymentID(payment)) {
-      throw new SmartError({
-        errorCode: 'request.invalid',
-        message: 'Payload invalid',
-        details: ['payload.payment is invalid'],
-      });
-    }
-
-    if (!currency) {
-      throw new SmartError({
-        errorCode: 'request.invalid',
-        message: 'Payload invalid',
-        details: ['payload.currency is invalid'],
-      });
-    }
-
-    return this.request(`/refunds/`, POST, payload);
   }
 
   setPublicKey(publicKey: KeyString) {

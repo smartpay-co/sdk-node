@@ -125,6 +125,8 @@ export default {
     shipping: { ref: 'address' },
 
     reference: { type: 'string' },
+
+    test: { type: 'boolean' },
   },
   additionalProperties: true,
 };

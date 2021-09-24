@@ -3,7 +3,7 @@ import test from 'tape';
 
 import Smartpay from '../build/esm/index.js';
 
-const API_PREFIX = 'https://api.smartpay.re/smartpayments';
+const API_PREFIX = 'https://api.smartpay.co/smartpayments';
 const CHECKOUT_URL = 'https://checkout.smartpay.co';
 
 const TEST_SECRET_KEY = 'sk_test_a7SlBkzf44tzdQoTwm6FrW';
@@ -34,7 +34,7 @@ test('Create Fake Checkout Session', async function testCreateCheckoutSession(t)
     items: [
       {
         name: 'レブロン 18 LOW',
-        price: 19250,
+        price: 250,
         currency: 'JPY',
         quantity: 1,
       },

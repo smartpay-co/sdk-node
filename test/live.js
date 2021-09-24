@@ -2,8 +2,10 @@ import test from 'tape';
 
 import Smartpay from '../build/esm/index.js';
 
-const API_PREFIX = 'https://api.smartpay.co/smartpayments';
-const CHECKOUT_URL = 'https://checkout.smartpay.co';
+const DOMAIN_NAME = process.env.DOMAIN_NAME || 'api.smartpay.co';
+
+const API_PREFIX = `https://${DOMAIN_NAME}/smartpayments`;
+const CHECKOUT_URL = 'https://checkout.smartpay.re';
 
 const TEST_SECRET_KEY = 'sk_test_a7SlBkzf44tzdQoTwm6FrW';
 const TEST_PUBLIC_KEY = 'pk_test_1m2ySnST0aYi6QM0GlKP0n';
@@ -38,9 +40,13 @@ test('Create Live Checkout Session', async function testCreateCheckoutSession(t)
     reference: 'order_ref_1234567',
     successURL: 'https://smartpay.co',
     cancelURL: 'https://smartpay.co',
+
+    test: true,
   };
 
   const session = await smartpay.createCheckoutSession(payload);
+
+  console.log(session); // eslint-disable-line no-console
 
   t.ok(session.id.length > 0);
 });

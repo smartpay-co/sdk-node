@@ -198,6 +198,7 @@ export const normalizeCheckoutSessionPayload = ({
   metadata,
   orderDescription,
   orderMetadata,
+  test,
 }: ChekoutSessionPayloadFlat) => ({
   customerInfo: normalizeCustomerInfo(customerInfo || customer),
   orderData: normalizeOrderData(
@@ -218,6 +219,7 @@ export const normalizeCheckoutSessionPayload = ({
   metadata,
   successUrl: successURL, // Temp prop
   cancelUrl: cancelURL, // Temp prop
+  test,
 });
 
 export default {

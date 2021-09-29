@@ -2,11 +2,6 @@ import test from 'tape';
 
 import Smartpay from '../build/esm/index.js';
 
-const DOMAIN_NAME = process.env.DOMAIN_NAME || 'api.smartpay.co';
-
-const API_PREFIX = `https://${DOMAIN_NAME}/smartpayments`;
-const CHECKOUT_URL = 'https://checkout.smartpay.re';
-
 const TEST_SECRET_KEY = 'sk_test_a7SlBkzf44tzdQoTwm6FrW';
 const TEST_PUBLIC_KEY = 'pk_test_1m2ySnST0aYi6QM0GlKP0n';
 
@@ -15,8 +10,6 @@ test('Create Live Checkout Session', async function testCreateCheckoutSession(t)
 
   const smartpay = new Smartpay(TEST_SECRET_KEY, {
     publicKey: TEST_PUBLIC_KEY,
-    apiPrefix: API_PREFIX,
-    checkoutURL: CHECKOUT_URL,
   });
 
   const payload = {

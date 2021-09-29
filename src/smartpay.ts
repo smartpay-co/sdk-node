@@ -29,6 +29,9 @@ export const STATUS_REJECTED = 'rejected';
 export const STATUS_FAILED = 'failed';
 export const STATUS_REQUIRES_AUTHORIZATION = 'requires_authorization';
 
+// eslint-disable-next-line prefer-destructuring
+const SMARTPAY_API_PREFIX = process.env.SMARTPAY_API_PREFIX;
+
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 class Smartpay {
@@ -52,7 +55,7 @@ class Smartpay {
 
     this._secretKey = key;
     this._publicKey = options.publicKey;
-    this._apiPrefix = options.apiPrefix || API_PREFIX;
+    this._apiPrefix = options.apiPrefix || SMARTPAY_API_PREFIX || API_PREFIX;
     this._checkoutURL = options.checkoutURL || CHECKOUT_URL;
   }
 

@@ -59,7 +59,7 @@ If you would like to know how Smartpay payment works, please see the [payment fl
     test: true,
   };
 
-  const session = smartpay.createCheckoutSession(payload);
+  const session = await smartpay.createCheckoutSession(payload);
 })();
 ```
 

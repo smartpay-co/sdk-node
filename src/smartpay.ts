@@ -186,8 +186,8 @@ class Smartpay {
     }
 
     const params = {
-      session_id: session.id,
-      key: this._publicKey,
+      'session-id': session.id,
+      'public-key': this._publicKey,
     };
 
     return qs.stringifyUrl({

@@ -16,7 +16,7 @@ yarn add @smartpay/sdk-node
 
 ## Usage
 
-The package needs to be configured with your own API keys, you can find them on your [dashboard](https://merchant.smartpay.co/settings/credentials).
+The package needs to be configured with your own API keys, you can find them on your [dashboard](https://dashboard.smartpay.co/settings/credentials).
 
 ```javascript
 const Smartpay = require('@smartpay/sdk-node').default;

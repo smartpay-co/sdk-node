@@ -16,6 +16,7 @@ export const normalizeCustomerInfo = (
   customer: CustomerInfoLoose = {}
 ): CustomerInfo => {
   const {
+    accountAge,
     emailAddress,
     email,
     firstName,
@@ -32,6 +33,7 @@ export const normalizeCustomerInfo = (
   } = customer;
 
   return {
+    accountAge,
     emailAddress: emailAddress || email,
     firstName,
     lastName,

@@ -26,6 +26,7 @@ export type Address = {
 };
 
 export type CustomerInfo = {
+  accountAge?: number;
   emailAddress?: string;
   firstName?: string;
   lastName?: string;
@@ -39,6 +40,7 @@ export type CustomerInfo = {
 };
 
 export type CustomerInfoLoose = {
+  accountAge?: number;
   emailAddress?: string;
   email?: string;
   firstName?: string;
@@ -179,6 +181,8 @@ export type ChekoutSessionPayloadFlat = {
   metadata?: MetaData;
   orderDescription?: string;
   orderMetadata?: MetaData;
+
+  test?: boolean;
 };
 
 export type RefundPayload = {

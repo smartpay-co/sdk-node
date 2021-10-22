@@ -42,15 +42,15 @@ class Smartpay {
 
   constructor(key: KeyString, options: SmartPayOptions = {}) {
     if (!key) {
-      throw new Error('Private API Key is required.');
+      throw new Error('Secret Key is required.');
     }
 
     if (!isValidSecretApiKey(key)) {
-      throw new Error('Private API Key is invalid.');
+      throw new Error('Secret Key is invalid.');
     }
 
     if (options.publicKey && !isValidPublicApiKey(options.publicKey)) {
-      throw new Error('Public API Key is invalid.');
+      throw new Error('Public Key is invalid.');
     }
 
     this._secretKey = key;

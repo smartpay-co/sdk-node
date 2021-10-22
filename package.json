@@ -4,7 +4,7 @@
   "engines": {
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Smartpay SDK NodeJS",
   "main": "./build/cjs/index.cjs",
   "module": "./build/esm/index.js",

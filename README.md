@@ -21,8 +21,8 @@ The package needs to be configured with your own API keys, you can find them on 
 ```javascript
 const Smartpay = require('@smartpay/sdk-node').default;
 
-const smartpay = new Smartpay('<YOUR_PRIVATE_API_KEY>', {
-  publicKey: '<YOUR_PUBLIC_API_KEY>',
+const smartpay = new Smartpay('<YOUR_SECRET_KEY>', {
+  publicKey: '<YOUR_PUBLIC_KEY>',
 });
 ```
 

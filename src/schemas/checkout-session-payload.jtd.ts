@@ -94,7 +94,7 @@ export default {
     },
     customer: {
       optionalProperties: {
-        accountAge: { type: 'number' },
+        accountAge: { type: 'uint32' },
         emailAddress: { type: 'string' },
         firstName: { type: 'string' },
         lastName: { type: 'string' },

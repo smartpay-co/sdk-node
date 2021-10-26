@@ -3,7 +3,7 @@ import test from 'tape';
 
 import Smartpay from '../build/esm/index.js';
 
-const API_PREFIX = 'https://api.smartpay.co/smartpayments';
+const API_PREFIX = 'https://api.smartpay.co';
 const CHECKOUT_URL = 'https://checkout.smartpay.co';
 
 const TEST_SECRET_KEY = 'sk_test_a7SlBkzf44tzdQoTwm6FrW';

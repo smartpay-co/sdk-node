@@ -17,7 +17,7 @@ import {
   SmartError,
 } from './utils';
 
-const API_PREFIX = 'https://api.smartpay.co/smartpayments';
+const API_PREFIX = 'https://api.smartpay.co';
 const CHECKOUT_URL = 'https://checkout.smartpay.co';
 
 const POST = 'POST';

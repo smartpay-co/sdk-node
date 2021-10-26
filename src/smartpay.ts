@@ -17,7 +17,7 @@ import {
   SmartError,
 } from './utils';
 
-const API_PREFIX = 'https://api.smartpay.co';
+const API_PREFIX = 'https://api.smartpay.co/v1';
 const CHECKOUT_URL = 'https://checkout.smartpay.co';
 
 const POST = 'POST';
@@ -131,7 +131,7 @@ class Smartpay {
 
     // Call API to create checkout session
     const req: Promise<CheckoutSession> = this.request(
-      '/checkout/sessions',
+      '/checkout-sessions',
       POST,
       normalizedPayload
     );

@@ -3,7 +3,7 @@ import test from 'tape';
 
 import Smartpay from '../build/esm/index.js';
 
-const API_PREFIX = 'https://api.smartpay.co';
+const API_PREFIX = 'https://api.smartpay.co/v1';
 const CHECKOUT_URL = 'https://checkout.smartpay.co';
 
 const TEST_SECRET_KEY = 'sk_test_a7SlBkzf44tzdQoTwm6FrW';
@@ -21,7 +21,7 @@ test('Create Fake Checkout Session', async function testCreateCheckoutSession(t)
       authorization: `Basic ${TEST_SECRET_KEY}`,
     },
   })
-    .post('/checkout/sessions')
+    .post('/checkout-sessions')
     .reply(200, JSON.stringify(FAKE_SESSION));
 
   const smartpay = new Smartpay(TEST_SECRET_KEY, {

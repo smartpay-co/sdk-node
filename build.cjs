@@ -13,7 +13,7 @@ esbuild
   .build({
     entryPoints: ['src/index.ts'],
     platform: 'node',
-    format: 'esm',
+    format: 'cjs',
     bundle: true,
     minify: false,
     sourcemap: false,

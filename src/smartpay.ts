@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-unfetch';
 import qs from 'query-string';
 
-import type {
+import {
   KeyString,
   SmartPayOptions,
   ChekoutSessionPayload,
@@ -129,9 +129,14 @@ class Smartpay {
   createCheckoutSession(payload: ChekoutSessionPayloadFlat) {
     const normalizedPayload = Smartpay.normalizeCheckoutSessionPayload(payload);
 
+    const params = {
+      'dev-lang': 'nodejs',
+      'sdk-version': '__buildVersion__',
+    };
+
     // Call API to create checkout session
     const req: Promise<CheckoutSession> = this.request(
-      '/checkout-sessions',
+      `/checkout-sessions?${qs.stringify(params)}`,
       POST,
       normalizedPayload
     );

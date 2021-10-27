@@ -17,9 +17,14 @@ import {
   SmartError,
 } from './utils';
 
+interface Params {
+  [key: string]: string;
+}
+
 const API_PREFIX = 'https://api.smartpay.co/v1';
 const CHECKOUT_URL = 'https://checkout.smartpay.co';
 
+const GET = 'GET';
 const POST = 'POST';
 // const PUT = 'PUT';
 // const DELETE = 'DELETE';
@@ -60,10 +65,25 @@ class Smartpay {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  request(endpoint: string, method: Method = 'GET', payload?: any) {
+  request(
+    endpoint: string,
+    options: {
+      method?: Method;
+      params?: Params;
+      payload?: any;
+    } = {}
+  ) {
+    const { method, params, payload } = options;
+
+    let url = `${this._apiPrefix}${endpoint}`;
+
+    if (params) {
+      url = `${url}?${qs.stringify(params)}`;
+    }
+
     return (
-      fetch(`${this._apiPrefix}${endpoint}`, {
-        method,
+      fetch(url, {
+        method: method || GET,
         headers: {
           Authorization: `Basic ${this._secretKey}`,
           Accept: 'application/json',
@@ -137,8 +157,10 @@ class Smartpay {
     // Call API to create checkout session
     const req: Promise<CheckoutSession> = this.request(
       `/checkout-sessions?${qs.stringify(params)}`,
-      POST,
-      normalizedPayload
+      {
+        method: POST,
+        payload: normalizedPayload,
+      }
     );
 
     return req.then((session) => {

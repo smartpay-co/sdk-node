@@ -1,6 +1,6 @@
 import esbuild from 'esbuild';
+import replace from 'replace-in-file';
 import { dtsPlugin } from 'esbuild-plugin-d.ts';
-import textReplace from 'esbuild-plugin-text-replace';
 import pkg from './package.json';
 
 const external = [
@@ -23,21 +23,9 @@ esbuild
     plugins: [dtsPlugin()],
   })
   .then(() => {
-    esbuild.build({
-      entryPoints: ['build/esm/index.js'],
-      platform: 'node',
-      format: 'cjs',
-      bundle: true,
-      minify: false,
-      sourcemap: false,
-      target: ['node12'],
-      outfile: 'build/esm/index.js',
-      allowOverwrite: true,
-      plugins: [
-        textReplace({
-          include: /smartpay/,
-          pattern: [[/__buildVersion__/g, pkg.version]],
-        }),
-      ],
+    replace({
+      files: 'build/esm/index.js',
+      from: /__buildVersion__/g,
+      to: pkg.version,
     });
   });

@@ -33,6 +33,7 @@ export const normalizeCustomerInfo = (
   } = customer;
 
   return {
+    ...customer,
     accountAge,
     emailAddress: emailAddress || email,
     firstName,
@@ -47,128 +48,136 @@ export const normalizeCustomerInfo = (
   };
 };
 
-export const normalizeProductData = ({
-  name,
-  brand,
-  categories,
-  description,
-  gtin,
-  images,
-  reference,
-  url,
-  metadata,
-}: Partial<ProductData> = {}) => ({
-  name,
-  brand,
-  categories,
-  description,
-  gtin,
-  images,
-  reference,
-  url,
-  metadata,
-});
+export const normalizeProductData = (product: Partial<ProductData> = {}) => {
+  const {
+    name,
+    brand,
+    categories,
+    description,
+    gtin,
+    images,
+    reference,
+    url,
+    metadata,
+  } = product;
 
-export const normalizePriceData = ({
-  productData,
-  amount,
-  currency,
-  metadata,
-}: Partial<PriceData> = {}) => ({
-  productData: normalizeProductData(productData),
-  amount,
-  currency,
-  metadata,
-});
+  return {
+    ...product,
+    name,
+    brand,
+    categories,
+    description,
+    gtin,
+    images,
+    reference,
+    url,
+    metadata,
+  };
+};
 
-export const normalizeLineItemData = ({
-  price,
-  priceData,
-  quantity,
-  name,
-  brand,
-  categories,
-  gtin,
-  images,
-  reference,
-  url,
-  amount,
-  currency,
-  label,
-  description,
-  metadata,
-  productDescription,
-  productMetadata,
-  priceDescription,
-  priceMetadata,
-}: LineItemDataFlat) => ({
-  price: typeof price === 'string' ? price : undefined,
-  priceData: normalizePriceData(
-    priceData || {
-      productData: {
-        name,
-        brand,
-        categories,
-        gtin,
-        images,
-        reference,
-        url,
-        description: productDescription,
-        metadata: productMetadata,
-      },
-      amount:
-        // eslint-disable-next-line no-nested-ternary
-        amount != null ? amount : typeof price === 'number' ? price : undefined,
-      currency,
-      label,
-      description: priceDescription,
-      metadata: priceMetadata,
-    }
-  ),
-  quantity,
-  description,
-  metadata,
-});
+export const normalizePriceData = (price: Partial<PriceData> = {}) => {
+  const { productData, amount, currency, metadata } = price;
+
+  return {
+    ...price,
+    productData: normalizeProductData(productData),
+    amount,
+    currency,
+    metadata,
+  };
+};
+
+export const normalizeLineItemData = (item: LineItemDataFlat) => {
+  const {
+    price,
+    priceData,
+    quantity,
+    name,
+    brand,
+    categories,
+    gtin,
+    images,
+    reference,
+    url,
+    amount,
+    currency,
+    label,
+    description,
+    metadata,
+    productDescription,
+    productMetadata,
+    priceDescription,
+    priceMetadata,
+  } = item;
+
+  return {
+    ...item,
+    price: typeof price === 'string' ? price : undefined,
+    priceData: normalizePriceData(
+      priceData || {
+        productData: {
+          name,
+          brand,
+          categories,
+          gtin,
+          images,
+          reference,
+          url,
+          description: productDescription,
+          metadata: productMetadata,
+        },
+        amount:
+          // eslint-disable-next-line no-nested-ternary
+          amount != null
+            ? amount
+            : typeof price === 'number'
+            ? price
+            : undefined,
+        currency,
+        label,
+        description: priceDescription,
+        metadata: priceMetadata,
+      }
+    ),
+    quantity,
+    description,
+    metadata,
+  };
+};
 
 export const normalizeLineItemDataList = (list: LineItemDataFlat[] = []) =>
   Array.isArray(list) ? list.map((item) => normalizeLineItemData(item)) : [];
 
-export const normalizeOrderData = ({
-  amount,
-  currency,
-  captureMethod,
-  confirmationMethod,
-  coupons,
-  shippingInfo,
-  items,
-  lineItemData,
-}: OrderDataLoose) => ({
-  amount,
-  currency,
-  captureMethod,
-  confirmationMethod,
-  coupons,
-  shippingInfo,
-  lineItemData: normalizeLineItemDataList(lineItemData || items),
-});
+export const normalizeOrderData = (order: OrderDataLoose) => {
+  const {
+    amount,
+    currency,
+    captureMethod,
+    confirmationMethod,
+    coupons,
+    shippingInfo,
+    items,
+    lineItemData,
+  } = order;
 
-export const normalizeShipping = ({
-  address,
-  addressType,
-  line1,
-  line2,
-  line3,
-  line4,
-  line5,
-  subLocality,
-  locality,
-  administrativeArea,
-  postalCode,
-  country,
-  feeAmount,
-  feeCurrency,
-}: Partial<ShippingInfo> & Partial<Address> = {}) => ({
-  address: address || {
+  return {
+    ...order,
+    amount,
+    currency,
+    captureMethod,
+    confirmationMethod,
+    coupons,
+    shippingInfo,
+    lineItemData: normalizeLineItemDataList(lineItemData || items),
+  };
+};
+
+export const normalizeShipping = (
+  shipping: Partial<ShippingInfo> & Partial<Address> = {}
+) => {
+  const {
+    address,
+    addressType,
     line1,
     line2,
     line3,
@@ -179,52 +188,76 @@ export const normalizeShipping = ({
     administrativeArea,
     postalCode,
     country,
-  },
-  addressType,
-  feeAmount,
-  feeCurrency,
-});
+    feeAmount,
+    feeCurrency,
+  } = shipping;
 
-export const normalizeCheckoutSessionPayload = ({
-  amount,
-  currency,
-  captureMethod,
-  confirmationMethod,
-  coupons,
-  lineItemData,
-  shippingInfo,
-  items,
-  shipping,
-  customerInfo,
-  customer,
-  orderData,
-  reference,
-  successURL,
-  cancelURL,
-  metadata,
-  orderDescription,
-  orderMetadata,
-}: ChekoutSessionPayloadFlat) => ({
-  customerInfo: normalizeCustomerInfo(customerInfo || customer),
-  orderData: normalizeOrderData(
-    orderData || {
-      amount,
-      currency,
-      captureMethod,
-      confirmationMethod,
-      coupons,
-      shippingInfo: shippingInfo || normalizeShipping(shipping),
-      items,
-      lineItemData,
-      description: orderDescription,
-      metadata: orderMetadata,
-    }
-  ),
-  reference,
-  metadata,
-  successUrl: successURL, // Temp prop
-  cancelUrl: cancelURL, // Temp prop
-});
+  return {
+    address: address || {
+      line1,
+      line2,
+      line3,
+      line4,
+      line5,
+      subLocality,
+      locality,
+      administrativeArea,
+      postalCode,
+      country,
+    },
+    addressType,
+    feeAmount,
+    feeCurrency,
+  };
+};
+
+export const normalizeCheckoutSessionPayload = (
+  payload: ChekoutSessionPayloadFlat
+) => {
+  const {
+    amount,
+    currency,
+    captureMethod,
+    confirmationMethod,
+    coupons,
+    lineItemData,
+    shippingInfo,
+    items,
+    shipping,
+    customerInfo,
+    customer,
+    orderData,
+    reference,
+    successURL,
+    cancelURL,
+    metadata,
+    orderDescription,
+    orderMetadata,
+  } = payload;
+
+  return {
+    ...payload,
+    customerInfo: normalizeCustomerInfo(customerInfo || customer),
+    orderData: normalizeOrderData(
+      orderData || {
+        amount,
+        currency,
+        captureMethod,
+        confirmationMethod,
+        coupons,
+        shippingInfo: shippingInfo || normalizeShipping(shipping),
+        items,
+        lineItemData,
+        description: orderDescription,
+        metadata: orderMetadata,
+      }
+    ),
+    reference,
+    metadata,
+    successUrl: successURL, // Temp prop
+    cancelUrl: cancelURL, // Temp prop
+  };
+};
 
 export default {
   normalizeCheckoutSessionPayload,

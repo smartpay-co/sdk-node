@@ -81,6 +81,8 @@ export default {
           },
           optionalProperties: {
             addressType: { type: 'string' },
+            feeAmount: { type: 'uint32' },
+            feeCurrency: { type: 'string' },
           },
           additionalProperties: true,
         },

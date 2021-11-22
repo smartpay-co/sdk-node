@@ -82,28 +82,41 @@ export const normalizeCheckoutSessionPayload = (
 ) => {
   const payload = fromLooseCheckoutSessionPayload(input);
   const { orderData } = payload;
+  const { shippingInfo } = orderData;
 
   // If not setting any currency in orderData
   // We take the currency in first line item
+  const defaultCurrency = orderData.lineItemData[0]?.priceData?.currency;
+
   if (!orderData.currency) {
-    orderData.currency = orderData.lineItemData[0]?.priceData?.currency;
+    orderData.currency = defaultCurrency;
+  }
+
+  if (shippingInfo && !shippingInfo?.feeCurrency) {
+    shippingInfo.feeCurrency = defaultCurrency;
   }
 
   const { currency } = orderData;
+  const shipping =
+    (shippingInfo?.feeCurrency &&
+      shippingInfo.feeCurrency === currency &&
+      shippingInfo?.feeAmount) ||
+    0;
 
   if (orderData.amount == null) {
-    orderData.amount = orderData.lineItemData.reduce((sum, item) => {
-      const { priceData } = item;
+    orderData.amount =
+      orderData.lineItemData.reduce((sum, item) => {
+        const { priceData } = item;
 
-      if (priceData.currency === currency) {
-        return sum + (priceData.amount || 0);
-      }
+        if (priceData.currency === currency) {
+          return sum + (priceData.amount || 0);
+        }
 
-      throw new SmartError({
-        errorCode: 'request.invalid',
-        details: ['payload.orderData.lineItemData[].currency is invalid'],
-      });
-    }, 0);
+        throw new SmartError({
+          errorCode: 'request.invalid',
+          details: ['payload.orderData.lineItemData[].currency is invalid'],
+        });
+      }, 0) + shipping;
   }
 
   return payload;

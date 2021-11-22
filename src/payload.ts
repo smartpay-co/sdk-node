@@ -165,6 +165,8 @@ export const normalizeShipping = ({
   administrativeArea,
   postalCode,
   country,
+  feeAmount,
+  feeCurrency,
 }: Partial<ShippingInfo> & Partial<Address> = {}) => ({
   address: address || {
     line1,
@@ -179,6 +181,8 @@ export const normalizeShipping = ({
     country,
   },
   addressType,
+  feeAmount,
+  feeCurrency,
 });
 
 export const normalizeCheckoutSessionPayload = ({
@@ -200,7 +204,6 @@ export const normalizeCheckoutSessionPayload = ({
   metadata,
   orderDescription,
   orderMetadata,
-  test,
 }: ChekoutSessionPayloadFlat) => ({
   customerInfo: normalizeCustomerInfo(customerInfo || customer),
   orderData: normalizeOrderData(
@@ -221,7 +224,6 @@ export const normalizeCheckoutSessionPayload = ({
   metadata,
   successUrl: successURL, // Temp prop
   cancelUrl: cancelURL, // Temp prop
-  test,
 });
 
 export default {

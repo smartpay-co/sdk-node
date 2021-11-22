@@ -2,8 +2,8 @@ import test from 'tape';
 
 import Smartpay from '../build/esm/index.js';
 
-const TEST_SECRET_KEY = 'sk_test_a7SlBkzf44tzdQoTwm6FrW';
-const TEST_PUBLIC_KEY = 'pk_test_1m2ySnST0aYi6QM0GlKP0n';
+const TEST_SECRET_KEY = 'sk_test_KTGPODEMjGTJByn1pu8psb';
+const TEST_PUBLIC_KEY = 'pk_test_7smSiNAbAwsI2HKQE9e3hA';
 
 test('Create Live Checkout Session', async function testCreateCheckoutSession(t) {
   t.plan(1);
@@ -27,14 +27,15 @@ test('Create Live Checkout Session', async function testCreateCheckoutSession(t)
       locality: 'locality',
       postalCode: '123',
       country: 'JP',
+
+      feeAmount: 100,
+      feeCurrency: 'JPY',
     },
 
     // Your internal reference of the order
     reference: 'order_ref_1234567',
     successURL: 'https://smartpay.co',
     cancelURL: 'https://smartpay.co',
-
-    test: true,
   };
 
   const session = await smartpay.createCheckoutSession(payload);

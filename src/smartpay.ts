@@ -100,14 +100,23 @@ class Smartpay {
           });
         })
         .then((response) => {
+          if (!response.ok) {
+            throw new SmartError({
+              errorCode: 'unexpected_error',
+              statusCode: response.status,
+              message: `${response.status}`,
+            });
+          }
+
           return (
             response
               .json()
               // Parse body failed
-              .catch(() => {
+              .catch((error) => {
                 throw new SmartError({
                   errorCode: 'unexpected_error',
                   statusCode: response.status,
+                  message: `${response.status} ${error.message}`,
                 });
               })
               .then((data) => {
@@ -118,7 +127,7 @@ class Smartpay {
                 throw new SmartError({
                   errorCode: data.errorCode,
                   statusCode: response.status,
-                  message: data.message,
+                  message: `${response.status} ${data.message}`,
                   details: data.details,
                 });
               })

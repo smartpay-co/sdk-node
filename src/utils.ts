@@ -77,38 +77,59 @@ export const validateCheckoutSessionPayload = (
   return errors;
 };
 
+/**
+ * Try to get the currency of this checkout
+ */
+export const getCurrency = (payload: ChekoutSessionPayload) => {
+  const { orderData } = payload;
+  let { currency } = orderData;
+
+  if (!currency) {
+    currency = orderData.lineItemData[0]?.priceData?.currency;
+  }
+
+  return currency;
+};
+
 export const normalizeCheckoutSessionPayload = (
   input: ChekoutSessionPayloadFlat
 ) => {
   const payload = fromLooseCheckoutSessionPayload(input);
   const { orderData } = payload;
   const { shippingInfo } = orderData;
+  const currency = getCurrency(payload);
 
-  // If not setting any currency in orderData
-  // We take the currency in first line item
-  const defaultCurrency = orderData.lineItemData[0]?.priceData?.currency;
+  if (!currency) {
+    throw new SmartError({
+      errorCode: 'request.invalid',
+      details: ['Currency is not available.'],
+    });
+  }
 
-  if (!orderData.currency) {
-    orderData.currency = defaultCurrency;
+  if (orderData && !orderData?.currency) {
+    payload.orderData.currency = currency;
   }
 
   if (shippingInfo && !shippingInfo?.feeCurrency) {
-    shippingInfo.feeCurrency = defaultCurrency;
+    shippingInfo.feeCurrency = currency;
   }
 
-  const { currency } = orderData;
-  const shipping =
-    (shippingInfo?.feeCurrency &&
-      shippingInfo.feeCurrency === currency &&
-      shippingInfo?.feeAmount) ||
-    0;
+  const feeCurrency = shippingInfo?.feeCurrency;
+  const feeAmount = shippingInfo?.feeAmount;
+  const shipping = (feeCurrency === currency && feeAmount) || 0;
 
   if (orderData.amount == null) {
     orderData.amount =
       orderData.lineItemData.reduce((sum, item) => {
         const { priceData } = item;
+        let itemCurrency = priceData.currency;
 
-        if (priceData.currency === currency) {
+        if (!itemCurrency) {
+          priceData.currency = currency;
+          itemCurrency = currency;
+        }
+
+        if (itemCurrency === currency) {
           return sum + (priceData.amount || 0);
         }
 

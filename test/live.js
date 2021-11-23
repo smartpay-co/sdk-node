@@ -73,6 +73,12 @@ test('Create Live Checkout Session Loose Payload 2', async function testCreateCh
       feeCurrency: 'JPY',
     },
 
+    customer: {
+      email: 'john@smartpay.co',
+      firstName: 'John',
+      lastName: 'Doe',
+    },
+
     // Your internal reference of the order
     reference: 'order_ref_1234567',
     successURL: 'https://smartpay.co',

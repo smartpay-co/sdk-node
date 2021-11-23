@@ -10,7 +10,20 @@ import type {
   ChekoutSessionPayloadFlat,
   ShippingInfo,
   Address,
+  LooseObject,
 } from './types';
+
+export const omit = (obj: LooseObject, omitKeys: string[]) => {
+  const rest = { ...obj };
+
+  for (let i = 0; i < omitKeys.length; i += 1) {
+    const key = omitKeys[i];
+
+    delete rest[key];
+  }
+
+  return rest;
+};
 
 export const normalizeCustomerInfo = (
   customer: CustomerInfoLoose = {}
@@ -32,8 +45,25 @@ export const normalizeCustomerInfo = (
     reference,
   } = customer;
 
+  const rest = omit(customer, [
+    'accountAge',
+    'emailAddress',
+    'email',
+    'firstName',
+    'lastName',
+    'firstNameKana',
+    'lastNameKana',
+    'address',
+    'phoneNumber',
+    'phone',
+    'dateOfBirth',
+    'legalGender',
+    'gender',
+    'reference',
+  ]);
+
   return {
-    ...customer,
+    ...rest,
     accountAge,
     emailAddress: emailAddress || email,
     firstName,
@@ -61,8 +91,20 @@ export const normalizeProductData = (product: Partial<ProductData> = {}) => {
     metadata,
   } = product;
 
+  const rest = omit(product, [
+    'name',
+    'brand',
+    'categories',
+    'description',
+    'gtin',
+    'images',
+    'reference',
+    'url',
+    'metadata',
+  ]);
+
   return {
-    ...product,
+    ...rest,
     name,
     brand,
     categories,
@@ -78,8 +120,10 @@ export const normalizeProductData = (product: Partial<ProductData> = {}) => {
 export const normalizePriceData = (price: Partial<PriceData> = {}) => {
   const { productData, amount, currency, metadata } = price;
 
+  const rest = omit(price, ['productData', 'amount', 'currency', 'metadata']);
+
   return {
-    ...price,
+    ...rest,
     productData: normalizeProductData(productData),
     amount,
     currency,
@@ -110,8 +154,30 @@ export const normalizeLineItemData = (item: LineItemDataFlat) => {
     priceMetadata,
   } = item;
 
+  const rest = omit(item, [
+    'price',
+    'priceData',
+    'quantity',
+    'name',
+    'brand',
+    'categories',
+    'gtin',
+    'images',
+    'reference',
+    'url',
+    'amount',
+    'currency',
+    'label',
+    'description',
+    'metadata',
+    'productDescription',
+    'productMetadata',
+    'priceDescription',
+    'priceMetadata',
+  ]);
+
   return {
-    ...item,
+    ...rest,
     price: typeof price === 'string' ? price : undefined,
     priceData: normalizePriceData(
       priceData || {
@@ -160,8 +226,19 @@ export const normalizeOrderData = (order: OrderDataLoose) => {
     lineItemData,
   } = order;
 
+  const rest = omit(order, [
+    'amount',
+    'currency',
+    'captureMethod',
+    'confirmationMethod',
+    'coupons',
+    'shippingInfo',
+    'items',
+    'lineItemData',
+  ]);
+
   return {
-    ...order,
+    ...rest,
     amount,
     currency,
     captureMethod,
@@ -192,7 +269,25 @@ export const normalizeShipping = (
     feeCurrency,
   } = shipping;
 
+  const rest = omit(shipping, [
+    'address',
+    'addressType',
+    'line1',
+    'line2',
+    'line3',
+    'line4',
+    'line5',
+    'subLocality',
+    'locality',
+    'administrativeArea',
+    'postalCode',
+    'country',
+    'feeAmount',
+    'feeCurrency',
+  ]);
+
   return {
+    ...rest,
     address: address || {
       line1,
       line2,
@@ -235,8 +330,29 @@ export const normalizeCheckoutSessionPayload = (
     orderMetadata,
   } = payload;
 
+  const rest = omit(payload, [
+    'amount',
+    'currency',
+    'captureMethod',
+    'confirmationMethod',
+    'coupons',
+    'lineItemData',
+    'shippingInfo',
+    'items',
+    'shipping',
+    'customerInfo',
+    'customer',
+    'orderData',
+    'reference',
+    'successURL',
+    'cancelURL',
+    'metadata',
+    'orderDescription',
+    'orderMetadata',
+  ]);
+
   return {
-    ...payload,
+    ...rest,
     customerInfo: normalizeCustomerInfo(customerInfo || customer),
     orderData: normalizeOrderData(
       orderData || {

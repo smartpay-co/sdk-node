@@ -77,33 +77,67 @@ export const validateCheckoutSessionPayload = (
   return errors;
 };
 
+/**
+ * Try to get the currency of this checkout
+ */
+export const getCurrency = (payload: ChekoutSessionPayload) => {
+  const { orderData } = payload;
+  let { currency } = orderData;
+
+  if (!currency) {
+    currency = orderData.lineItemData[0]?.priceData?.currency;
+  }
+
+  return currency;
+};
+
 export const normalizeCheckoutSessionPayload = (
   input: ChekoutSessionPayloadFlat
 ) => {
   const payload = fromLooseCheckoutSessionPayload(input);
   const { orderData } = payload;
+  const { shippingInfo } = orderData;
+  const currency = getCurrency(payload);
 
-  // If not setting any currency in orderData
-  // We take the currency in first line item
-  if (!orderData.currency) {
-    orderData.currency = orderData.lineItemData[0]?.priceData?.currency;
+  if (!currency) {
+    throw new SmartError({
+      errorCode: 'request.invalid',
+      details: ['Currency is not available.'],
+    });
   }
 
-  const { currency } = orderData;
+  if (orderData && !orderData?.currency) {
+    payload.orderData.currency = currency;
+  }
+
+  if (shippingInfo && !shippingInfo?.feeCurrency) {
+    shippingInfo.feeCurrency = currency;
+  }
+
+  const feeCurrency = shippingInfo?.feeCurrency;
+  const feeAmount = shippingInfo?.feeAmount;
+  const shipping = (feeCurrency === currency && feeAmount) || 0;
 
   if (orderData.amount == null) {
-    orderData.amount = orderData.lineItemData.reduce((sum, item) => {
-      const { priceData } = item;
+    orderData.amount =
+      orderData.lineItemData.reduce((sum, item) => {
+        const { priceData } = item;
+        let itemCurrency = priceData.currency;
 
-      if (priceData.currency === currency) {
-        return sum + (priceData.amount || 0);
-      }
+        if (!itemCurrency) {
+          priceData.currency = currency;
+          itemCurrency = currency;
+        }
 
-      throw new SmartError({
-        errorCode: 'request.invalid',
-        details: ['payload.orderData.lineItemData[].currency is invalid'],
-      });
-    }, 0);
+        if (itemCurrency === currency) {
+          return sum + (priceData.amount || 0);
+        }
+
+        throw new SmartError({
+          errorCode: 'request.invalid',
+          details: ['payload.orderData.lineItemData[].currency is invalid'],
+        });
+      }, 0) + shipping;
   }
 
   return payload;

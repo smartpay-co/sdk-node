@@ -118,6 +118,8 @@ export type ShippingInfo = {
   addressType?: AddressType;
   carrierName?: string;
   reference?: string;
+  feeAmount?: number;
+  feeCurrency?: string;
 };
 
 export type OrderData = {

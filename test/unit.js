@@ -46,14 +46,12 @@ test('Test Validate Checkout Session Payload', function testGetSessionURL(t) {
   try {
     Smartpay.normalizeCheckoutSessionPayload(payload1);
   } catch (error1) {
-    t.ok(
-      error1.details?.includes(
-        'payload.orderData is invalid (definitions,order,properties,currency)'
-      )
-    );
+    t.ok(error1.details?.includes('Currency is not available.'));
   }
 
   const payload2 = {
+    currency: 'JPY',
+
     shipping: {
       line1: 'line1',
       locality: 'locality',

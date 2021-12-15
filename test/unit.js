@@ -9,6 +9,9 @@ const TEST_PUBLIC_KEY = 'pk_test_1m2ySnST0aYi6QM0GlKP0n';
 
 const FAKE_SESSION = {
   id: 'cs_live_abcdef12345678',
+  metadata: {
+    __promotion_code__: '12345ABCDE',
+  },
 };
 
 test('Get Session URL', function testGetSessionURL(t) {
@@ -24,6 +27,54 @@ test('Get Session URL', function testGetSessionURL(t) {
   t.ok(sessionURL.indexOf(CHECKOUT_URL) === 0);
   t.ok(sessionURL.indexOf(`public-key=${TEST_PUBLIC_KEY}`) > 0);
   t.ok(sessionURL.indexOf(`session-id=${FAKE_SESSION.id}`) > 0);
+});
+
+test('Promotion Code', function testPromotionCode(t) {
+  t.plan(2);
+
+  const CODE1 = 'ABCDE12345';
+
+  const payload = {
+    currency: 'JPY',
+
+    items: [
+      {
+        name: 'Item',
+        price: 100,
+        quantity: 1,
+      },
+    ],
+
+    shipping: {
+      line1: 'line1',
+      locality: 'locality',
+      postalCode: '123',
+      country: 'JP',
+    },
+
+    reference: 'order_ref_1234567',
+    successURL: 'https://smartpay.co',
+    cancelURL: 'https://smartpay.co',
+
+    promotionCode: CODE1,
+  };
+
+  const normalizePayload = Smartpay.normalizeCheckoutSessionPayload(payload);
+
+  t.ok(normalizePayload?.metadata?.__promotion_code__ === CODE1);
+
+  const smartpay = new Smartpay(TEST_SECRET_KEY, {
+    publicKey: TEST_PUBLIC_KEY,
+    checkoutURL: CHECKOUT_URL,
+  });
+
+  const sessionURL = smartpay.getSessionURL(FAKE_SESSION);
+
+  t.ok(
+    sessionURL.indexOf(
+      `promotion-code=${FAKE_SESSION.metadata.__promotion_code__}`
+    ) > 0
+  );
 });
 
 test('Test Validate Checkout Session Payload', function testGetSessionURL(t) {

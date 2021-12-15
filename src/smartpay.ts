@@ -42,6 +42,17 @@ const SMARTPAY_API_PREFIX =
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
+type GetSessionURLOptions = {
+  checkoutURL?: string;
+  promotionCode?: string;
+};
+
+type SessionURLParams = {
+  'session-id': string;
+  'public-key': string;
+  'promotion-code'?: string;
+};
+
 class Smartpay {
   _secretKey: KeyString;
   _publicKey?: KeyString;
@@ -209,7 +220,10 @@ class Smartpay {
     return {};
   }
 
-  getSessionURL(session: CheckoutSession): string {
+  getSessionURL(
+    session: CheckoutSession,
+    options?: GetSessionURLOptions
+  ): string {
     if (!session) {
       throw new SmartError({
         errorCode: 'request.invalid',
@@ -224,13 +238,22 @@ class Smartpay {
       });
     }
 
-    const params = {
+    const params: SessionURLParams = {
       'session-id': session.id,
       'public-key': this._publicKey,
     };
 
+    const promotionCode =
+      options?.promotionCode || session.metadata?.__promotion_code__;
+
+    if (promotionCode) {
+      params['promotion-code'] = promotionCode;
+    }
+
+    const checkoutURL = options?.checkoutURL || this._checkoutURL;
+
     return qs.stringifyUrl({
-      url: `${this._checkoutURL}/login`,
+      url: `${checkoutURL}/login`,
       query: params,
     });
   }

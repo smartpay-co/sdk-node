@@ -40,6 +40,8 @@ const SMARTPAY_API_PREFIX =
     ? process.env.SMARTPAY_API_PREFIX
     : '';
 
+const SMARTPAY_CHECKOUT_URL = process.env.SMARTPAY_CHECKOUT_URL;
+
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 type GetSessionURLOptions = {
@@ -75,7 +77,8 @@ class Smartpay {
     this._secretKey = key;
     this._publicKey = options.publicKey;
     this._apiPrefix = options.apiPrefix || SMARTPAY_API_PREFIX || API_PREFIX;
-    this._checkoutURL = options.checkoutURL || CHECKOUT_URL;
+    this._checkoutURL =
+      options.checkoutURL || SMARTPAY_CHECKOUT_URL || CHECKOUT_URL;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

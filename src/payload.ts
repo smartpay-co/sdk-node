@@ -328,6 +328,7 @@ export const normalizeCheckoutSessionPayload = (
     metadata,
     orderDescription,
     orderMetadata,
+    promotionCode,
   } = payload;
 
   const rest = omit(payload, [
@@ -349,7 +350,14 @@ export const normalizeCheckoutSessionPayload = (
     'metadata',
     'orderDescription',
     'orderMetadata',
+    'promotionCode',
   ]);
+
+  const parsedMetadata = metadata || {};
+
+  if (promotionCode) {
+    parsedMetadata.__promotion_code__ = promotionCode;
+  }
 
   return {
     ...rest,
@@ -369,7 +377,7 @@ export const normalizeCheckoutSessionPayload = (
       }
     ),
     reference,
-    metadata,
+    metadata: parsedMetadata,
     successUrl: successURL, // Temp prop
     cancelUrl: cancelURL, // Temp prop
   };

@@ -1,3 +1,7 @@
+export interface LooseObject {
+  [key: string]: any;
+}
+
 export interface MetaData {
   [key: string]: string;
 }
@@ -183,6 +187,8 @@ export type ChekoutSessionPayloadFlat = {
   metadata?: MetaData;
   orderDescription?: string;
   orderMetadata?: MetaData;
+
+  promotionCode?: string;
 
   test?: boolean;
 };

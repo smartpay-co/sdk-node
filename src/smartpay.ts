@@ -7,6 +7,7 @@ import {
   ChekoutSessionPayload,
   CheckoutSession,
   ChekoutSessionPayloadFlat,
+  OrdersResult,
 } from './types';
 import {
   isValidPublicApiKey,
@@ -34,12 +35,15 @@ export const STATUS_REJECTED = 'rejected';
 export const STATUS_FAILED = 'failed';
 export const STATUS_REQUIRES_AUTHORIZATION = 'requires_authorization';
 
+const DEFAULT_PAGE_COUNT = 20;
+
 // eslint-disable-next-line prefer-destructuring
 const SMARTPAY_API_PREFIX =
   process.env.SMARTPAY_API_PREFIX?.toLowerCase()?.includes('api.smartpay')
     ? process.env.SMARTPAY_API_PREFIX
     : '';
 
+// eslint-disable-next-line prefer-destructuring
 const SMARTPAY_CHECKOUT_URL = process.env.SMARTPAY_CHECKOUT_URL;
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -53,6 +57,11 @@ type SessionURLParams = {
   'session-id': string;
   'public-key': string;
   'promotion-code'?: string;
+};
+
+type GetOrdersParams = {
+  page?: number;
+  count?: number;
 };
 
 class Smartpay {
@@ -201,6 +210,28 @@ class Smartpay {
 
       return session;
     });
+  }
+
+  getOrders(params: GetOrdersParams = { page: 1, count: DEFAULT_PAGE_COUNT }) {
+    const page = params.page || 1;
+    const count = params.count || DEFAULT_PAGE_COUNT;
+
+    const parsedParams = {
+      'dev-lang': 'nodejs',
+      'sdk-version': '__buildVersion__',
+      page,
+      count,
+    };
+
+    // Call API to create checkout session
+    const req: Promise<OrdersResult> = this.request(
+      `/orders?${qs.stringify(parsedParams)}`,
+      {
+        method: GET,
+      }
+    );
+
+    return req;
   }
 
   setPublicKey(publicKey: KeyString) {

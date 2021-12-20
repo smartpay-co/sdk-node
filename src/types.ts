@@ -292,6 +292,16 @@ export type Refund = {
   metadata?: MetaData;
 };
 
+export type OrdersResult = {
+  orders: Order[];
+  paging: {
+    total: number;
+    count: number;
+    page: number;
+    hasNext: boolean;
+  };
+};
+
 export type JTDError = {
   instancePath: string[];
   schemaPath: string[];

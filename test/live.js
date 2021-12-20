@@ -172,3 +172,17 @@ test('Create Live Checkout Session Strict Payload', async function testCreateChe
 
   console.log(session); // eslint-disable-line no-console
 });
+
+test('Create Live Checkout Session Strict Payload', async function testCreateCheckoutSession(t) {
+  t.plan(2);
+
+  const smartpay = new Smartpay(TEST_SECRET_KEY, {
+    publicKey: TEST_PUBLIC_KEY,
+  });
+
+  const data = await smartpay.getOrders();
+  const { orders } = data;
+
+  t.ok(orders.length === 20);
+  t.ok(/^order_(test|live)_[0-9a-zA-Z]+$/.test(orders[0].id));
+});

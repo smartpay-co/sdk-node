@@ -112,10 +112,7 @@
     }
   },
 
-  "properties": {
-    "successUrl": { "type": "string" },
-    "cancelUrl": { "type": "string" }
-  },
+  "properties": {},
   "optionalProperties": {
     "customerInfo": { "ref": "customer" },
     "customer": { "ref": "customer" },
@@ -129,7 +126,10 @@
 
     "reference": { "type": "string" },
 
-    "test": { "type": "boolean" }
+    "successUrl": { "type": "string" },
+    "cancelUrl": { "type": "string" },
+    "successURL": { "type": "string" },
+    "cancelURL": { "type": "string" }
   },
   "additionalProperties": true
 }

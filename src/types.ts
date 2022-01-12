@@ -180,8 +180,8 @@ export type ChekoutSessionPayloadFlat = {
   // Rest of CheckoutSession
   orderData?: OrderData;
   reference?: string;
-  successURL: string;
-  cancelURL: string;
+  successUrl: string;
+  cancelUrl: string;
 
   description?: string;
   metadata?: MetaData;
@@ -257,8 +257,8 @@ export type CheckoutSession = {
   updatedAt: number;
   customerInfo: CustomerInfo;
   order: Order;
-  successURL: string;
-  cancelURL: string;
+  successUrl: string;
+  cancelUrl: string;
   reference?: string;
   metadata?: MetaData;
   checkoutURL?: string;

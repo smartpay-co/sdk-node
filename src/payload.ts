@@ -323,12 +323,14 @@ export const normalizeCheckoutSessionPayload = (
     customer,
     orderData,
     reference,
-    successURL,
-    cancelURL,
     metadata,
     orderDescription,
     orderMetadata,
     promotionCode,
+    successUrl,
+    cancelUrl,
+    successURL,
+    cancelURL,
   } = payload;
 
   const rest = omit(payload, [
@@ -345,12 +347,12 @@ export const normalizeCheckoutSessionPayload = (
     'customer',
     'orderData',
     'reference',
-    'successURL',
-    'cancelURL',
     'metadata',
     'orderDescription',
     'orderMetadata',
     'promotionCode',
+    'successUrl',
+    'cancelUrl',
   ]);
 
   const parsedMetadata = metadata || {};
@@ -378,8 +380,8 @@ export const normalizeCheckoutSessionPayload = (
     ),
     reference,
     metadata: parsedMetadata,
-    successUrl: successURL, // Temp prop
-    cancelUrl: cancelURL, // Temp prop
+    successUrl: successUrl || successURL,
+    cancelUrl: cancelUrl || cancelURL,
   };
 };
 

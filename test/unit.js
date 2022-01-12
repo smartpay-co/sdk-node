@@ -53,8 +53,8 @@ test('Promotion Code', function testPromotionCode(t) {
     },
 
     reference: 'order_ref_1234567',
-    successURL: 'https://smartpay.co',
-    cancelURL: 'https://smartpay.co',
+    successUrl: 'https://smartpay.co',
+    cancelUrl: 'https://smartpay.co',
 
     promotionCode: CODE1,
   };
@@ -90,8 +90,8 @@ test('Test Validate Checkout Session Payload', function testGetSessionURL(t) {
 
     // Your internal reference of the order
     reference: 'order_ref_1234567',
-    successURL: 'https://smartpay.co',
-    cancelURL: 'https://smartpay.co',
+    successUrl: 'https://smartpay.co',
+    cancelUrl: 'https://smartpay.co',
   };
 
   try {
@@ -114,8 +114,8 @@ test('Test Validate Checkout Session Payload', function testGetSessionURL(t) {
 
     // Your internal reference of the order
     reference: 'order_ref_1234567',
-    successURL: 'https://smartpay.co',
-    cancelURL: 'https://smartpay.co',
+    successUrl: 'https://smartpay.co',
+    cancelUrl: 'https://smartpay.co',
   };
 
   try {

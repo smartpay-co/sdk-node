@@ -35,8 +35,8 @@ test('Create Live Checkout Session Loose Payload 1', async function testCreateCh
 
     // Your internal reference of the order
     reference: 'order_ref_1234567',
-    successURL: 'https://smartpay.co',
-    cancelURL: 'https://smartpay.co',
+    successUrl: 'https://smartpay.co',
+    cancelUrl: 'https://smartpay.co',
   };
 
   const session = await smartpay.createCheckoutSession(payload);
@@ -81,8 +81,8 @@ test('Create Live Checkout Session Loose Payload 2', async function testCreateCh
 
     // Your internal reference of the order
     reference: 'order_ref_1234567',
-    successURL: 'https://smartpay.co',
-    cancelURL: 'https://smartpay.co',
+    successUrl: 'https://smartpay.co',
+    cancelUrl: 'https://smartpay.co',
   };
 
   const session = await smartpay.createCheckoutSession(payload);
@@ -154,8 +154,8 @@ test('Create Live Checkout Session Strict Payload', async function testCreateChe
 
     // Your internal reference of the order
     reference: 'order_ref_1234567',
-    successURL: 'https://smartpay.co',
-    cancelURL: 'https://smartpay.co',
+    successUrl: 'https://smartpay.co',
+    cancelUrl: 'https://smartpay.co',
 
     promotionCode: CODE,
 

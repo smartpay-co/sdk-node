@@ -53,8 +53,8 @@ test('Create Fake Checkout Session', async function testCreateCheckoutSession(t)
       country: 'JP',
     },
     reference: 'order_ref_1234567', // Your internal reference of the order
-    successURL: 'https://smartpay.co',
-    cancelURL: 'https://smartpay.co',
+    successUrl: 'https://smartpay.co',
+    cancelUrl: 'https://smartpay.co',
   };
   const session = await smartpay.createCheckoutSession(payload);
 

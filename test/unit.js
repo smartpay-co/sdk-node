@@ -30,7 +30,7 @@ test('Get Session URL', function testGetSessionURL(t) {
 });
 
 test('Promotion Code', function testPromotionCode(t) {
-  t.plan(2);
+  t.plan(3);
 
   const CODE1 = 'ABCDE12345';
 
@@ -41,7 +41,7 @@ test('Promotion Code', function testPromotionCode(t) {
       {
         name: 'Item',
         price: 100,
-        quantity: 1,
+        quantity: 2,
       },
     ],
 
@@ -61,6 +61,7 @@ test('Promotion Code', function testPromotionCode(t) {
 
   const normalizePayload = Smartpay.normalizeCheckoutSessionPayload(payload);
 
+  t.ok(normalizePayload?.orderData?.amount === 200);
   t.ok(normalizePayload?.metadata?.__promotion_code__ === CODE1);
 
   const smartpay = new Smartpay(TEST_SECRET_KEY, {

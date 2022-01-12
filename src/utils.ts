@@ -130,7 +130,12 @@ export const normalizeCheckoutSessionPayload = (
         }
 
         if (itemCurrency === currency) {
-          return sum + (priceData.amount || 0);
+          return (
+            sum +
+            (priceData && priceData.amount
+              ? priceData.amount * item.quantity
+              : 0)
+          );
         }
 
         throw new SmartError({

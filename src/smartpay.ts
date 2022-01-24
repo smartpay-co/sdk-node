@@ -40,6 +40,7 @@ const SMARTPAY_API_PREFIX =
     ? process.env.SMARTPAY_API_PREFIX
     : '';
 
+// eslint-disable-next-line prefer-destructuring
 const SMARTPAY_CHECKOUT_URL = process.env.SMARTPAY_CHECKOUT_URL;
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -241,19 +242,12 @@ class Smartpay {
       });
     }
 
+    const checkoutURL = options?.checkoutURL || this._checkoutURL;
     const params: SessionURLParams = {
       'session-id': session.id,
       'public-key': this._publicKey,
+      'promotion-code': options?.promotionCode,
     };
-
-    const promotionCode =
-      options?.promotionCode || session.metadata?.__promotion_code__;
-
-    if (promotionCode) {
-      params['promotion-code'] = promotionCode;
-    }
-
-    const checkoutURL = options?.checkoutURL || this._checkoutURL;
 
     return qs.stringifyUrl({
       url: `${checkoutURL}/login`,

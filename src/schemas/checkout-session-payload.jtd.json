@@ -85,7 +85,8 @@
             "feeCurrency": { "type": "string" }
           },
           "additionalProperties": true
-        }
+        },
+        "reference": { "type": "string" }
       },
       "optionalProperties": {
         "captureMethod": { "type": "string" },

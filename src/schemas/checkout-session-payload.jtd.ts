@@ -86,6 +86,7 @@ export default {
           },
           additionalProperties: true,
         },
+        reference: { type: 'string' },
       },
       optionalProperties: {
         captureMethod: { type: 'string' },

@@ -130,6 +130,8 @@ test('Create Live Checkout Session Strict Payload', async function testCreateChe
         feeAmount: 100,
         feeCurrency: 'JPY',
       },
+
+      reference: 'order_ref_1234567',
     },
 
     customerInfo: {
@@ -153,7 +155,6 @@ test('Create Live Checkout Session Strict Payload', async function testCreateChe
     },
 
     // Your internal reference of the order
-    reference: 'order_ref_1234567',
     successUrl: 'https://smartpay.co',
     cancelUrl: 'https://smartpay.co',
 

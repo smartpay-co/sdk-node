@@ -224,6 +224,9 @@ export const normalizeOrderData = (order: OrderDataLoose) => {
     shippingInfo,
     items,
     lineItemData,
+    reference,
+    description,
+    metadata,
   } = order;
 
   const rest = omit(order, [
@@ -235,6 +238,9 @@ export const normalizeOrderData = (order: OrderDataLoose) => {
     'shippingInfo',
     'items',
     'lineItemData',
+    'reference',
+    'description',
+    'metadata',
   ]);
 
   return {
@@ -246,6 +252,9 @@ export const normalizeOrderData = (order: OrderDataLoose) => {
     coupons,
     shippingInfo,
     lineItemData: normalizeLineItemDataList(lineItemData || items),
+    reference,
+    description,
+    metadata,
   };
 };
 
@@ -323,10 +332,8 @@ export const normalizeCheckoutSessionPayload = (
     customer,
     orderData,
     reference,
+    description,
     metadata,
-    orderDescription,
-    orderMetadata,
-    promotionCode,
     successUrl,
     cancelUrl,
     successURL,
@@ -348,18 +355,11 @@ export const normalizeCheckoutSessionPayload = (
     'orderData',
     'reference',
     'metadata',
-    'orderDescription',
-    'orderMetadata',
+    'description',
     'promotionCode',
     'successUrl',
     'cancelUrl',
   ]);
-
-  const parsedMetadata = metadata || {};
-
-  if (promotionCode) {
-    parsedMetadata.__promotion_code__ = promotionCode;
-  }
 
   return {
     ...rest,
@@ -374,14 +374,13 @@ export const normalizeCheckoutSessionPayload = (
         shippingInfo: shippingInfo || normalizeShipping(shipping),
         items,
         lineItemData,
-        description: orderDescription,
-        metadata: orderMetadata,
+        reference,
+        description,
+        metadata,
       }
     ),
-    reference,
-    metadata: parsedMetadata,
-    successUrl: successUrl || successURL,
-    cancelUrl: cancelUrl || cancelURL,
+    successUrl: successUrl || successURL || '',
+    cancelUrl: cancelUrl || cancelURL || '',
   };
 };
 

@@ -132,9 +132,10 @@ export type OrderData = {
   captureMethod?: 'automatic' | 'manual';
   confirmationMethod?: 'automatic' | 'manual';
   coupons?: string[];
-  description?: string;
   lineItemData: LineItemData[];
   shippingInfo?: ShippingInfo;
+  reference?: string;
+  description?: string;
   metadata?: MetaData;
 };
 
@@ -144,10 +145,11 @@ export type OrderDataLoose = {
   captureMethod?: 'automatic' | 'manual';
   confirmationMethod?: 'automatic' | 'manual';
   coupons?: string[];
-  description?: string;
   lineItemData?: LineItemData[];
   items?: LineItemDataFlat[];
   shippingInfo?: ShippingInfo;
+  reference?: string;
+  description?: string;
   metadata?: MetaData;
 };
 
@@ -180,8 +182,10 @@ export type ChekoutSessionPayloadFlat = {
   // Rest of CheckoutSession
   orderData?: OrderData;
   reference?: string;
-  successUrl: string;
-  cancelUrl: string;
+  successURL?: string;
+  cancelURL?: string;
+  successUrl?: string;
+  cancelUrl?: string;
 
   description?: string;
   metadata?: MetaData;

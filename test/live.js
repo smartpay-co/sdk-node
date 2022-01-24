@@ -93,7 +93,7 @@ test('Create Live Checkout Session Loose Payload 2', async function testCreateCh
 });
 
 test('Create Live Checkout Session Strict Payload', async function testCreateCheckoutSession(t) {
-  t.plan(2);
+  t.plan(3);
 
   const smartpay = new Smartpay(TEST_SECRET_KEY, {
     publicKey: TEST_PUBLIC_KEY,
@@ -166,9 +166,12 @@ test('Create Live Checkout Session Strict Payload', async function testCreateChe
   };
 
   const session = await smartpay.createCheckoutSession(payload);
-  const sessionURL = smartpay.getSessionURL(session);
+  const sessionURL = smartpay.getSessionURL(session, {
+    promotionCode: CODE,
+  });
 
   t.ok(session.id.length > 0);
+  t.ok(session.checkoutURL.indexOf(`promotion-code=${CODE}`) > 0);
   t.ok(sessionURL.indexOf(`promotion-code=${CODE}`) > 0);
 
   console.log(session); // eslint-disable-line no-console

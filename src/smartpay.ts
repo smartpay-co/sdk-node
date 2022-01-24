@@ -192,7 +192,9 @@ class Smartpay {
 
     return req.then((session) => {
       if (session) {
-        const sessionURL = this.getSessionURL(session);
+        const sessionURL = this.getSessionURL(session, {
+          promotionCode: payload.promotionCode,
+        });
 
         if (sessionURL) {
           // eslint-disable-next-line no-param-reassign

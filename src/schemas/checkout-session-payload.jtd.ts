@@ -86,12 +86,12 @@ export default {
           },
           additionalProperties: true,
         },
-        reference: { type: 'string' },
       },
       optionalProperties: {
         captureMethod: { type: 'string' },
         confirmationMethod: { type: 'string' },
         coupons: { elements: { type: 'string' } },
+        reference: { type: 'string' },
       },
       additionalProperties: true,
     },

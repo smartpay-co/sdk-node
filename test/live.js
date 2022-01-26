@@ -34,7 +34,6 @@ test('Create Live Checkout Session Loose Payload 1', async function testCreateCh
     },
 
     // Your internal reference of the order
-    reference: 'order_ref_1234567',
     successUrl: 'https://smartpay.co',
     cancelUrl: 'https://smartpay.co',
   };

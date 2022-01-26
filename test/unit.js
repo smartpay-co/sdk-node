@@ -9,9 +9,6 @@ const TEST_PUBLIC_KEY = 'pk_test_1m2ySnST0aYi6QM0GlKP0n';
 
 const FAKE_SESSION = {
   id: 'cs_live_abcdef12345678',
-  metadata: {
-    __promotion_code__: '12345ABCDE',
-  },
 };
 
 test('Get Session URL', function testGetSessionURL(t) {

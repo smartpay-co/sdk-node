@@ -37,16 +37,18 @@ test('Promotion Code', function testPromotionCode(t) {
     items: [
       {
         name: 'Item',
-        price: 100,
+        amount: 100,
         quantity: 2,
       },
     ],
 
-    shipping: {
-      line1: 'line1',
-      locality: 'locality',
-      postalCode: '123',
-      country: 'JP',
+    shippingInfo: {
+      address: {
+        line1: 'line1',
+        locality: 'locality',
+        postalCode: '123',
+        country: 'JP',
+      },
     },
 
     reference: 'order_ref_1234567',
@@ -58,32 +60,32 @@ test('Promotion Code', function testPromotionCode(t) {
 
   const normalizePayload = Smartpay.normalizeCheckoutSessionPayload(payload);
 
-  t.ok(normalizePayload?.orderData?.amount === 200);
-  t.ok(normalizePayload?.metadata?.__promotion_code__ === CODE1);
+  t.ok(normalizePayload.amount === 200);
+  t.ok(normalizePayload.promotionCode === CODE1);
 
   const smartpay = new Smartpay(TEST_SECRET_KEY, {
     publicKey: TEST_PUBLIC_KEY,
     checkoutURL: CHECKOUT_URL,
   });
 
-  const sessionURL = smartpay.getSessionURL(FAKE_SESSION);
+  const sessionURL = smartpay.getSessionURL(FAKE_SESSION, {
+    promotionCode: CODE1,
+  });
 
-  t.ok(
-    sessionURL.indexOf(
-      `promotion-code=${FAKE_SESSION.metadata.__promotion_code__}`
-    ) > 0
-  );
+  t.ok(sessionURL.indexOf(`promotion-code=${CODE1}`) > 0);
 });
 
 test('Test Validate Checkout Session Payload', function testGetSessionURL(t) {
   t.plan(2);
 
   const payload1 = {
-    shipping: {
-      line1: 'line1',
-      locality: 'locality',
-      postalCode: '123',
-      country: 'JP',
+    shippingInfo: {
+      address: {
+        line1: 'line1',
+        locality: 'locality',
+        postalCode: '123',
+        country: 'JP',
+      },
     },
 
     // Your internal reference of the order
@@ -100,27 +102,48 @@ test('Test Validate Checkout Session Payload', function testGetSessionURL(t) {
 
   const payload2 = {
     currency: 'JPY',
-
-    shipping: {
-      line1: 'line1',
-      locality: 'locality',
-      postalCode: '123',
-      country: 'JP',
-    },
-
     items: [],
-
-    // Your internal reference of the order
+    customer: {
+      accountAge: 20,
+      email: 'linmic+test@smartpay.co',
+      firstName: '田中',
+      lastName: '太郎',
+      firstNameKana: 'タナカ',
+      lastNameKana: 'タロウ',
+      address: {
+        line1: '北青山 3-6-7',
+        line2: '青山パラシオタワー 11階',
+        subLocality: '',
+        locality: '港区',
+        administrativeArea: '東京都',
+        postalCode: '107-0061',
+        country: 'JP',
+      },
+      dateOfBirth: '1985-06-30',
+      gender: 'male',
+    },
+    shippingInfo: {
+      address: {
+        line1: '北青山 3-6-7',
+        line2: '青山パラシオタワー 11階',
+        subLocality: '',
+        locality: '港区',
+        administrativeArea: '東京都',
+        postalCode: '107-0061',
+        country: 'JP',
+      },
+      feeAmount: 150,
+      feeCurrency: 'JPY',
+    },
     reference: 'order_ref_1234567',
-    successUrl: 'https://smartpay.co',
-    cancelUrl: 'https://smartpay.co',
+    successUrl: 'https://docs.smartpay.co/example-pages/checkout-successful',
+    cancelUrl: 'https://docs.smartpay.co/example-pages/checkout-canceled',
+    promotionCode: 'SPRINGSALE2022',
   };
 
   try {
     Smartpay.normalizeCheckoutSessionPayload(payload2);
   } catch (error2) {
-    t.ok(
-      error2.details?.includes('payload.orderData.lineItemnData is required.')
-    );
+    t.ok(error2.details?.includes('payload.items is required.'));
   }
 });

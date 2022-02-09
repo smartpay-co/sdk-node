@@ -10,7 +10,12 @@ import Smartpay from '../build/esm/index.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = jsonfile.readFileSync(resolve(__dirname, '../package.json'));
 
-const API_PREFIX = 'https://api.smartpay.co/v1';
+const SMARTPAY_API_PREFIX =
+  process.env.SMARTPAY_API_PREFIX?.toLowerCase()?.includes('api.smartpay')
+    ? process.env.SMARTPAY_API_PREFIX
+    : '';
+
+const API_PREFIX = SMARTPAY_API_PREFIX || 'https://api.smartpay.co/v1';
 const CHECKOUT_URL = 'https://checkout.smartpay.co';
 
 const TEST_SECRET_KEY = 'sk_test_a7SlBkzf44tzdQoTwm6FrW';
@@ -41,16 +46,18 @@ test('Create Fake Checkout Session', async function testCreateCheckoutSession(t)
     items: [
       {
         name: 'レブロン 18 LOW',
-        price: 250,
+        amount: 250,
         currency: 'JPY',
         quantity: 1,
       },
     ],
-    shipping: {
-      line1: 'line1',
-      locality: 'locality',
-      postalCode: '123',
-      country: 'JP',
+    shippingInfo: {
+      address: {
+        line1: 'line1',
+        locality: 'locality',
+        postalCode: '123',
+        country: 'JP',
+      },
     },
     reference: 'order_ref_1234567', // Your internal reference of the order
     successUrl: 'https://smartpay.co',

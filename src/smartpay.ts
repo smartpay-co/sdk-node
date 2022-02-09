@@ -4,9 +4,8 @@ import qs from 'query-string';
 import {
   KeyString,
   SmartPayOptions,
-  ChekoutSessionPayload,
   CheckoutSession,
-  ChekoutSessionPayloadFlat,
+  SimpleChekoutSessionPayload,
 } from './types';
 import {
   isValidPublicApiKey,
@@ -155,11 +154,11 @@ class Smartpay {
   }
 
   static normalizeCheckoutSessionPayload(
-    payload: ChekoutSessionPayloadFlat
-  ): ChekoutSessionPayload {
+    payload: SimpleChekoutSessionPayload
+  ): SimpleChekoutSessionPayload {
     const normalizedPayload = normalizeCheckoutSessionPayload(payload);
     const errors = validateCheckoutSessionPayload(
-      normalizedPayload as ChekoutSessionPayload
+      normalizedPayload as SimpleChekoutSessionPayload
     );
 
     if (errors.length) {
@@ -173,7 +172,7 @@ class Smartpay {
     return normalizedPayload;
   }
 
-  createCheckoutSession(payload: ChekoutSessionPayloadFlat) {
+  createCheckoutSession(payload: SimpleChekoutSessionPayload) {
     const normalizedPayload = Smartpay.normalizeCheckoutSessionPayload(payload);
 
     const params = {

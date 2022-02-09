@@ -1,11 +1,10 @@
 import { validate, Schema } from 'jtd';
 
-import { normalizeCheckoutSessionPayload as fromLooseCheckoutSessionPayload } from './payload';
-import checkoutSessionPayloadSchema from './schemas/checkout-session-payload.jtd';
+import { normalizeCheckoutSessionPayload as fromSimpleCheckoutSessionPayload } from './payload';
+import checkoutSessionPayloadSchema from './schemas/simple-checkout-session-payload.jtd';
 import type {
   KeyString,
-  ChekoutSessionPayload,
-  ChekoutSessionPayloadFlat,
+  SimpleChekoutSessionPayload,
   ErrorDetails,
 } from './types';
 
@@ -62,7 +61,7 @@ export const isValidPaymentID = (paymentID: string) => {
 };
 
 export const validateCheckoutSessionPayload = (
-  payload: ChekoutSessionPayload
+  payload: SimpleChekoutSessionPayload
 ) => {
   const errors = validate(
     checkoutSessionPayloadSchema as Schema,
@@ -70,8 +69,8 @@ export const validateCheckoutSessionPayload = (
     // payload
   ) as ErrorDetails;
 
-  if (payload.orderData.lineItemData.length === 0) {
-    errors.push('payload.orderData.lineItemnData is required.');
+  if (payload.items.length === 0) {
+    errors.push('payload.items is required.');
   }
 
   return errors;
@@ -80,23 +79,21 @@ export const validateCheckoutSessionPayload = (
 /**
  * Try to get the currency of this checkout
  */
-export const getCurrency = (payload: ChekoutSessionPayload) => {
-  const { orderData } = payload;
-  let { currency } = orderData;
+export const getCurrency = (payload: SimpleChekoutSessionPayload) => {
+  let { currency } = payload;
 
   if (!currency) {
-    currency = orderData.lineItemData[0]?.priceData?.currency;
+    currency = payload.items[0]?.currency;
   }
 
   return currency;
 };
 
 export const normalizeCheckoutSessionPayload = (
-  input: ChekoutSessionPayloadFlat
+  input: SimpleChekoutSessionPayload
 ) => {
-  const payload = fromLooseCheckoutSessionPayload(input);
-  const { orderData } = payload;
-  const { shippingInfo } = orderData;
+  const payload = fromSimpleCheckoutSessionPayload(input);
+  const { shippingInfo } = payload;
   const currency = getCurrency(payload);
 
   if (!currency) {
@@ -106,8 +103,8 @@ export const normalizeCheckoutSessionPayload = (
     });
   }
 
-  if (orderData && !orderData?.currency) {
-    payload.orderData.currency = currency;
+  if (!payload.currency) {
+    payload.currency = currency;
   }
 
   if (shippingInfo && !shippingInfo?.feeCurrency) {
@@ -118,29 +115,24 @@ export const normalizeCheckoutSessionPayload = (
   const feeAmount = shippingInfo?.feeAmount;
   const shipping = (feeCurrency === currency && feeAmount) || 0;
 
-  if (orderData.amount == null) {
-    orderData.amount =
-      orderData.lineItemData.reduce((sum, item) => {
-        const { priceData } = item;
-        let itemCurrency = priceData.currency;
+  if (payload.amount == null) {
+    payload.amount =
+      payload.items.reduce((sum, item) => {
+        let itemCurrency = item.currency;
 
         if (!itemCurrency) {
-          priceData.currency = currency;
+          // eslint-disable-next-line no-param-reassign
+          item.currency = currency;
           itemCurrency = currency;
         }
 
         if (itemCurrency === currency) {
-          return (
-            sum +
-            (priceData && priceData.amount
-              ? priceData.amount * item.quantity
-              : 0)
-          );
+          return sum + (item.amount ? item.amount * item.quantity : 0);
         }
 
         throw new SmartError({
           errorCode: 'request.invalid',
-          details: ['payload.orderData.lineItemData[].currency is invalid'],
+          details: ['payload.items[].currency is invalid'],
         });
       }, 0) + shipping;
   }

@@ -90,13 +90,11 @@ export type LineItemData = {
   metadata?: MetaData;
 };
 
-export type LineItemDataFlat = {
+export type SimpleLineItem = {
   // LineItem
-  price?: string;
-  priceData?: PriceData;
   quantity: number;
   // ProductData
-  name?: string;
+  name: string;
   brand?: string;
   categories?: string[];
   gtin?: string;
@@ -104,9 +102,8 @@ export type LineItemDataFlat = {
   reference?: string;
   url?: string;
   // PriceData
-  amount?: number;
-  priceAmount?: number;
-  currency?: string;
+  amount: number;
+  currency: string;
   label?: string;
 
   description?: string;
@@ -139,20 +136,6 @@ export type OrderData = {
   metadata?: MetaData;
 };
 
-export type OrderDataLoose = {
-  amount?: number;
-  currency?: string;
-  captureMethod?: 'automatic' | 'manual';
-  confirmationMethod?: 'automatic' | 'manual';
-  coupons?: string[];
-  lineItemData?: LineItemData[];
-  items?: LineItemDataFlat[];
-  shippingInfo?: ShippingInfo;
-  reference?: string;
-  description?: string;
-  metadata?: MetaData;
-};
-
 export type ChekoutSessionPayload = {
   customerInfo: CustomerInfo;
   orderData: OrderData;
@@ -161,40 +144,25 @@ export type ChekoutSessionPayload = {
   reference?: string;
 };
 
-export type ChekoutSessionPayloadFlat = {
+export type SimpleChekoutSessionPayload = {
   // OrderData
   amount?: number;
   currency?: string;
   captureMethod?: 'automatic' | 'manual';
   confirmationMethod?: 'automatic' | 'manual';
-  coupons?: string[];
-  lineItemData?: LineItemData[];
+
+  items: SimpleLineItem[];
   shippingInfo?: ShippingInfo;
-
-  // Shortuts of OrderData
-  items?: LineItemDataFlat[];
-  shipping?: Partial<ShippingInfo> & Partial<Address>;
-
-  // CustomerInfo
   customerInfo?: CustomerInfo;
-  customer?: CustomerInfoLoose;
-
-  // Rest of CheckoutSession
-  orderData?: OrderData;
-  reference?: string;
-  successURL?: string;
-  cancelURL?: string;
-  successUrl?: string;
-  cancelUrl?: string;
 
   description?: string;
   metadata?: MetaData;
-  orderDescription?: string;
-  orderMetadata?: MetaData;
+  reference?: string;
+
+  successUrl?: string;
+  cancelUrl?: string;
 
   promotionCode?: string;
-
-  test?: boolean;
 };
 
 export type RefundPayload = {

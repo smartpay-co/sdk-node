@@ -135,12 +135,8 @@ export const normalizeItem = (item: SimpleLineItem) => {
 export const normalizeItems = (list: SimpleLineItem[] = []) =>
   Array.isArray(list) ? list.map((item) => normalizeItem(item)) : [];
 
-export const normalizeShippingInfo = (
-  shipping: Partial<ShippingInfo> & Partial<Address> = {}
-) => {
+export const normalizeAddress = (address: Partial<Address> = {}) => {
   const {
-    address,
-    addressType,
     line1,
     line2,
     line3,
@@ -151,13 +147,9 @@ export const normalizeShippingInfo = (
     administrativeArea,
     postalCode,
     country,
-    feeAmount,
-    feeCurrency,
-  } = shipping;
+  } = address;
 
-  const rest = omit(shipping, [
-    'address',
-    'addressType',
+  const rest = omit(address, [
     'line1',
     'line2',
     'line3',
@@ -168,24 +160,36 @@ export const normalizeShippingInfo = (
     'administrativeArea',
     'postalCode',
     'country',
+  ]);
+
+  return {
+    ...rest,
+    line1,
+    line2,
+    line3,
+    line4,
+    line5,
+    subLocality,
+    locality,
+    administrativeArea,
+    postalCode,
+    country,
+  };
+};
+
+export const normalizeShippingInfo = (shipping: Partial<ShippingInfo> = {}) => {
+  const { address, addressType, feeAmount, feeCurrency } = shipping;
+
+  const rest = omit(shipping, [
+    'address',
+    'addressType',
     'feeAmount',
     'feeCurrency',
   ]);
 
   return {
     ...rest,
-    address: address || {
-      line1,
-      line2,
-      line3,
-      line4,
-      line5,
-      subLocality,
-      locality,
-      administrativeArea,
-      postalCode,
-      country,
-    },
+    address: normalizeAddress(address),
     addressType,
     feeAmount,
     feeCurrency,
@@ -215,12 +219,9 @@ export const normalizeCheckoutSessionPayload = (
     'currency',
     'captureMethod',
     'confirmationMethod',
-    'coupons',
-    'shippingInfo',
     'items',
-    'shipping',
     'customerInfo',
-    'customer',
+    'shippingInfo',
     'reference',
     'metadata',
     'description',

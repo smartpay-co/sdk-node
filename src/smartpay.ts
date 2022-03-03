@@ -50,8 +50,6 @@ type GetSessionURLOptions = {
 };
 
 type SessionURLParams = {
-  'session-id': string;
-  'public-key': string;
   'promotion-code'?: string;
 };
 
@@ -191,13 +189,13 @@ class Smartpay {
 
     return req.then((session) => {
       if (session) {
-        const sessionURL = this.getSessionURL(session, {
+        const sessionURL = Smartpay.getSessionURL(session, {
           promotionCode: payload.promotionCode,
         });
 
         if (sessionURL) {
           // eslint-disable-next-line no-param-reassign
-          session.checkoutURL = sessionURL;
+          session.url = sessionURL;
         }
       }
 
@@ -225,7 +223,7 @@ class Smartpay {
     return {};
   }
 
-  getSessionURL(
+  static getSessionURL(
     session: CheckoutSession,
     options?: GetSessionURLOptions
   ): string {
@@ -236,22 +234,13 @@ class Smartpay {
       });
     }
 
-    if (!this._publicKey) {
-      throw new SmartError({
-        errorCode: 'request.invalid',
-        message: 'Public Key is required',
-      });
-    }
-
-    const checkoutURL = options?.checkoutURL || this._checkoutURL;
+    const checkoutURL = session.url;
     const params: SessionURLParams = {
-      'session-id': session.id,
-      'public-key': this._publicKey,
       'promotion-code': options?.promotionCode,
     };
 
     return qs.stringifyUrl({
-      url: `${checkoutURL}/login`,
+      url: checkoutURL,
       query: params,
     });
   }

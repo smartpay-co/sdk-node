@@ -127,7 +127,6 @@ export type OrderData = {
   amount?: number;
   currency?: string;
   captureMethod?: 'automatic' | 'manual';
-  confirmationMethod?: 'automatic' | 'manual';
   coupons?: string[];
   lineItemData: LineItemData[];
   shippingInfo?: ShippingInfo;
@@ -149,7 +148,6 @@ export type SimpleChekoutSessionPayload = {
   amount?: number;
   currency?: string;
   captureMethod?: 'automatic' | 'manual';
-  confirmationMethod?: 'automatic' | 'manual';
 
   items: SimpleLineItem[];
   shippingInfo?: ShippingInfo;
@@ -233,7 +231,7 @@ export type CheckoutSession = {
   cancelUrl: string;
   reference?: string;
   metadata?: MetaData;
-  checkoutURL?: string;
+  url: string;
 };
 
 export type Payment = {

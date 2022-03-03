@@ -96,3 +96,21 @@ test('Create Live Checkout Session Loose Payload 2', async function testCreateCh
 
   t.ok(session.id.length > 0);
 });
+
+test('Get orders', async function testGetOrders(t) {
+  t.plan(2);
+
+  const smartpay = new Smartpay(TEST_SECRET_KEY, {
+    publicKey: TEST_PUBLIC_KEY,
+  });
+
+  const orderCollection = await smartpay.getOrders();
+
+  t.ok(orderCollection.data.length > 0);
+
+  const firstOrder = orderCollection.data[0];
+
+  const order = await smartpay.getOrder(firstOrder.id);
+
+  t.ok(order.id === firstOrder.id);
+});

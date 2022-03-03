@@ -267,6 +267,24 @@ export type JTDError = {
   schemaPath: string[];
 };
 
+export type GetOrdersParams = {
+  expoand?: string;
+  pageToken?: string;
+  maxResults?: number;
+};
+
+export type GetOrderParams = {
+  expoand?: string;
+};
+export type OrdersCollection = {
+  object: string;
+  pageToken: string;
+  nextPageToken?: string;
+  maxResults: number;
+  results: number;
+  data: Array<Order>;
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ErrorDetail = any;
 export type ErrorDetails = ErrorDetail[];

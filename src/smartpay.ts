@@ -6,6 +6,9 @@ import {
   SmartPayOptions,
   CheckoutSession,
   SimpleChekoutSessionPayload,
+  GetOrdersParams,
+  GetOrderParams,
+  OrdersCollection,
 } from './types';
 import {
   isValidPublicApiKey,
@@ -201,6 +204,35 @@ class Smartpay {
 
       return session;
     });
+  }
+
+  getOrders(params: GetOrdersParams = {}) {
+    const req: Promise<OrdersCollection> = this.request(
+      `/orders?${qs.stringify(params)}`,
+      {
+        method: GET,
+      }
+    );
+
+    return req;
+  }
+
+  getOrder(id: string, params: GetOrderParams = {}) {
+    if (!id) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Order Id is required',
+      });
+    }
+
+    const req: Promise<OrdersCollection> = this.request(
+      `/orders/${id}?${qs.stringify(params)}`,
+      {
+        method: GET,
+      }
+    );
+
+    return req;
   }
 
   setPublicKey(publicKey: KeyString) {

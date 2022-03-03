@@ -65,6 +65,7 @@
     "eslint-plugin-testing-library": "^3.9.2",
     "eslint-webpack-plugin": "^2.5.2",
     "jsonfile": "^6.1.0",
+    "lodash.sumby": "^4.6.0",
     "nock": "^13.1.1",
     "prettier": "^2.3.2",
     "replace-in-file": "^6.3.2",

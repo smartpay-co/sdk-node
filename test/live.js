@@ -1,9 +1,10 @@
 import test from 'tape';
+import sumBy from 'lodash.sumby';
 
 import Smartpay from '../build/esm/index.js';
 
-const TEST_SECRET_KEY = 'sk_test_KTGPODEMjGTJByn1pu8psb';
-const TEST_PUBLIC_KEY = 'pk_test_7smSiNAbAwsI2HKQE9e3hA';
+const TEST_SECRET_KEY = process.env.SECRET_KEY;
+const TEST_PUBLIC_KEY = process.env.PUBLIC_KEY;
 
 test('Create Live Checkout Session Loose Payload 1', async function testCreateCheckoutSession(t) {
   t.plan(1);
@@ -98,19 +99,70 @@ test('Create Live Checkout Session Loose Payload 2', async function testCreateCh
 });
 
 test('Get orders', async function testGetOrders(t) {
-  t.plan(2);
+  t.plan(3);
 
   const smartpay = new Smartpay(TEST_SECRET_KEY, {
     publicKey: TEST_PUBLIC_KEY,
   });
 
-  const orderCollection = await smartpay.getOrders();
+  const ordersCollection = await smartpay.getOrders({ maxResults: 10 });
 
-  t.ok(orderCollection.data.length > 0);
+  t.ok(ordersCollection.data.length > 0);
 
-  const firstOrder = orderCollection.data[0];
+  const { nextPageToken } = ordersCollection;
 
-  const order = await smartpay.getOrder(firstOrder.id);
+  if (nextPageToken) {
+    const nextOrdersCollection = await smartpay.getOrders({
+      pageToken: nextPageToken,
+    });
+
+    t.ok(nextOrdersCollection.data.length > 0);
+  } else {
+    t.ok(true);
+  }
+
+  const firstOrder = ordersCollection.data[0];
+
+  const order = await smartpay.getOrder({ id: firstOrder.id });
 
   t.ok(order.id === firstOrder.id);
+});
+
+test('Create refund', async function testGetOrders(t) {
+  const REFUND_AMOUNT = 1;
+
+  t.plan(1);
+
+  const smartpay = new Smartpay(TEST_SECRET_KEY, {
+    publicKey: TEST_PUBLIC_KEY,
+  });
+
+  const ordersCollection = await smartpay.getOrders({
+    maxResults: 100,
+    expand: 'all',
+  });
+  const refundablePayment = ordersCollection.data.reduce((result, order) => {
+    if (result) {
+      return result;
+    }
+
+    if (order.status === 'succeeded') {
+      const p = order.payments.find(
+        (payment) => payment.amount > sumBy(payment.refunds, 'amount')
+      );
+
+      return p;
+    }
+
+    return result;
+  }, null);
+
+  const refund = await smartpay.createRefund({
+    payment: refundablePayment.id,
+    amount: REFUND_AMOUNT,
+    currency: 'JPY',
+    reason: 'requested_by_customer',
+  });
+
+  t.ok(refund && refund.amount === REFUND_AMOUNT);
 });

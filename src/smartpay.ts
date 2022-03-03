@@ -6,8 +6,11 @@ import {
   SmartPayOptions,
   CheckoutSession,
   SimpleChekoutSessionPayload,
+  Refund,
   GetOrdersParams,
   GetOrderParams,
+  CreatePaymentParams,
+  CreateRefundParams,
   OrdersCollection,
 } from './types';
 import {
@@ -15,6 +18,7 @@ import {
   isValidSecretApiKey,
   validateCheckoutSessionPayload,
   normalizeCheckoutSessionPayload,
+  omit,
   jtdErrorToDetails,
   SmartError,
 } from './utils';
@@ -217,7 +221,9 @@ class Smartpay {
     return req;
   }
 
-  getOrder(id: string, params: GetOrderParams = {}) {
+  getOrder(params: GetOrderParams = {}) {
+    const { id } = params;
+
     if (!id) {
       throw new SmartError({
         errorCode: 'request.invalid',
@@ -226,7 +232,7 @@ class Smartpay {
     }
 
     const req: Promise<OrdersCollection> = this.request(
-      `/orders/${id}?${qs.stringify(params)}`,
+      `/orders/${id}?${qs.stringify(omit(params, ['id']))}`,
       {
         method: GET,
       }
@@ -234,6 +240,84 @@ class Smartpay {
 
     return req;
   }
+
+  createPayment(params: CreatePaymentParams = {}) {
+    const { id, amount, currency } = params;
+
+    if (!id) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Order Id is required',
+      });
+    }
+
+    if (!amount) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Capture Amount is required',
+      });
+    }
+
+    if (!currency) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Capture Amount Currency is required',
+      });
+    }
+
+    const req: Promise<OrdersCollection> = this.request(`/payments`, {
+      method: POST,
+      payload: params,
+    });
+
+    return req;
+  }
+
+  capture(params: CreatePaymentParams = {}) {
+    return this.createPayment(params);
+  }
+
+  createRefund(params: CreateRefundParams = {}) {
+    const { payment, amount, currency } = params;
+
+    if (!payment) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Payment Id is required',
+      });
+    }
+
+    if (!amount) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Refund Amount is required',
+      });
+    }
+
+    if (!currency) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Refund Amount Currency is required',
+      });
+    }
+
+    const req: Promise<Refund> = this.request(`/refunds`, {
+      method: POST,
+      payload: params,
+    });
+
+    return req;
+  }
+
+  refund(params: CreateRefundParams = {}) {
+    return this.createRefund(params);
+  }
+
+  /**
+   * refundOrder will automatically find payments in the order and create refund
+   * one by one until amount are all refunded.
+   */
+  // refundOrder() {}
 
   setPublicKey(publicKey: KeyString) {
     if (!publicKey) {

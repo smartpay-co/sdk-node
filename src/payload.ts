@@ -7,20 +7,8 @@ import type {
   SimpleChekoutSessionPayload,
   ShippingInfo,
   Address,
-  LooseObject,
 } from './types';
-
-export const omit = (obj: LooseObject, omitKeys: string[]) => {
-  const rest = { ...obj };
-
-  for (let i = 0; i < omitKeys.length; i += 1) {
-    const key = omitKeys[i];
-
-    delete rest[key];
-  }
-
-  return rest;
-};
+import { omit } from './utils';
 
 export const normalizeCustomerInfo = (
   customer: CustomerInfoLoose = {}

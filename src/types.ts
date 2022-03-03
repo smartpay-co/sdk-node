@@ -10,6 +10,8 @@ export type KeyString = string;
 
 export type AddressType = 'gift' | 'home' | 'locker' | 'office' | 'store';
 
+export type RefundReason = 'requested_by_customer' | 'fraudulent';
+
 export type SmartPayOptions = {
   publicKey?: KeyString;
   apiPrefix?: string;
@@ -252,9 +254,12 @@ export type Payment = {
 
 export type Refund = {
   id: string;
-  status: string;
+  payment: string;
+  object: string;
   amount: number;
   currency: string;
+  lineItems: LineItemData[];
+  reason: RefundReason;
   test: boolean;
   createdAt: number;
   updatedAt: number;
@@ -274,8 +279,26 @@ export type GetOrdersParams = {
 };
 
 export type GetOrderParams = {
+  id?: string;
   expoand?: string;
 };
+
+export type CreatePaymentParams = {
+  id?: string;
+  amount?: number;
+  currency?: string;
+  description?: string;
+  metadata?: MetaData;
+};
+
+export type CreateRefundParams = {
+  payment?: string;
+  amount?: number;
+  currency?: string;
+  reason?: RefundReason;
+  description?: string;
+};
+
 export type OrdersCollection = {
   object: string;
   pageToken: string;

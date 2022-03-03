@@ -6,6 +6,7 @@ import type {
   KeyString,
   SimpleChekoutSessionPayload,
   ErrorDetails,
+  LooseObject,
 } from './types';
 
 const publicKeyRegExp = /^pk_(test|live)_[0-9a-zA-Z]+$/;
@@ -138,6 +139,18 @@ export const normalizeCheckoutSessionPayload = (
   }
 
   return payload;
+};
+
+export const omit = (obj: LooseObject, omitKeys: string[]) => {
+  const rest = { ...obj };
+
+  for (let i = 0; i < omitKeys.length; i += 1) {
+    const key = omitKeys[i];
+
+    delete rest[key];
+  }
+
+  return rest;
 };
 
 export const DEFAULT_ERROR_MESSAGES: {

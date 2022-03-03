@@ -1,10 +1,13 @@
+import fetch from 'isomorphic-unfetch';
 import test from 'tape';
-import sumBy from 'lodash.sumby';
 
 import Smartpay from '../build/esm/index.js';
 
 const TEST_SECRET_KEY = process.env.SECRET_KEY;
 const TEST_PUBLIC_KEY = process.env.PUBLIC_KEY;
+const { TEST_USERNAME, TEST_PASSWORD } = process.env;
+
+const TestSessionData = {};
 
 test('Create Live Checkout Session Loose Payload 1', async function testCreateCheckoutSession(t) {
   t.plan(1);
@@ -37,7 +40,8 @@ test('Create Live Checkout Session Loose Payload 1', async function testCreateCh
       feeCurrency: 'JPY',
     },
 
-    // Your internal reference of the order
+    captureMethod: 'manual',
+
     reference: 'order_ref_1234567',
     successUrl: 'https://smartpay.co',
     cancelUrl: 'https://smartpay.co',
@@ -46,6 +50,8 @@ test('Create Live Checkout Session Loose Payload 1', async function testCreateCh
   const session = await smartpay.createCheckoutSession(payload);
 
   console.log(session); // eslint-disable-line no-console
+
+  TestSessionData.manualCaptureSession = session;
 
   t.ok(session.id.length > 0);
 });
@@ -128,7 +134,56 @@ test('Get orders', async function testGetOrders(t) {
   t.ok(order.id === firstOrder.id);
 });
 
-test('Create refund', async function testGetOrders(t) {
+test('Create payment', async function testCreatePayment(t) {
+  const orderId = TestSessionData.manualCaptureSession.order.id;
+  const PAYMENT_AMOUNT = 50;
+
+  t.plan(3);
+
+  const loginResponse = await fetch(
+    `https://${process.env.API_BASE}/consumers/auth/login`,
+    {
+      headers: {},
+      body: `{"emailAddress":"${TEST_USERNAME}","password":"${TEST_PASSWORD}"}`,
+      method: 'POST',
+    }
+  );
+  const { accessToken } = await loginResponse.json();
+
+  await fetch(
+    `https://${process.env.API_BASE}/orders/${orderId}/authorizations`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: '{"paymentMethod":"pm_test_visaApproved","paymentPlan":"pay_in_three"}',
+      method: 'POST',
+    }
+  );
+
+  const smartpay = new Smartpay(TEST_SECRET_KEY, {
+    publicKey: TEST_PUBLIC_KEY,
+  });
+
+  const payment1 = await smartpay.createPayment({
+    order: orderId,
+    amount: PAYMENT_AMOUNT,
+    currency: 'JPY',
+  });
+
+  const payment2 = await smartpay.createPayment({
+    order: orderId,
+    amount: PAYMENT_AMOUNT,
+    currency: 'JPY',
+  });
+
+  t.ok(payment1.id);
+  t.ok(payment2.id);
+  t.ok(payment2.amount === PAYMENT_AMOUNT);
+});
+
+test('Create refund', async function testCreateRefunds(t) {
+  const orderId = TestSessionData.manualCaptureSession.order.id;
   const REFUND_AMOUNT = 1;
 
   t.plan(1);
@@ -137,28 +192,10 @@ test('Create refund', async function testGetOrders(t) {
     publicKey: TEST_PUBLIC_KEY,
   });
 
-  const ordersCollection = await smartpay.getOrders({
-    maxResults: 100,
-    expand: 'all',
-  });
-  const refundablePayment = ordersCollection.data.reduce((result, order) => {
-    if (result) {
-      return result;
-    }
-
-    if (order.status === 'succeeded') {
-      const p = order.payments.find(
-        (payment) => payment.amount > sumBy(payment.refunds, 'amount')
-      );
-
-      return p;
-    }
-
-    return result;
-  }, null);
-
+  const order = await smartpay.getOrder({ id: orderId });
+  const refundablePayment = order.payments[0];
   const refund = await smartpay.createRefund({
-    payment: refundablePayment.id,
+    payment: refundablePayment,
     amount: REFUND_AMOUNT,
     currency: 'JPY',
     reason: 'requested_by_customer',

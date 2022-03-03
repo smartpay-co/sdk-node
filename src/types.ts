@@ -284,7 +284,7 @@ export type GetOrderParams = {
 };
 
 export type CreatePaymentParams = {
-  id?: string;
+  order?: string;
   amount?: number;
   currency?: string;
   description?: string;

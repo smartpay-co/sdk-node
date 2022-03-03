@@ -242,9 +242,9 @@ class Smartpay {
   }
 
   createPayment(params: CreatePaymentParams = {}) {
-    const { id, amount, currency } = params;
+    const { order, amount, currency } = params;
 
-    if (!id) {
+    if (!order) {
       throw new SmartError({
         errorCode: 'request.invalid',
         message: 'Order Id is required',

@@ -287,6 +287,7 @@ export type CreatePaymentParams = {
   order?: string;
   amount?: number;
   currency?: string;
+  reference?: string;
   description?: string;
   metadata?: MetaData;
 };
@@ -296,7 +297,9 @@ export type CreateRefundParams = {
   amount?: number;
   currency?: string;
   reason?: RefundReason;
+  reference?: string;
   description?: string;
+  metadata?: MetaData;
 };
 
 export type OrdersCollection = {

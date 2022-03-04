@@ -273,14 +273,14 @@ export type JTDError = {
 };
 
 export type GetOrdersParams = {
-  expoand?: string;
+  expand?: string;
   pageToken?: string;
   maxResults?: number;
 };
 
 export type GetOrderParams = {
   id?: string;
-  expoand?: string;
+  expand?: string;
 };
 
 export type CreatePaymentParams = {

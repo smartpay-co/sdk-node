@@ -171,7 +171,7 @@ test('Create payment', async function testCreatePayment(t) {
     currency: 'JPY',
   });
 
-  const payment2 = await smartpay.createPayment({
+  const payment2 = await smartpay.capture({
     order: orderId,
     amount: PAYMENT_AMOUNT,
     currency: 'JPY',
@@ -186,7 +186,7 @@ test('Create refund', async function testCreateRefunds(t) {
   const orderId = TestSessionData.manualCaptureSession.order.id;
   const REFUND_AMOUNT = 1;
 
-  t.plan(1);
+  t.plan();
 
   const smartpay = new Smartpay(TEST_SECRET_KEY, {
     publicKey: TEST_PUBLIC_KEY,
@@ -194,12 +194,19 @@ test('Create refund', async function testCreateRefunds(t) {
 
   const order = await smartpay.getOrder({ id: orderId });
   const refundablePayment = order.payments[0];
-  const refund = await smartpay.createRefund({
+  const refund1 = await smartpay.createRefund({
     payment: refundablePayment,
     amount: REFUND_AMOUNT,
     currency: 'JPY',
-    reason: 'requested_by_customer',
+    reason: Smartpay.REJECT_REQUEST_BY_CUSTOMER,
+  });
+  const refund2 = await smartpay.createRefund({
+    payment: refundablePayment,
+    amount: REFUND_AMOUNT,
+    currency: 'JPY',
+    reason: Smartpay.REJECT_REQUEST_BY_CUSTOMER,
   });
 
-  t.ok(refund && refund.amount === REFUND_AMOUNT);
+  t.ok(refund1 && refund1.amount === REFUND_AMOUNT);
+  t.ok(refund2 && refund2.amount === REFUND_AMOUNT);
 });

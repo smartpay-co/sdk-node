@@ -61,6 +61,9 @@ type SessionURLParams = {
 };
 
 class Smartpay {
+  static REJECT_REQUEST_BY_CUSTOMER = 'requested_by_customer';
+  static REJECT_FRAUDULENT = 'fraudulent';
+
   _secretKey: KeyString;
   _publicKey?: KeyString;
   _apiPrefix: string;
@@ -278,7 +281,7 @@ class Smartpay {
   }
 
   createRefund(params: CreateRefundParams = {}) {
-    const { payment, amount, currency } = params;
+    const { payment, amount, currency, reason } = params;
 
     if (!payment) {
       throw new SmartError({
@@ -298,6 +301,13 @@ class Smartpay {
       throw new SmartError({
         errorCode: 'request.invalid',
         message: 'Refund Amount Currency is required',
+      });
+    }
+
+    if (!reason) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Refund Reason is required',
       });
     }
 

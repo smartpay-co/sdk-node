@@ -6,12 +6,19 @@ import {
   SmartPayOptions,
   CheckoutSession,
   SimpleChekoutSessionPayload,
+  Refund,
+  GetOrdersParams,
+  GetOrderParams,
+  CreatePaymentParams,
+  CreateRefundParams,
+  OrdersCollection,
 } from './types';
 import {
   isValidPublicApiKey,
   isValidSecretApiKey,
   validateCheckoutSessionPayload,
   normalizeCheckoutSessionPayload,
+  omit,
   jtdErrorToDetails,
   SmartError,
 } from './utils';
@@ -50,12 +57,13 @@ type GetSessionURLOptions = {
 };
 
 type SessionURLParams = {
-  'session-id': string;
-  'public-key': string;
   'promotion-code'?: string;
 };
 
 class Smartpay {
+  static REJECT_REQUEST_BY_CUSTOMER = 'requested_by_customer';
+  static REJECT_FRAUDULENT = 'fraudulent';
+
   _secretKey: KeyString;
   _publicKey?: KeyString;
   _apiPrefix: string;
@@ -191,19 +199,135 @@ class Smartpay {
 
     return req.then((session) => {
       if (session) {
-        const sessionURL = this.getSessionURL(session, {
+        const sessionURL = Smartpay.getSessionURL(session, {
           promotionCode: payload.promotionCode,
         });
 
         if (sessionURL) {
           // eslint-disable-next-line no-param-reassign
-          session.checkoutURL = sessionURL;
+          session.url = sessionURL;
         }
       }
 
       return session;
     });
   }
+
+  getOrders(params: GetOrdersParams = {}) {
+    const req: Promise<OrdersCollection> = this.request(
+      `/orders?${qs.stringify(params)}`,
+      {
+        method: GET,
+      }
+    );
+
+    return req;
+  }
+
+  getOrder(params: GetOrderParams = {}) {
+    const { id } = params;
+
+    if (!id) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Order Id is required',
+      });
+    }
+
+    const req: Promise<OrdersCollection> = this.request(
+      `/orders/${id}?${qs.stringify(omit(params, ['id']))}`,
+      {
+        method: GET,
+      }
+    );
+
+    return req;
+  }
+
+  createPayment(params: CreatePaymentParams = {}) {
+    const { order, amount, currency } = params;
+
+    if (!order) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Order Id is required',
+      });
+    }
+
+    if (!amount) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Capture Amount is required',
+      });
+    }
+
+    if (!currency) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Capture Amount Currency is required',
+      });
+    }
+
+    const req: Promise<OrdersCollection> = this.request(`/payments`, {
+      method: POST,
+      payload: params,
+    });
+
+    return req;
+  }
+
+  capture(params: CreatePaymentParams = {}) {
+    return this.createPayment(params);
+  }
+
+  createRefund(params: CreateRefundParams = {}) {
+    const { payment, amount, currency, reason } = params;
+
+    if (!payment) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Payment Id is required',
+      });
+    }
+
+    if (!amount) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Refund Amount is required',
+      });
+    }
+
+    if (!currency) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Refund Amount Currency is required',
+      });
+    }
+
+    if (!reason) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Refund Reason is required',
+      });
+    }
+
+    const req: Promise<Refund> = this.request(`/refunds`, {
+      method: POST,
+      payload: params,
+    });
+
+    return req;
+  }
+
+  refund(params: CreateRefundParams = {}) {
+    return this.createRefund(params);
+  }
+
+  /**
+   * refundOrder will automatically find payments in the order and create refund
+   * one by one until amount are all refunded.
+   */
+  // refundOrder() {}
 
   setPublicKey(publicKey: KeyString) {
     if (!publicKey) {
@@ -225,7 +349,7 @@ class Smartpay {
     return {};
   }
 
-  getSessionURL(
+  static getSessionURL(
     session: CheckoutSession,
     options?: GetSessionURLOptions
   ): string {
@@ -236,22 +360,13 @@ class Smartpay {
       });
     }
 
-    if (!this._publicKey) {
-      throw new SmartError({
-        errorCode: 'request.invalid',
-        message: 'Public Key is required',
-      });
-    }
-
-    const checkoutURL = options?.checkoutURL || this._checkoutURL;
+    const checkoutURL = session.url;
     const params: SessionURLParams = {
-      'session-id': session.id,
-      'public-key': this._publicKey,
       'promotion-code': options?.promotionCode,
     };
 
     return qs.stringifyUrl({
-      url: `${checkoutURL}/login`,
+      url: checkoutURL,
       query: params,
     });
   }

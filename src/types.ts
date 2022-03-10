@@ -10,6 +10,8 @@ export type KeyString = string;
 
 export type AddressType = 'gift' | 'home' | 'locker' | 'office' | 'store';
 
+export type RefundReason = 'requested_by_customer' | 'fraudulent';
+
 export type SmartPayOptions = {
   publicKey?: KeyString;
   apiPrefix?: string;
@@ -127,7 +129,6 @@ export type OrderData = {
   amount?: number;
   currency?: string;
   captureMethod?: 'automatic' | 'manual';
-  confirmationMethod?: 'automatic' | 'manual';
   coupons?: string[];
   lineItemData: LineItemData[];
   shippingInfo?: ShippingInfo;
@@ -149,7 +150,6 @@ export type SimpleChekoutSessionPayload = {
   amount?: number;
   currency?: string;
   captureMethod?: 'automatic' | 'manual';
-  confirmationMethod?: 'automatic' | 'manual';
 
   items: SimpleLineItem[];
   shippingInfo?: ShippingInfo;
@@ -233,7 +233,7 @@ export type CheckoutSession = {
   cancelUrl: string;
   reference?: string;
   metadata?: MetaData;
-  checkoutURL?: string;
+  url: string;
 };
 
 export type Payment = {
@@ -254,9 +254,12 @@ export type Payment = {
 
 export type Refund = {
   id: string;
-  status: string;
+  payment: string;
+  object: string;
   amount: number;
   currency: string;
+  lineItems: LineItemData[];
+  reason: RefundReason;
   test: boolean;
   createdAt: number;
   updatedAt: number;
@@ -267,6 +270,45 @@ export type Refund = {
 export type JTDError = {
   instancePath: string[];
   schemaPath: string[];
+};
+
+export type GetOrdersParams = {
+  expand?: string;
+  pageToken?: string;
+  maxResults?: number;
+};
+
+export type GetOrderParams = {
+  id?: string;
+  expand?: string;
+};
+
+export type CreatePaymentParams = {
+  order?: string;
+  amount?: number;
+  currency?: string;
+  reference?: string;
+  description?: string;
+  metadata?: MetaData;
+};
+
+export type CreateRefundParams = {
+  payment?: string;
+  amount?: number;
+  currency?: string;
+  reason?: RefundReason;
+  reference?: string;
+  description?: string;
+  metadata?: MetaData;
+};
+
+export type OrdersCollection = {
+  object: string;
+  pageToken: string;
+  nextPageToken?: string;
+  maxResults: number;
+  results: number;
+  data: Array<Order>;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

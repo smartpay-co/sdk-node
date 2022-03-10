@@ -7,20 +7,8 @@ import type {
   SimpleChekoutSessionPayload,
   ShippingInfo,
   Address,
-  LooseObject,
 } from './types';
-
-export const omit = (obj: LooseObject, omitKeys: string[]) => {
-  const rest = { ...obj };
-
-  for (let i = 0; i < omitKeys.length; i += 1) {
-    const key = omitKeys[i];
-
-    delete rest[key];
-  }
-
-  return rest;
-};
+import { omit } from './utils';
 
 export const normalizeCustomerInfo = (
   customer: CustomerInfoLoose = {}
@@ -203,7 +191,6 @@ export const normalizeCheckoutSessionPayload = (
     amount,
     currency,
     captureMethod,
-    confirmationMethod,
     items,
     customerInfo,
     shippingInfo,
@@ -218,7 +205,6 @@ export const normalizeCheckoutSessionPayload = (
     'amount',
     'currency',
     'captureMethod',
-    'confirmationMethod',
     'items',
     'customerInfo',
     'shippingInfo',
@@ -234,7 +220,6 @@ export const normalizeCheckoutSessionPayload = (
     amount,
     currency,
     captureMethod,
-    confirmationMethod,
     items: normalizeItems(items),
     customerInfo: normalizeCustomerInfo(customerInfo),
     shippingInfo: normalizeShippingInfo(shippingInfo),

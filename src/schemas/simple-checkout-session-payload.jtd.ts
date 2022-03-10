@@ -78,7 +78,6 @@ export default {
   },
   optionalProperties: {
     captureMethod: { type: 'string' },
-    confirmationMethod: { type: 'string' },
     description: { type: 'string' },
     reference: { type: 'string' },
 

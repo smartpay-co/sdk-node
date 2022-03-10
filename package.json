@@ -27,7 +27,7 @@
     "test:unit": "tape test/unit.js",
     "test:nock": "tape test/nock.js",
     "test:live": "tape test/live.js",
-    "test": "yarn test:unit && yarn test:nock && yarn test:live"
+    "test": "yarn test:unit && yarn test:nock"
   },
   "repository": {
     "type": "git",

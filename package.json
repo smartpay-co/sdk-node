@@ -23,7 +23,7 @@
     "build:esm": "node --experimental-json-modules build.js",
     "build:cjs": "node build.cjs",
     "build": "yarn build:esm && yarn build:cjs",
-    "prepublish": "npm run build",
+    "prepublishOnly": "npm run build",
     "pretest": "yarn build",
     "test:unit": "tape test/unit.js",
     "test:nock": "tape test/nock.js",

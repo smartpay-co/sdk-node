@@ -6,11 +6,15 @@ import {
   SmartPayOptions,
   CheckoutSession,
   SimpleChekoutSessionPayload,
+  Payment,
   Refund,
+  Order,
   GetOrdersParams,
   GetOrderParams,
   CreatePaymentParams,
+  GetPaymentParams,
   CreateRefundParams,
+  GetRefundParams,
   OrdersCollection,
 } from './types';
 import {
@@ -32,7 +36,7 @@ const CHECKOUT_URL = 'https://checkout.smartpay.co';
 
 const GET = 'GET';
 const POST = 'POST';
-// const PUT = 'PUT';
+const PUT = 'PUT';
 // const DELETE = 'DELETE';
 
 export const STATUS_SUCCEEDED = 'succeeded';
@@ -234,10 +238,30 @@ class Smartpay {
       });
     }
 
-    const req: Promise<OrdersCollection> = this.request(
+    const req: Promise<Order> = this.request(
       `/orders/${id}?${qs.stringify(omit(params, ['id']))}`,
       {
         method: GET,
+      }
+    );
+
+    return req;
+  }
+
+  cancelOrder(params: GetOrderParams = {}) {
+    const { id } = params;
+
+    if (!id) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Order Id is required',
+      });
+    }
+
+    const req: Promise<Order> = this.request(
+      `/orders/${id}/cancellation?${qs.stringify(omit(params, ['id']))}`,
+      {
+        method: PUT,
       }
     );
 
@@ -268,7 +292,7 @@ class Smartpay {
       });
     }
 
-    const req: Promise<OrdersCollection> = this.request(`/payments`, {
+    const req: Promise<Payment> = this.request(`/payments`, {
       method: POST,
       payload: params,
     });
@@ -278,6 +302,26 @@ class Smartpay {
 
   capture(params: CreatePaymentParams = {}) {
     return this.createPayment(params);
+  }
+
+  getPayment(params: GetPaymentParams = {}) {
+    const { id } = params;
+
+    if (!id) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Payment Id is required',
+      });
+    }
+
+    const req: Promise<Payment> = this.request(
+      `/payments/${id}?${qs.stringify(omit(params, ['id']))}`,
+      {
+        method: GET,
+      }
+    );
+
+    return req;
   }
 
   createRefund(params: CreateRefundParams = {}) {
@@ -321,6 +365,26 @@ class Smartpay {
 
   refund(params: CreateRefundParams = {}) {
     return this.createRefund(params);
+  }
+
+  getRefund(params: GetRefundParams = {}) {
+    const { id } = params;
+
+    if (!id) {
+      throw new SmartError({
+        errorCode: 'request.invalid',
+        message: 'Refund Id is required',
+      });
+    }
+
+    const req: Promise<Refund> = this.request(
+      `/refunds/${id}?${qs.stringify(omit(params, ['id']))}`,
+      {
+        method: GET,
+      }
+    );
+
+    return req;
   }
 
   /**

@@ -283,6 +283,16 @@ export type GetOrderParams = {
   expand?: string;
 };
 
+export type GetPaymentParams = {
+  id?: string;
+  expand?: string;
+};
+
+export type GetRefundParams = {
+  id?: string;
+  expand?: string;
+};
+
 export type CreatePaymentParams = {
   order?: string;
   amount?: number;

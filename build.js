@@ -1,7 +1,7 @@
 import esbuild from 'esbuild';
 import replace from 'replace-in-file';
 import { dtsPlugin } from 'esbuild-plugin-d.ts';
-import pkg from './package.json';
+import pkg from './package.json' assert { type: 'json' };
 
 const external = [
   ...Object.keys(pkg.dependencies || {}),

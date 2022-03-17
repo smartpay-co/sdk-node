@@ -24,7 +24,7 @@ import {
   normalizeCheckoutSessionPayload,
   omit,
   jtdErrorToDetails,
-  SmartError,
+  SmartpayError,
 } from './utils';
 
 interface Params {
@@ -122,27 +122,19 @@ class Smartpay {
       })
         // Netowork issue
         .catch((error) => {
-          throw new SmartError({
+          throw new SmartpayError({
             errorCode: 'unexpected_error',
             statusCode: -1,
             message: error.message,
           });
         })
         .then((response) => {
-          if (!response.ok) {
-            throw new SmartError({
-              errorCode: 'unexpected_error',
-              statusCode: response.status,
-              message: `${response.status}`,
-            });
-          }
-
           return (
             response
               .json()
               // Parse body failed
               .catch((error) => {
-                throw new SmartError({
+                throw new SmartpayError({
                   errorCode: 'unexpected_error',
                   statusCode: response.status,
                   message: `${response.status} ${error.message}`,
@@ -153,7 +145,7 @@ class Smartpay {
                   return data;
                 }
 
-                throw new SmartError({
+                throw new SmartpayError({
                   errorCode: data.errorCode,
                   statusCode: response.status,
                   message: `${response.status} ${data.message}`,
@@ -174,7 +166,7 @@ class Smartpay {
     );
 
     if (errors.length) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Payload invalid',
         details: jtdErrorToDetails(errors, 'payload'),
@@ -232,7 +224,7 @@ class Smartpay {
     const { id } = params;
 
     if (!id) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Order Id is required',
       });
@@ -252,7 +244,7 @@ class Smartpay {
     const { id } = params;
 
     if (!id) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Order Id is required',
       });
@@ -272,21 +264,21 @@ class Smartpay {
     const { order, amount, currency } = params;
 
     if (!order) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Order Id is required',
       });
     }
 
     if (!amount) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Capture Amount is required',
       });
     }
 
     if (!currency) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Capture Amount Currency is required',
       });
@@ -308,7 +300,7 @@ class Smartpay {
     const { id } = params;
 
     if (!id) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Payment Id is required',
       });
@@ -328,28 +320,28 @@ class Smartpay {
     const { payment, amount, currency, reason } = params;
 
     if (!payment) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Payment Id is required',
       });
     }
 
     if (!amount) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Refund Amount is required',
       });
     }
 
     if (!currency) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Refund Amount Currency is required',
       });
     }
 
     if (!reason) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Refund Reason is required',
       });
@@ -371,7 +363,7 @@ class Smartpay {
     const { id } = params;
 
     if (!id) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Refund Id is required',
       });
@@ -395,14 +387,14 @@ class Smartpay {
 
   setPublicKey(publicKey: KeyString) {
     if (!publicKey) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Public Key is required',
       });
     }
 
     if (!isValidPublicApiKey(publicKey)) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Public Key is invalid',
       });
@@ -418,7 +410,7 @@ class Smartpay {
     options?: GetSessionURLOptions
   ): string {
     if (!session) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Session is invalid',
       });

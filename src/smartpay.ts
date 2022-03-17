@@ -1,5 +1,7 @@
-import fetch from 'isomorphic-unfetch';
+import fetchRetry from 'fetch-retry';
+import originalFetch from 'isomorphic-unfetch';
 import qs from 'query-string';
+import randomstring from 'randomstring';
 
 import {
   KeyString,
@@ -11,6 +13,7 @@ import {
   Order,
   GetOrdersParams,
   GetOrderParams,
+  CancelOrderParams,
   CreatePaymentParams,
   GetPaymentParams,
   CreateRefundParams,
@@ -26,6 +29,16 @@ import {
   jtdErrorToDetails,
   SmartpayError,
 } from './utils';
+
+const fetch = fetchRetry(originalFetch, {
+  retryDelay: (attempt: number) => {
+    return 2 ** attempt * 200;
+  },
+  retryOn: (attempt: number, error: Error, response: Response) => {
+    // retry on any network error, or 4xx or 5xx status codes
+    return attempt < 5 && (error !== null || response.status >= 400);
+  },
+});
 
 interface Params {
   [key: string]: string;
@@ -100,15 +113,20 @@ class Smartpay {
       method?: Method;
       params?: Params;
       payload?: any;
+      idempotencyKey?: string;
     } = {}
   ) {
-    const { method, params, payload } = options;
-
-    let url = `${this._apiPrefix}${endpoint}`;
-
-    if (params) {
-      url = `${url}?${qs.stringify(params)}`;
-    }
+    const {
+      method,
+      params,
+      payload,
+      idempotencyKey: customIdempotencyKey,
+    } = options;
+    const idempotencyKey = customIdempotencyKey || randomstring.generate();
+    const url = qs.stringifyUrl({
+      url: `${this._apiPrefix}${endpoint}`,
+      query: params,
+    });
 
     return (
       fetch(url, {
@@ -117,6 +135,7 @@ class Smartpay {
           Authorization: `Basic ${this._secretKey}`,
           Accept: 'application/json',
           'Content-Type': 'application/json',
+          'Idempotency-Key': idempotencyKey,
         },
         body: payload ? JSON.stringify(payload) : null,
       })
@@ -189,7 +208,8 @@ class Smartpay {
       `/checkout-sessions?${qs.stringify(params)}`,
       {
         method: POST,
-        payload: normalizedPayload,
+        idempotencyKey: payload.idempotencyKey,
+        payload: omit(normalizedPayload, ['idempotencyKey']),
       }
     );
 
@@ -240,7 +260,7 @@ class Smartpay {
     return req;
   }
 
-  cancelOrder(params: GetOrderParams = {}) {
+  cancelOrder(params: CancelOrderParams = {}) {
     const { id } = params;
 
     if (!id) {
@@ -254,6 +274,7 @@ class Smartpay {
       `/orders/${id}/cancellation?${qs.stringify(omit(params, ['id']))}`,
       {
         method: PUT,
+        idempotencyKey: params.idempotencyKey,
       }
     );
 
@@ -286,7 +307,8 @@ class Smartpay {
 
     const req: Promise<Payment> = this.request(`/payments`, {
       method: POST,
-      payload: params,
+      idempotencyKey: params.idempotencyKey,
+      payload: omit(params, ['idempotencyKey']),
     });
 
     return req;
@@ -349,7 +371,8 @@ class Smartpay {
 
     const req: Promise<Refund> = this.request(`/refunds`, {
       method: POST,
-      payload: params,
+      idempotencyKey: params.idempotencyKey,
+      payload: omit(params, ['idempotencyKey']),
     });
 
     return req;

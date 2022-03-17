@@ -163,6 +163,8 @@ export type SimpleChekoutSessionPayload = {
   cancelUrl?: string;
 
   promotionCode?: string;
+
+  idempotencyKey?: string;
 };
 
 export type RefundPayload = {
@@ -293,6 +295,11 @@ export type GetRefundParams = {
   expand?: string;
 };
 
+export type CancelOrderParams = {
+  id?: string;
+  idempotencyKey?: string;
+};
+
 export type CreatePaymentParams = {
   order?: string;
   amount?: number;
@@ -300,6 +307,7 @@ export type CreatePaymentParams = {
   reference?: string;
   description?: string;
   metadata?: MetaData;
+  idempotencyKey?: string;
 };
 
 export type CreateRefundParams = {
@@ -310,6 +318,7 @@ export type CreateRefundParams = {
   reference?: string;
   description?: string;
   metadata?: MetaData;
+  idempotencyKey?: string;
 };
 
 export type OrdersCollection = {

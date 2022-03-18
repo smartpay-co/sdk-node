@@ -23,6 +23,9 @@ import {
 import {
   isValidPublicApiKey,
   isValidSecretApiKey,
+  isValidOrderId,
+  isValidPaymentId,
+  isValidRefundId,
   validateCheckoutSessionPayload,
   normalizeCheckoutSessionPayload,
   omit,
@@ -242,6 +245,13 @@ class Smartpay {
       });
     }
 
+    if (!isValidOrderId(id)) {
+      throw new SmartpayError({
+        errorCode: 'request.invalid',
+        message: 'Order Id is invalid',
+      });
+    }
+
     const req: Promise<Order> = this.request(`/orders/${id}`, {
       method: GET,
       params: omit(params, ['id']),
@@ -257,6 +267,13 @@ class Smartpay {
       throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Order Id is required',
+      });
+    }
+
+    if (!isValidOrderId(id)) {
+      throw new SmartpayError({
+        errorCode: 'request.invalid',
+        message: 'Order Id is invalid',
       });
     }
 
@@ -276,6 +293,13 @@ class Smartpay {
       throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Order Id is required',
+      });
+    }
+
+    if (!isValidOrderId(order)) {
+      throw new SmartpayError({
+        errorCode: 'request.invalid',
+        message: 'Order Id is invalid',
       });
     }
 
@@ -316,6 +340,13 @@ class Smartpay {
       });
     }
 
+    if (!isValidPaymentId(id)) {
+      throw new SmartpayError({
+        errorCode: 'request.invalid',
+        message: 'Payment Id is invalid',
+      });
+    }
+
     const req: Promise<Payment> = this.request(`/payments/${id}`, {
       method: GET,
       params: omit(params, ['id']),
@@ -331,6 +362,13 @@ class Smartpay {
       throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Payment Id is required',
+      });
+    }
+
+    if (!isValidPaymentId(payment)) {
+      throw new SmartpayError({
+        errorCode: 'request.invalid',
+        message: 'Payment Id is invalid',
       });
     }
 
@@ -375,6 +413,13 @@ class Smartpay {
       throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Refund Id is required',
+      });
+    }
+
+    if (!isValidRefundId(id)) {
+      throw new SmartpayError({
+        errorCode: 'request.invalid',
+        message: 'Refund Id is invalid',
       });
     }
 

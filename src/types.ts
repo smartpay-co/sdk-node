@@ -304,6 +304,7 @@ export type CreatePaymentParams = {
   order?: string;
   amount?: number;
   currency?: string;
+  cancelMethod?: 'automatic' | 'manual';
   reference?: string;
   description?: string;
   metadata?: MetaData;

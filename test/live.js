@@ -138,7 +138,7 @@ test('Create payment', async function testCreatePayment(t) {
   const orderId = TestSessionData.manualCaptureSession.order.id;
   const PAYMENT_AMOUNT = 50;
 
-  t.plan(3);
+  t.plan(5);
 
   const loginResponse = await fetch(
     `https://${process.env.API_BASE}/consumers/auth/login`,
@@ -169,24 +169,33 @@ test('Create payment', async function testCreatePayment(t) {
     order: orderId,
     amount: PAYMENT_AMOUNT,
     currency: 'JPY',
+    cancelMethod: 'manual',
   });
 
   const payment2 = await smartpay.capture({
     order: orderId,
-    amount: PAYMENT_AMOUNT,
+    amount: PAYMENT_AMOUNT + 1,
     currency: 'JPY',
+    cancelMethod: 'manual',
   });
 
   t.ok(payment1.id);
   t.ok(payment2.id);
-  t.ok(payment2.amount === PAYMENT_AMOUNT);
+  t.ok(payment2.amount === PAYMENT_AMOUNT + 1);
+
+  const retrivedPayment2 = await smartpay.getPayment({
+    id: payment2.id,
+  });
+
+  t.ok(payment2.id === retrivedPayment2.id);
+  t.ok(payment2.amount === retrivedPayment2.amount);
 });
 
 test('Create refund', async function testCreateRefunds(t) {
   const orderId = TestSessionData.manualCaptureSession.order.id;
   const REFUND_AMOUNT = 1;
 
-  t.plan();
+  t.plan(4);
 
   const smartpay = new Smartpay(TEST_SECRET_KEY, {
     publicKey: TEST_PUBLIC_KEY,
@@ -202,11 +211,18 @@ test('Create refund', async function testCreateRefunds(t) {
   });
   const refund2 = await smartpay.createRefund({
     payment: refundablePayment,
-    amount: REFUND_AMOUNT,
+    amount: REFUND_AMOUNT + 1,
     currency: 'JPY',
     reason: Smartpay.REJECT_REQUEST_BY_CUSTOMER,
   });
 
   t.ok(refund1 && refund1.amount === REFUND_AMOUNT);
-  t.ok(refund2 && refund2.amount === REFUND_AMOUNT);
+  t.ok(refund2 && refund2.amount === REFUND_AMOUNT + 1);
+
+  const retrivedRefund2 = await smartpay.getRefund({
+    id: refund2.id,
+  });
+
+  t.ok(refund2.id === retrivedRefund2.id);
+  t.ok(refund2.amount === retrivedRefund2.amount);
 });

@@ -1,9 +1,9 @@
 import Smartpay from './smartpay';
 
 export {
-  isValidCheckoutSessionID,
-  isValidOrderID,
-  isValidPaymentID,
+  isValidCheckoutSessionId,
+  isValidOrderId,
+  isValidPaymentId,
 } from './utils';
 
 export default Smartpay;

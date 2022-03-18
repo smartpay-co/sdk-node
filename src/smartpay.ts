@@ -31,17 +31,15 @@ import {
 } from './utils';
 
 const fetch = fetchRetry(originalFetch, {
+  retries: 3,
+  retryOn: [500, 501, 502, 503, 504],
   retryDelay: (attempt: number) => {
     return 2 ** attempt * 200;
-  },
-  retryOn: (attempt: number, error: Error, response: Response) => {
-    // retry on any network error, or 4xx or 5xx status codes
-    return attempt < 5 && (error !== null || response.status >= 400);
   },
 });
 
 interface Params {
-  [key: string]: string;
+  [key: string]: string | number;
 }
 
 const API_PREFIX = 'https://api.smartpay.co/v1';

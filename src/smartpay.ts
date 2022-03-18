@@ -123,7 +123,11 @@ class Smartpay {
     const idempotencyKey = customIdempotencyKey || randomstring.generate();
     const url = qs.stringifyUrl({
       url: `${this._apiPrefix}${endpoint}`,
-      query: params,
+      query: {
+        ...params,
+        'dev-lang': 'nodejs',
+        'sdk-version': '__buildVersion__',
+      },
     });
 
     return (
@@ -196,20 +200,12 @@ class Smartpay {
   createCheckoutSession(payload: SimpleChekoutSessionPayload) {
     const normalizedPayload = Smartpay.normalizeCheckoutSessionPayload(payload);
 
-    const params = {
-      'dev-lang': 'nodejs',
-      'sdk-version': '__buildVersion__',
-    };
-
     // Call API to create checkout session
-    const req: Promise<CheckoutSession> = this.request(
-      `/checkout-sessions?${qs.stringify(params)}`,
-      {
-        method: POST,
-        idempotencyKey: payload.idempotencyKey,
-        payload: omit(normalizedPayload, ['idempotencyKey']),
-      }
-    );
+    const req: Promise<CheckoutSession> = this.request(`/checkout-sessions`, {
+      method: POST,
+      idempotencyKey: payload.idempotencyKey,
+      payload: omit(normalizedPayload, ['idempotencyKey']),
+    });
 
     return req.then((session) => {
       if (session) {
@@ -228,12 +224,10 @@ class Smartpay {
   }
 
   getOrders(params: GetOrdersParams = {}) {
-    const req: Promise<OrdersCollection> = this.request(
-      `/orders?${qs.stringify(params)}`,
-      {
-        method: GET,
-      }
-    );
+    const req: Promise<OrdersCollection> = this.request(`/orders`, {
+      method: GET,
+      params,
+    });
 
     return req;
   }
@@ -248,12 +242,10 @@ class Smartpay {
       });
     }
 
-    const req: Promise<Order> = this.request(
-      `/orders/${id}?${qs.stringify(omit(params, ['id']))}`,
-      {
-        method: GET,
-      }
-    );
+    const req: Promise<Order> = this.request(`/orders/${id}`, {
+      method: GET,
+      params: omit(params, ['id']),
+    });
 
     return req;
   }
@@ -268,13 +260,11 @@ class Smartpay {
       });
     }
 
-    const req: Promise<Order> = this.request(
-      `/orders/${id}/cancellation?${qs.stringify(omit(params, ['id']))}`,
-      {
-        method: PUT,
-        idempotencyKey: params.idempotencyKey,
-      }
-    );
+    const req: Promise<Order> = this.request(`/orders/${id}/cancellation`, {
+      method: PUT,
+      params: omit(params, ['id']),
+      idempotencyKey: params.idempotencyKey,
+    });
 
     return req;
   }
@@ -326,12 +316,10 @@ class Smartpay {
       });
     }
 
-    const req: Promise<Payment> = this.request(
-      `/payments/${id}?${qs.stringify(omit(params, ['id']))}`,
-      {
-        method: GET,
-      }
-    );
+    const req: Promise<Payment> = this.request(`/payments/${id}`, {
+      method: GET,
+      params: omit(params, ['id']),
+    });
 
     return req;
   }
@@ -390,12 +378,10 @@ class Smartpay {
       });
     }
 
-    const req: Promise<Refund> = this.request(
-      `/refunds/${id}?${qs.stringify(omit(params, ['id']))}`,
-      {
-        method: GET,
-      }
-    );
+    const req: Promise<Refund> = this.request(`/refunds/${id}`, {
+      method: GET,
+      params: omit(params, ['id']),
+    });
 
     return req;
   }

@@ -91,6 +91,8 @@ test('Create Live Checkout Session Loose Payload 2', async function testCreateCh
       lastName: 'Doe',
     },
 
+    captureMethod: 'manual',
+
     // Your internal reference of the order
     reference: 'order_ref_1234567',
     successUrl: 'https://smartpay.co',
@@ -99,7 +101,7 @@ test('Create Live Checkout Session Loose Payload 2', async function testCreateCh
 
   const session = await smartpay.createCheckoutSession(payload);
 
-  console.log(session); // eslint-disable-line no-console
+  TestSessionData.cancelOrderSession = session;
 
   t.ok(session.id.length > 0);
 });
@@ -225,4 +227,39 @@ test('Create refund', async function testCreateRefunds(t) {
 
   t.ok(refund2.id === retrivedRefund2.id);
   t.ok(refund2.amount === retrivedRefund2.amount);
+});
+
+test('Create cancel', async function testCancelOrder(t) {
+  const orderId = TestSessionData.cancelOrderSession.order.id;
+
+  t.plan(1);
+
+  const loginResponse = await fetch(
+    `https://${process.env.API_BASE}/consumers/auth/login`,
+    {
+      headers: {},
+      body: `{"emailAddress":"${TEST_USERNAME}","password":"${TEST_PASSWORD}"}`,
+      method: 'POST',
+    }
+  );
+  const { accessToken } = await loginResponse.json();
+
+  await fetch(
+    `https://${process.env.API_BASE}/orders/${orderId}/authorizations`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: '{"paymentMethod":"pm_test_visaApproved","paymentPlan":"pay_in_three"}',
+      method: 'POST',
+    }
+  );
+
+  const smartpay = new Smartpay(TEST_SECRET_KEY, {
+    publicKey: TEST_PUBLIC_KEY,
+  });
+
+  const result = await smartpay.cancelOrder({ id: orderId });
+
+  t.ok(result.status === 'canceled');
 });

@@ -57,6 +57,7 @@ export const STATUS_SUCCEEDED = 'succeeded';
 export const STATUS_REJECTED = 'rejected';
 export const STATUS_FAILED = 'failed';
 export const STATUS_REQUIRES_AUTHORIZATION = 'requires_authorization';
+export const STATUS_CANCELED = 'canceled';
 
 // eslint-disable-next-line prefer-destructuring
 const SMARTPAY_API_PREFIX =

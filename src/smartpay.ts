@@ -34,7 +34,7 @@ import {
 } from './utils';
 
 const fetch = fetchRetry(originalFetch, {
-  retries: 3,
+  retries: 1,
   retryOn: [500, 501, 502, 503, 504],
   retryDelay: (attempt: number) => {
     return 2 ** attempt * 200;

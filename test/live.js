@@ -171,14 +171,14 @@ test('Create payment', async function testCreatePayment(t) {
     order: orderId,
     amount: PAYMENT_AMOUNT,
     currency: 'JPY',
-    cancelMethod: 'manual',
+    cancelRemainder: 'manual',
   });
 
   const payment2 = await smartpay.capture({
     order: orderId,
     amount: PAYMENT_AMOUNT + 1,
     currency: 'JPY',
-    cancelMethod: 'manual',
+    cancelRemainder: 'manual',
   });
 
   t.ok(payment1.id);

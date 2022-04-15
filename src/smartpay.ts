@@ -1,30 +1,48 @@
-import fetch from 'isomorphic-unfetch';
+import fetchRetry from 'fetch-retry';
+import originalFetch from 'isomorphic-unfetch';
 import qs from 'query-string';
+import randomstring from 'randomstring';
 
 import {
   KeyString,
   SmartPayOptions,
   CheckoutSession,
   SimpleChekoutSessionPayload,
+  Payment,
   Refund,
+  Order,
   GetOrdersParams,
   GetOrderParams,
+  CancelOrderParams,
   CreatePaymentParams,
+  GetPaymentParams,
   CreateRefundParams,
+  GetRefundParams,
   OrdersCollection,
 } from './types';
 import {
   isValidPublicApiKey,
   isValidSecretApiKey,
+  isValidOrderId,
+  isValidPaymentId,
+  isValidRefundId,
   validateCheckoutSessionPayload,
   normalizeCheckoutSessionPayload,
   omit,
   jtdErrorToDetails,
-  SmartError,
+  SmartpayError,
 } from './utils';
 
+const fetch = fetchRetry(originalFetch, {
+  retries: 1,
+  retryOn: [500, 501, 502, 503, 504],
+  retryDelay: (attempt: number) => {
+    return 2 ** attempt * 200;
+  },
+});
+
 interface Params {
-  [key: string]: string;
+  [key: string]: string | number;
 }
 
 const API_PREFIX = 'https://api.smartpay.co/v1';
@@ -32,13 +50,14 @@ const CHECKOUT_URL = 'https://checkout.smartpay.co';
 
 const GET = 'GET';
 const POST = 'POST';
-// const PUT = 'PUT';
+const PUT = 'PUT';
 // const DELETE = 'DELETE';
 
 export const STATUS_SUCCEEDED = 'succeeded';
 export const STATUS_REJECTED = 'rejected';
 export const STATUS_FAILED = 'failed';
 export const STATUS_REQUIRES_AUTHORIZATION = 'requires_authorization';
+export const STATUS_CANCELED = 'canceled';
 
 // eslint-disable-next-line prefer-destructuring
 const SMARTPAY_API_PREFIX =
@@ -96,15 +115,24 @@ class Smartpay {
       method?: Method;
       params?: Params;
       payload?: any;
+      idempotencyKey?: string;
     } = {}
   ) {
-    const { method, params, payload } = options;
-
-    let url = `${this._apiPrefix}${endpoint}`;
-
-    if (params) {
-      url = `${url}?${qs.stringify(params)}`;
-    }
+    const {
+      method,
+      params,
+      payload,
+      idempotencyKey: customIdempotencyKey,
+    } = options;
+    const idempotencyKey = customIdempotencyKey || randomstring.generate();
+    const url = qs.stringifyUrl({
+      url: `${this._apiPrefix}${endpoint}`,
+      query: {
+        ...params,
+        'dev-lang': 'nodejs',
+        'sdk-version': '__buildVersion__',
+      },
+    });
 
     return (
       fetch(url, {
@@ -113,32 +141,25 @@ class Smartpay {
           Authorization: `Basic ${this._secretKey}`,
           Accept: 'application/json',
           'Content-Type': 'application/json',
+          'Idempotency-Key': idempotencyKey,
         },
         body: payload ? JSON.stringify(payload) : null,
       })
         // Netowork issue
         .catch((error) => {
-          throw new SmartError({
+          throw new SmartpayError({
             errorCode: 'unexpected_error',
             statusCode: -1,
             message: error.message,
           });
         })
         .then((response) => {
-          if (!response.ok) {
-            throw new SmartError({
-              errorCode: 'unexpected_error',
-              statusCode: response.status,
-              message: `${response.status}`,
-            });
-          }
-
           return (
             response
               .json()
               // Parse body failed
               .catch((error) => {
-                throw new SmartError({
+                throw new SmartpayError({
                   errorCode: 'unexpected_error',
                   statusCode: response.status,
                   message: `${response.status} ${error.message}`,
@@ -149,7 +170,7 @@ class Smartpay {
                   return data;
                 }
 
-                throw new SmartError({
+                throw new SmartpayError({
                   errorCode: data.errorCode,
                   statusCode: response.status,
                   message: `${response.status} ${data.message}`,
@@ -170,7 +191,7 @@ class Smartpay {
     );
 
     if (errors.length) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Payload invalid',
         details: jtdErrorToDetails(errors, 'payload'),
@@ -183,19 +204,12 @@ class Smartpay {
   createCheckoutSession(payload: SimpleChekoutSessionPayload) {
     const normalizedPayload = Smartpay.normalizeCheckoutSessionPayload(payload);
 
-    const params = {
-      'dev-lang': 'nodejs',
-      'sdk-version': '__buildVersion__',
-    };
-
     // Call API to create checkout session
-    const req: Promise<CheckoutSession> = this.request(
-      `/checkout-sessions?${qs.stringify(params)}`,
-      {
-        method: POST,
-        payload: normalizedPayload,
-      }
-    );
+    const req: Promise<CheckoutSession> = this.request(`/checkout-sessions`, {
+      method: POST,
+      idempotencyKey: payload.idempotencyKey,
+      payload: omit(normalizedPayload, ['idempotencyKey']),
+    });
 
     return req.then((session) => {
       if (session) {
@@ -214,12 +228,10 @@ class Smartpay {
   }
 
   getOrders(params: GetOrdersParams = {}) {
-    const req: Promise<OrdersCollection> = this.request(
-      `/orders?${qs.stringify(params)}`,
-      {
-        method: GET,
-      }
-    );
+    const req: Promise<OrdersCollection> = this.request(`/orders`, {
+      method: GET,
+      params,
+    });
 
     return req;
   }
@@ -228,18 +240,49 @@ class Smartpay {
     const { id } = params;
 
     if (!id) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Order Id is required',
       });
     }
 
-    const req: Promise<OrdersCollection> = this.request(
-      `/orders/${id}?${qs.stringify(omit(params, ['id']))}`,
-      {
-        method: GET,
-      }
-    );
+    if (!isValidOrderId(id)) {
+      throw new SmartpayError({
+        errorCode: 'request.invalid',
+        message: 'Order Id is invalid',
+      });
+    }
+
+    const req: Promise<Order> = this.request(`/orders/${id}`, {
+      method: GET,
+      params: omit(params, ['id']),
+    });
+
+    return req;
+  }
+
+  cancelOrder(params: CancelOrderParams = {}) {
+    const { id } = params;
+
+    if (!id) {
+      throw new SmartpayError({
+        errorCode: 'request.invalid',
+        message: 'Order Id is required',
+      });
+    }
+
+    if (!isValidOrderId(id)) {
+      throw new SmartpayError({
+        errorCode: 'request.invalid',
+        message: 'Order Id is invalid',
+      });
+    }
+
+    const req: Promise<Order> = this.request(`/orders/${id}/cancellation`, {
+      method: PUT,
+      params: omit(params, ['id']),
+      idempotencyKey: params.idempotencyKey,
+    });
 
     return req;
   }
@@ -248,29 +291,37 @@ class Smartpay {
     const { order, amount, currency } = params;
 
     if (!order) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Order Id is required',
       });
     }
 
+    if (!isValidOrderId(order)) {
+      throw new SmartpayError({
+        errorCode: 'request.invalid',
+        message: 'Order Id is invalid',
+      });
+    }
+
     if (!amount) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Capture Amount is required',
       });
     }
 
     if (!currency) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Capture Amount Currency is required',
       });
     }
 
-    const req: Promise<OrdersCollection> = this.request(`/payments`, {
+    const req: Promise<Payment> = this.request(`/payments`, {
       method: POST,
-      payload: params,
+      idempotencyKey: params.idempotencyKey,
+      payload: omit(params, ['idempotencyKey']),
     });
 
     return req;
@@ -280,32 +331,64 @@ class Smartpay {
     return this.createPayment(params);
   }
 
-  createRefund(params: CreateRefundParams = {}) {
-    const { payment, amount, currency, reason } = params;
+  getPayment(params: GetPaymentParams = {}) {
+    const { id } = params;
 
-    if (!payment) {
-      throw new SmartError({
+    if (!id) {
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Payment Id is required',
       });
     }
 
+    if (!isValidPaymentId(id)) {
+      throw new SmartpayError({
+        errorCode: 'request.invalid',
+        message: 'Payment Id is invalid',
+      });
+    }
+
+    const req: Promise<Payment> = this.request(`/payments/${id}`, {
+      method: GET,
+      params: omit(params, ['id']),
+    });
+
+    return req;
+  }
+
+  createRefund(params: CreateRefundParams = {}) {
+    const { payment, amount, currency, reason } = params;
+
+    if (!payment) {
+      throw new SmartpayError({
+        errorCode: 'request.invalid',
+        message: 'Payment Id is required',
+      });
+    }
+
+    if (!isValidPaymentId(payment)) {
+      throw new SmartpayError({
+        errorCode: 'request.invalid',
+        message: 'Payment Id is invalid',
+      });
+    }
+
     if (!amount) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Refund Amount is required',
       });
     }
 
     if (!currency) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Refund Amount Currency is required',
       });
     }
 
     if (!reason) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Refund Reason is required',
       });
@@ -313,7 +396,8 @@ class Smartpay {
 
     const req: Promise<Refund> = this.request(`/refunds`, {
       method: POST,
-      payload: params,
+      idempotencyKey: params.idempotencyKey,
+      payload: omit(params, ['idempotencyKey']),
     });
 
     return req;
@@ -321,6 +405,31 @@ class Smartpay {
 
   refund(params: CreateRefundParams = {}) {
     return this.createRefund(params);
+  }
+
+  getRefund(params: GetRefundParams = {}) {
+    const { id } = params;
+
+    if (!id) {
+      throw new SmartpayError({
+        errorCode: 'request.invalid',
+        message: 'Refund Id is required',
+      });
+    }
+
+    if (!isValidRefundId(id)) {
+      throw new SmartpayError({
+        errorCode: 'request.invalid',
+        message: 'Refund Id is invalid',
+      });
+    }
+
+    const req: Promise<Refund> = this.request(`/refunds/${id}`, {
+      method: GET,
+      params: omit(params, ['id']),
+    });
+
+    return req;
   }
 
   /**
@@ -331,14 +440,14 @@ class Smartpay {
 
   setPublicKey(publicKey: KeyString) {
     if (!publicKey) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Public Key is required',
       });
     }
 
     if (!isValidPublicApiKey(publicKey)) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Public Key is invalid',
       });
@@ -354,7 +463,7 @@ class Smartpay {
     options?: GetSessionURLOptions
   ): string {
     if (!session) {
-      throw new SmartError({
+      throw new SmartpayError({
         errorCode: 'request.invalid',
         message: 'Session is invalid',
       });

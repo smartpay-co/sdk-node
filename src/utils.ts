@@ -13,10 +13,11 @@ const publicKeyRegExp = /^pk_(test|live)_[0-9a-zA-Z]+$/;
 const secretKeyRegExp = /^sk_(test|live)_[0-9a-zA-Z]+$/;
 
 const checkoutSessionIDRegExp = /^checkout_(test|live)_[0-9a-zA-Z]+$/;
-const orderIDRegExp = /^order_(test|live)_[0-9a-zA-Z]+$/;
-const paymentIDRegExp = /^payment_(test|live)_[0-9a-zA-Z]+$/;
+const orderIdRegExp = /^order_(test|live)_[0-9a-zA-Z]+$/;
+const paymentIdRegExp = /^payment_(test|live)_[0-9a-zA-Z]+$/;
+const refundIdRegExp = /^refund_(test|live)_[0-9a-zA-Z]+$/;
 
-export class SmartError extends Error {
+export class SmartpayError extends Error {
   statusCode?: number;
   errorCode: string;
   details?: ErrorDetails;
@@ -34,31 +35,35 @@ export class SmartError extends Error {
   }) {
     super(message);
     this.message = message || errorCode;
-    this.name = 'SmartError';
+    this.name = 'SmartpayError';
     this.statusCode = statusCode;
     this.errorCode = errorCode;
     this.details = details;
   }
 }
 
-export const isValidPublicApiKey = (apiKey: KeyString) => {
-  return publicKeyRegExp.test(apiKey);
+export const isValidPublicApiKey = (input: KeyString) => {
+  return publicKeyRegExp.test(input);
 };
 
-export const isValidSecretApiKey = (apiKey: KeyString) => {
-  return secretKeyRegExp.test(apiKey);
+export const isValidSecretApiKey = (input: KeyString) => {
+  return secretKeyRegExp.test(input);
 };
 
-export const isValidCheckoutSessionID = (checkoutSessionID: string) => {
-  return checkoutSessionIDRegExp.test(checkoutSessionID);
+export const isValidCheckoutSessionId = (input: string) => {
+  return checkoutSessionIDRegExp.test(input);
 };
 
-export const isValidOrderID = (orderID: string) => {
-  return orderIDRegExp.test(orderID);
+export const isValidOrderId = (input: string) => {
+  return orderIdRegExp.test(input);
 };
 
-export const isValidPaymentID = (paymentID: string) => {
-  return paymentIDRegExp.test(paymentID);
+export const isValidPaymentId = (input: string) => {
+  return paymentIdRegExp.test(input);
+};
+
+export const isValidRefundId = (input: string) => {
+  return refundIdRegExp.test(input);
 };
 
 export const validateCheckoutSessionPayload = (
@@ -98,7 +103,7 @@ export const normalizeCheckoutSessionPayload = (
   const currency = getCurrency(payload);
 
   if (!currency) {
-    throw new SmartError({
+    throw new SmartpayError({
       errorCode: 'request.invalid',
       details: ['Currency is not available.'],
     });
@@ -131,7 +136,7 @@ export const normalizeCheckoutSessionPayload = (
           return sum + (item.amount ? item.amount * item.quantity : 0);
         }
 
-        throw new SmartError({
+        throw new SmartpayError({
           errorCode: 'request.invalid',
           details: ['payload.items[].currency is invalid'],
         });

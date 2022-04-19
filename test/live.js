@@ -67,7 +67,7 @@ test('Create Live Checkout Session Loose Payload 2', async function testCreateCh
     items: [
       {
         name: 'レブロン 18 LOW',
-        amount: 250,
+        amount: 350,
         currency: 'JPY',
         quantity: 1,
       },
@@ -138,7 +138,7 @@ test('Get orders', async function testGetOrders(t) {
 
 test('Create payment', async function testCreatePayment(t) {
   const orderId = TestSessionData.manualCaptureSession.order.id;
-  const PAYMENT_AMOUNT = 50;
+  const PAYMENT_AMOUNT = 150;
 
   t.plan(5);
 

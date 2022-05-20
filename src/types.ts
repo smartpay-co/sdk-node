@@ -331,6 +331,17 @@ export type OrdersCollection = {
   data: Array<Order>;
 };
 
+export type CalculateWebhookSignatureParams = {
+  data: string;
+  secret: string;
+};
+
+export type VerifyWebhookSignatureParams = {
+  data: string;
+  signature: string;
+  secret: string;
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ErrorDetail = any;
 export type ErrorDetails = ErrorDetail[];

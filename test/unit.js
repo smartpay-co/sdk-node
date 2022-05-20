@@ -4,26 +4,19 @@ import Smartpay from '../build/esm/index.js';
 
 const CHECKOUT_URL = 'https://checkout.smartpay.co';
 
-const TEST_SECRET_KEY = 'sk_test_a7SlBkzf44tzdQoTwm6FrW';
-const TEST_PUBLIC_KEY = 'pk_test_1m2ySnST0aYi6QM0GlKP0n';
-
 const FAKE_SESSION = {
-  id: 'cs_live_abcdef12345678',
+  id: 'checkout_test_hm3tau0XY7r3ULm06pHtr8.1nsIwu',
+
+  // eslint-disable-next-line max-len
+  url: 'https://checkout.smartpay.co/checkout_test_hm3tau0XY7r3ULm06pHtr8.1nsIwu.9tR7VVYMmLWwq77hGPuN0HbPB6TYsPKLrJbJJkcIKiR8GUY0WalxEoRtBcWF6I1WYLGit6xiAlJtyi8xrXxDfD?demo=true&promotion-code=SPRINGSALE2022&',
 };
 
 test('Get Session URL', function testGetSessionURL(t) {
-  t.plan(3);
+  t.plan(1);
 
-  const smartpay = new Smartpay(TEST_SECRET_KEY, {
-    publicKey: TEST_PUBLIC_KEY,
-    checkoutURL: CHECKOUT_URL,
-  });
-
-  const sessionURL = smartpay.getSessionURL(FAKE_SESSION);
+  const sessionURL = Smartpay.getSessionURL(FAKE_SESSION);
 
   t.ok(sessionURL.indexOf(CHECKOUT_URL) === 0);
-  t.ok(sessionURL.indexOf(`public-key=${TEST_PUBLIC_KEY}`) > 0);
-  t.ok(sessionURL.indexOf(`session-id=${FAKE_SESSION.id}`) > 0);
 });
 
 test('Promotion Code', function testPromotionCode(t) {
@@ -56,6 +49,9 @@ test('Promotion Code', function testPromotionCode(t) {
     cancelUrl: 'https://smartpay.co',
 
     promotionCode: CODE1,
+
+    // eslint-disable-next-line max-len
+    url: 'https://checkout.smartpay.co/checkout_test_hm3tau0XY7r3ULm06pHtr8.1nsIwu.9tR7VVYMmLWwq77hGPuN0HbPB6TYsPKLrJbJJkcIKiR8GUY0WalxEoRtBcWF6I1WYLGit6xiAlJtyi8xrXxDfD?demo=true&promotion-code=SPRINGSALE2022&',
   };
 
   const normalizePayload = Smartpay.normalizeCheckoutSessionPayload(payload);
@@ -63,12 +59,7 @@ test('Promotion Code', function testPromotionCode(t) {
   t.ok(normalizePayload.amount === 200);
   t.ok(normalizePayload.promotionCode === CODE1);
 
-  const smartpay = new Smartpay(TEST_SECRET_KEY, {
-    publicKey: TEST_PUBLIC_KEY,
-    checkoutURL: CHECKOUT_URL,
-  });
-
-  const sessionURL = smartpay.getSessionURL(FAKE_SESSION, {
+  const sessionURL = Smartpay.getSessionURL(normalizePayload, {
     promotionCode: CODE1,
   });
 
@@ -146,4 +137,16 @@ test('Test Validate Checkout Session Payload', function testGetSessionURL(t) {
   } catch (error2) {
     t.ok(error2.details?.includes('payload.items is required.'));
   }
+});
+
+test('Verify Webhook Signature Verification function', function testWebhookSignature(t) {
+  t.plan(1);
+
+  // eslint-disable-next-line max-len
+  const data = `1653028612220.{"id":"evt_test_dwPfFKu5iSEKyHR2LFj9Lx","object":"event","createdAt":1653028523052,"test":true,"eventData":{"type":"payment.created","version":"2022-02-18","data":{"id":"payment_test_35LxgmF5KM22XKG38BjpJg","object":"payment","test":true,"createdAt":1653028523020,"updatedAt":1653028523020,"amount":200,"currency":"JPY","order":"order_test_RiYq2rthzRHrkKVGeucSwn","reference":"order_ref_1234567","status":"processed","metadata":{}}}}`;
+  const signature =
+    '68007ada8485ea0ceca7c5e879ae860a50412b7af95ab8e81b32a3e13f3c0832';
+  const secret = 'gybcsjixKyBW2d4z6iNPlaYzHUMtawnodwZt3W0q';
+
+  t.ok(Smartpay.verifyWebhookSignature({ data, signature, secret }));
 });

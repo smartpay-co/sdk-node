@@ -1,3 +1,8 @@
+import { createHmac } from 'crypto';
+
+import basex from 'base-x';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { Request, Response } from 'express';
 import fetchRetry from 'fetch-retry';
 import originalFetch from 'isomorphic-unfetch';
 import qs from 'query-string';
@@ -19,6 +24,8 @@ import {
   CreateRefundParams,
   GetRefundParams,
   OrdersCollection,
+  CalculateWebhookSignatureParams,
+  VerifyWebhookSignatureParams,
 } from './types';
 import {
   isValidPublicApiKey,
@@ -32,6 +39,9 @@ import {
   jtdErrorToDetails,
   SmartpayError,
 } from './utils';
+
+const BASE62 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const base62 = basex(BASE62);
 
 const fetch = fetchRetry(originalFetch, {
   retries: 1,
@@ -458,7 +468,7 @@ class Smartpay {
     return {};
   }
 
-  static getSessionURL(
+  static getSessionUrl(
     session: CheckoutSession,
     options?: GetSessionURLOptions
   ): string {
@@ -478,6 +488,53 @@ class Smartpay {
       url: checkoutURL,
       query: params,
     });
+  }
+
+  // Backward compatiable method
+  static getSessionURL(
+    session: CheckoutSession,
+    options?: GetSessionURLOptions
+  ): string {
+    return this.getSessionUrl(session, options);
+  }
+
+  static calculateWebhookSignature(params: CalculateWebhookSignatureParams) {
+    const { data, secret } = params;
+    const signer = createHmac('sha256', Buffer.from(base62.decode(secret)));
+    const result = signer.update(Buffer.from(data, 'utf8')).digest('hex');
+
+    return result;
+  }
+
+  static verifyWebhookSignature(params: VerifyWebhookSignatureParams) {
+    const { data, signature, secret } = params;
+    const calculatedSignature = Smartpay.calculateWebhookSignature({
+      data,
+      secret,
+    });
+
+    return signature === calculatedSignature;
+  }
+
+  static expressWebhookMiddleware(secret: string | Function) {
+    return (req: Request, res: Response, buf: Buffer) => {
+      if (req.headers['smartpay-signature']) {
+        const subscriptionId = req.headers['smartpay-subscription-id'];
+        const signingSecret =
+          typeof secret === 'string' ? secret : secret(subscriptionId);
+        const signer = createHmac(
+          'sha256',
+          Buffer.from(base62.decode(signingSecret))
+        );
+        const signatureTimestamp = req.headers['smartpay-signature-timestamp'];
+        const result = signer
+          .update(Buffer.from(`${signatureTimestamp}.`, 'utf8'))
+          .update(buf)
+          .digest('hex');
+
+        req.headers['calculated-signature'] = result; // eslint-disable-line no-param-reassign
+      }
+    };
   }
 }
 

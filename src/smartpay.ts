@@ -90,8 +90,8 @@ type SessionURLParams = {
 };
 
 class Smartpay {
-  static REJECT_REQUEST_BY_CUSTOMER = 'requested_by_customer';
-  static REJECT_FRAUDULENT = 'fraudulent';
+  static REFUND_REQUEST_BY_CUSTOMER = 'requested_by_customer';
+  static REFUND_FRAUDULENT = 'fraudulent';
 
   _secretKey: KeyString;
   _publicKey?: KeyString;
@@ -507,7 +507,7 @@ class Smartpay {
   }
 
   static verifyWebhookSignature(params: VerifyWebhookSignatureParams) {
-    const { data, signature, secret } = params;
+    const { data, secret, signature } = params;
     const calculatedSignature = Smartpay.calculateWebhookSignature({
       data,
       secret,

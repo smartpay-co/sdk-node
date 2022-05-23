@@ -336,10 +336,8 @@ export type CalculateWebhookSignatureParams = {
   secret: string;
 };
 
-export type VerifyWebhookSignatureParams = {
-  data: string;
+export type VerifyWebhookSignatureParams = CalculateWebhookSignatureParams & {
   signature: string;
-  secret: string;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

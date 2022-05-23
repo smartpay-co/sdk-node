@@ -387,3 +387,5 @@ Smartpay.REFUND_FRAUDULENT
 [refund object]: https://en.docs.smartpay.co/reference/the-refund-object
 [capture]: https://en.docs.smartpay.co/docs/capture-an-order#using-the-smartpay-api
 [refund]: https://en.docs.smartpay.co/docs/refund-a-purchase#using-the-smartpay-api
+[collection]: #collection
+[common exceptions]: #common-exceptions

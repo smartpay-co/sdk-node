@@ -140,30 +140,35 @@ class SmartpayBase {
           });
         })
         .then((response) => {
-          return (
-            response
-              .json()
-              // Parse body failed
-              .catch((error) => {
-                throw new SmartpayError({
-                  errorCode: 'unexpected_error',
-                  statusCode: response.status,
-                  message: `${response.status} ${error.message}`,
-                });
-              })
-              .then((data) => {
-                if (response.ok) {
-                  return data;
-                }
+          switch (response.status) {
+            case 204:
+              return Promise.resolve('');
+            default:
+              return (
+                response
+                  .json()
+                  // Parse body failed
+                  .catch((error) => {
+                    throw new SmartpayError({
+                      errorCode: 'unexpected_error',
+                      statusCode: response.status,
+                      message: `${response.status} ${error.message}`,
+                    });
+                  })
+                  .then((data) => {
+                    if (response.ok) {
+                      return data;
+                    }
 
-                throw new SmartpayError({
-                  errorCode: data.errorCode,
-                  statusCode: response.status,
-                  message: `${response.status} ${data.message}`,
-                  details: data.details,
-                });
-              })
-          );
+                    throw new SmartpayError({
+                      errorCode: data.errorCode,
+                      statusCode: response.status,
+                      message: `${response.status} ${data.message}`,
+                      details: data.details,
+                    });
+                  })
+              );
+          }
         })
     );
   }

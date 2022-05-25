@@ -387,6 +387,150 @@ const refunds = await smartpay.listRefunds({
 
 [Collection][] of [refund object][]
 
+#### Create Webhook Endpoint
+
+**Async** method, create a webhook endpoint object to an order.
+
+```javascript
+const webhookEndpoint = await smartpay.createWebhookEndpoint({
+  order,
+  amount,
+  currency,
+  cancelRemainder,
+  lineitems,
+  reference,
+  description,
+  metadata,
+});
+```
+
+#### Arguments
+
+| Name                   | Type     | Description                                                                                        |
+| ---------------------- | -------- | -------------------------------------------------------------------------------------------------- |
+| url                    | String   | The url which will be called when any of the events you subscribed to occur.                       |
+| eventSubscriptions     | String[] | The list of events to subscribe to. If not specified you will be subsribed to all events.          |
+| description (optional) | String   | An arbitrary long form explanation of the Webhook Endpoint, meant to be displayed to the customer. |
+| metadata (optional)    | Object   | Set of up to 20 key-value pairs that you can attach to the object.                                 |
+
+#### Return
+
+[Webhook Endpoint object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
+### Get Webhook Endpoint
+
+**Async** method, get the webhook endpoint object by webhook endpoint id.
+
+```javascript
+const webhookEndpoint = await smartpay.getWebhookEndpoint({
+  id,
+});
+```
+
+#### Arguments
+
+| Name | Type   | Description             |
+| ---- | ------ | ----------------------- |
+| id   | string | The webhook endpoint id |
+
+#### Return
+
+[Webhook Endpoint object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
+#### Update Webhook Endpoint
+
+**Async** method, create a webhook endpoint.
+
+```javascript
+const webhookEndpoint = await smartpay.updateWebhookEndpoint({
+  id,
+  url,
+  eventSubscriptions,
+  active,
+  description,
+  metadata,
+});
+```
+
+#### Arguments
+
+| Name                   | Type     | Description                                                                                        |
+| ---------------------- | -------- | -------------------------------------------------------------------------------------------------- |
+| id                     | String   | The order id                                                                                       |
+| url                    | String   | The url which will be called when any of the events you subscribed to occur.                       |
+| eventSubscriptions     | String[] | The list of events to subscribe to. If not specified you will be subsribed to all events.          |
+| active (optional)      | Boolean  | Has the value true if the webhook endpoint is active and events are sent to the url specified.     |
+| description (optional) | String   | An arbitrary long form explanation of the Webhook Endpoint, meant to be displayed to the customer. |
+| metadata (optional)    | Object   | Set of up to 20 key-value pairs that you can attach to the object.                                 |
+
+#### Return
+
+[Webhook Endpoint object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
+### Delete Webhook Endpoint
+
+**Async** method, get the webhook endpoint object by webhook endpoint id.
+
+```javascript
+const webhookEndpoint = await smartpay.deleteWebhookEndpoint({
+  id,
+});
+```
+
+#### Arguments
+
+| Name | Type   | Description             |
+| ---- | ------ | ----------------------- |
+| id   | string | The webhook endpoint id |
+
+#### Return
+
+Empty response body with 204
+
+#### Exceptions
+
+[Common exceptions][]
+
+### List Webhook Endpoint
+
+**Async** method, list the webhook endpoint objects.
+
+```javascript
+const webhookEndpoint = await smartpay.listWebhookEndpoints({
+  maxResults,
+  pageToken,
+  expand,
+});
+```
+
+#### Arguments
+
+| Name                              | Type   | Description                                                                                |
+| --------------------------------- | ------ | ------------------------------------------------------------------------------------------ |
+| maxResults (optional, defualt=20) | Number | Number of objects to return.                                                               |
+| pageToken (optional)              | String | The token for the page of the collection of objects.                                       |
+| expand (optional, default=no)     | String | Set to `all` if the references within the response need to be expanded to the full objects |
+
+#### Return
+
+[Collection][] of [webhook endpoint object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
 ### Calculate Webhook Signature
 
 **Static** method, calculate the signature for webhook event of the given data.
@@ -501,6 +645,7 @@ Smartpay.REFUND_FRAUDULENT
 [order object]: https://ja.docs.smartpay.co/reference/the-order-object
 [payment object]: https://en.docs.smartpay.co/reference/the-payment-object
 [refund object]: https://en.docs.smartpay.co/reference/the-refund-object
+[webhook endpoint object]: https://en.docs.smartpay.co/reference/the-webhook-endpoint-object
 [capture]: https://en.docs.smartpay.co/docs/capture-an-order#using-the-smartpay-api
 [refund]: https://en.docs.smartpay.co/docs/refund-a-purchase#using-the-smartpay-api
 [collection]: #collection

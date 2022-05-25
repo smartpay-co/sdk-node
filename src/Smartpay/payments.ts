@@ -1,7 +1,7 @@
 import {
   Payment,
   CreatePaymentParams,
-  GetPaymentParams,
+  GetObjectParams,
   UpdatePaymentParams,
   ListParams,
   Collection,
@@ -61,7 +61,7 @@ const paymentsMixin = <T extends Constructor>(Base: T) => {
       return this.createPayment(params);
     }
 
-    getPayment(params: GetPaymentParams = {}) {
+    getPayment(params: GetObjectParams = {}) {
       const { id } = params;
 
       if (!id) {

@@ -269,6 +269,19 @@ export type Refund = {
   metadata?: MetaData;
 };
 
+export type WebhookEndpoint = {
+  id: string;
+  object: string;
+  active: boolean;
+  createdAt: number;
+  description?: string;
+  eventSubscriptions: string[];
+  metadata?: MetaData;
+  test: boolean;
+  url: string;
+  updatedAt: number;
+};
+
 export type JTDError = {
   instancePath: string[];
   schemaPath: string[];
@@ -280,17 +293,7 @@ export type ListParams = {
   maxResults?: number;
 };
 
-export type GetOrderParams = {
-  id?: string;
-  expand?: string;
-};
-
-export type GetPaymentParams = {
-  id?: string;
-  expand?: string;
-};
-
-export type GetRefundParams = {
+export type GetObjectParams = {
   id?: string;
   expand?: string;
 };
@@ -334,6 +337,23 @@ export type UpdateRefundParams = {
   reference?: string;
   description?: string;
   metadata?: MetaData;
+};
+
+export type CreateWebhookEndpointParams = {
+  description?: string;
+  eventSubscriptions?: string[];
+  metadata?: MetaData;
+  url?: string;
+  idempotencyKey?: string;
+};
+
+export type UpdateWebhookEndpointParams = CreateWebhookEndpointParams & {
+  id?: string;
+  active?: boolean;
+};
+
+export type DeleteWebhookEndpointParams = {
+  id?: string;
 };
 
 export type Collection<T> = {

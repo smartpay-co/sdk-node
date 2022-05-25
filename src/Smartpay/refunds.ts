@@ -1,7 +1,7 @@
 import {
   Refund,
   CreateRefundParams,
-  GetRefundParams,
+  GetObjectParams,
   UpdateRefundParams,
   ListParams,
   Collection,
@@ -71,7 +71,7 @@ const refundsMixin = <T extends Constructor>(Base: T) => {
       return this.createRefund(params);
     }
 
-    getRefund(params: GetRefundParams = {}) {
+    getRefund(params: GetObjectParams = {}) {
       const { id } = params;
 
       if (!id) {

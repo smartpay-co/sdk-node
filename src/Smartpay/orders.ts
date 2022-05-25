@@ -1,7 +1,7 @@
 import {
   Order,
   ListParams,
-  GetOrderParams,
+  GetObjectParams,
   CancelOrderParams,
   Collection,
 } from '../types';
@@ -20,7 +20,7 @@ const ordersMixin = <T extends Constructor>(Base: T) => {
       return req;
     }
 
-    getOrder(params: GetOrderParams = {}) {
+    getOrder(params: GetObjectParams = {}) {
       const { id } = params;
 
       if (!id) {

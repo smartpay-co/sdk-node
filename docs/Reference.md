@@ -77,12 +77,16 @@ The checkout URL of the checkout session. ex:
 https://checkout.smartpay.co/checkout_live_vptIEMeycBuKLNNVRL6kB2.1ntK1e.2Z9eoI1j1KU7Jz7XMA9t9wU6gKI4ByzfUSJcwZAhYDoZWPr46ztb1F1ZcsBc7J4QmifNzmcNm4eVHSO98sMVzg
 ```
 
-### Get Orders
+### List Orders
 
-**Static** method, get orders collection of the merchant
+**Static** method, list order objects.
 
 ```javascript
-const ordersCollection = await smartpay.getOrders({ maxResults: 10 });
+const ordersCollection = await smartpay.getOrders({
+  maxResults,
+  pageToken,
+  expand,
+});
 ```
 
 #### Arguments
@@ -209,6 +213,64 @@ const payment = await smartpay.getPayment({
 
 [Common exceptions][]
 
+#### Update Payment
+
+**Async** method, create a payment object([capture][]) to an order.
+
+```javascript
+const payment = await smartpay.updatePayment({
+  id,
+  reference,
+  description,
+  metadata,
+});
+```
+
+#### Arguments
+
+| Name                   | Type   | Description                                                                                              |
+| ---------------------- | ------ | -------------------------------------------------------------------------------------------------------- |
+| id                     | String | The order id                                                                                             |
+| reference (optional)   | String | A string to reference the Payment which can be used to reconcile the Payment with your internal systems. |
+| description (optional) | String | An arbitrary long form explanation of the Payment, meant to be displayed to the customer.                |
+| metadata (optional)    | Object | Set of up to 20 key-value pairs that you can attach to the object.                                       |
+
+#### Return
+
+[Payment object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
+### List Payment
+
+**Async** method, list the payment objects.
+
+```javascript
+const payment = await smartpay.listPayments({
+  maxResults,
+  pageToken,
+  expand,
+});
+```
+
+#### Arguments
+
+| Name                              | Type   | Description                                                                                |
+| --------------------------------- | ------ | ------------------------------------------------------------------------------------------ |
+| maxResults (optional, defualt=20) | Number | Number of objects to return.                                                               |
+| pageToken (optional)              | String | The token for the page of the collection of objects.                                       |
+| expand (optional, default=no)     | String | Set to `all` if the references within the response need to be expanded to the full objects |
+
+#### Return
+
+[Collection][] of [payment object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
 ### Create Refund
 
 **Async** method, create a refund object([refund][]) to a payment.
@@ -270,6 +332,60 @@ const refund = await smartpay.getRefund({
 #### Exceptions
 
 [Common exceptions][]
+
+#### Update Refund
+
+**Async** method, update a refund object([capture][]).
+
+```javascript
+const refund = await smartpay.updateRefund({
+  id,
+  reference,
+  description,
+  metadata,
+});
+```
+
+#### Arguments
+
+| Name                   | Type   | Description                                                                                              |
+| ---------------------- | ------ | -------------------------------------------------------------------------------------------------------- |
+| id                     | String | The refund id                                                                                            |
+| reference (optional)   | String | A string to reference the Payment which can be used to reconcile the Payment with your internal systems. |
+| description (optional) | String | An arbitrary long form explanation of the Payment, meant to be displayed to the customer.                |
+| metadata (optional)    | Object | Set of up to 20 key-value pairs that you can attach to the object.                                       |
+
+#### Return
+
+[Refund object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
+### List Refund
+
+**Async** method, list refunds.
+
+```javascript
+const refunds = await smartpay.listRefunds({
+  maxResults,
+  pageToken,
+  expand,
+});
+```
+
+#### Arguments
+
+| Name                              | Type   | Description                                                                                |
+| --------------------------------- | ------ | ------------------------------------------------------------------------------------------ |
+| maxResults (optional, defualt=20) | Number | Number of objects to return.                                                               |
+| pageToken (optional)              | String | The token for the page of the collection of objects.                                       |
+| expand (optional, default=no)     | String | Set to `all` if the references within the response need to be expanded to the full objects |
+
+#### Return
+
+[Collection][] of [refund object][]
 
 ### Calculate Webhook Signature
 

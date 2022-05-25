@@ -1,4 +1,11 @@
-import { Payment, CreatePaymentParams, GetPaymentParams } from '../types';
+import {
+  Payment,
+  CreatePaymentParams,
+  GetPaymentParams,
+  UpdatePaymentParams,
+  ListParams,
+  Collection,
+} from '../types';
 import {
   isValidOrderId,
   isValidPaymentId,
@@ -6,7 +13,7 @@ import {
   SmartpayError,
 } from '../utils';
 
-import { GET, POST, Constructor } from './base';
+import { GET, POST, PATCH, Constructor } from './base';
 
 const paymentsMixin = <T extends Constructor>(Base: T) => {
   return class extends Base {
@@ -74,6 +81,40 @@ const paymentsMixin = <T extends Constructor>(Base: T) => {
       const req: Promise<Payment> = this.request(`/payments/${id}`, {
         method: GET,
         params: omit(params, ['id']),
+      });
+
+      return req;
+    }
+
+    updatePayment(params: UpdatePaymentParams = {}) {
+      const { id } = params;
+
+      if (!id) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payment Id is required',
+        });
+      }
+
+      if (!isValidPaymentId(id)) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payment Id is invalid',
+        });
+      }
+
+      const req: Promise<Payment> = this.request(`/payments/${id}`, {
+        method: PATCH,
+        params: omit(params, ['id']),
+      });
+
+      return req;
+    }
+
+    listPayments(params: ListParams = {}) {
+      const req: Promise<Collection<Payment>> = this.request(`/payments`, {
+        method: GET,
+        params,
       });
 
       return req;

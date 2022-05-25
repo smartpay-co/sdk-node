@@ -1,9 +1,9 @@
 import {
   Order,
-  GetOrdersParams,
+  ListParams,
   GetOrderParams,
   CancelOrderParams,
-  OrdersCollection,
+  Collection,
 } from '../types';
 import { isValidOrderId, omit, SmartpayError } from '../utils';
 
@@ -11,8 +11,8 @@ import { GET, PUT, Constructor } from './base';
 
 const ordersMixin = <T extends Constructor>(Base: T) => {
   return class extends Base {
-    getOrders(params: GetOrdersParams = {}) {
-      const req: Promise<OrdersCollection> = this.request(`/orders`, {
+    getOrders(params: ListParams = {}) {
+      const req: Promise<Collection<Order>> = this.request(`/orders`, {
         method: GET,
         params,
       });

@@ -274,7 +274,7 @@ export type JTDError = {
   schemaPath: string[];
 };
 
-export type GetOrdersParams = {
+export type ListParams = {
   expand?: string;
   pageToken?: string;
   maxResults?: number;
@@ -311,6 +311,13 @@ export type CreatePaymentParams = {
   idempotencyKey?: string;
 };
 
+export type UpdatePaymentParams = {
+  id?: string;
+  reference?: string;
+  description?: string;
+  metadata?: MetaData;
+};
+
 export type CreateRefundParams = {
   payment?: string;
   amount?: number;
@@ -322,13 +329,20 @@ export type CreateRefundParams = {
   idempotencyKey?: string;
 };
 
-export type OrdersCollection = {
+export type UpdateRefundParams = {
+  id?: string;
+  reference?: string;
+  description?: string;
+  metadata?: MetaData;
+};
+
+export type Collection<T> = {
   object: string;
   pageToken: string;
   nextPageToken?: string;
   maxResults: number;
   results: number;
-  data: Array<Order>;
+  data: Array<T>;
 };
 
 export type CalculateWebhookSignatureParams = {

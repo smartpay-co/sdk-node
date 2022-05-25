@@ -37,6 +37,7 @@ const CHECKOUT_URL = 'https://checkout.smartpay.co';
 export const GET = 'GET';
 export const POST = 'POST';
 export const PUT = 'PUT';
+export const PATCH = 'PATCH';
 export const DELETE = 'DELETE';
 
 export const STATUS_SUCCEEDED = 'succeeded';
@@ -54,7 +55,7 @@ const SMARTPAY_API_PREFIX =
 // eslint-disable-next-line prefer-destructuring
 const SMARTPAY_CHECKOUT_URL = process.env.SMARTPAY_CHECKOUT_URL;
 
-type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
+type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 type GetSessionURLOptions = {
   checkoutURL?: string;

@@ -1,4 +1,11 @@
-import { Refund, CreateRefundParams, GetRefundParams } from '../types';
+import {
+  Refund,
+  CreateRefundParams,
+  GetRefundParams,
+  UpdateRefundParams,
+  ListParams,
+  Collection,
+} from '../types';
 import {
   isValidPaymentId,
   isValidRefundId,
@@ -6,7 +13,7 @@ import {
   SmartpayError,
 } from '../utils';
 
-import { GET, POST, Constructor } from './base';
+import { GET, POST, PATCH, Constructor } from './base';
 
 const refundsMixin = <T extends Constructor>(Base: T) => {
   return class extends Base {
@@ -94,6 +101,40 @@ const refundsMixin = <T extends Constructor>(Base: T) => {
      * one by one until amount are all refunded.
      */
     // refundOrder() {}
+
+    updateRefund(params: UpdateRefundParams = {}) {
+      const { id } = params;
+
+      if (!id) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Refund Id is required',
+        });
+      }
+
+      if (!isValidRefundId(id)) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Refund Id is invalid',
+        });
+      }
+
+      const req: Promise<Refund> = this.request(`/refunds/${id}`, {
+        method: PATCH,
+        params: omit(params, ['id']),
+      });
+
+      return req;
+    }
+
+    listRefunds(params: ListParams = {}) {
+      const req: Promise<Collection<Refund>> = this.request(`/refunds`, {
+        method: GET,
+        params,
+      });
+
+      return req;
+    }
   };
 };
 

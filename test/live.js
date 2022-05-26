@@ -285,3 +285,39 @@ test('Create cancel', async function testCancelOrder(t) {
 
   t.ok(result.status === 'canceled');
 });
+
+test('Webhook Endpoint CRUD', async function testWebhookEndpointCRUD(t) {
+  t.plan(5);
+
+  const smartpay = new Smartpay(TEST_SECRET_KEY, {
+    publicKey: TEST_PUBLIC_KEY,
+  });
+
+  const webhookEndpoint = await smartpay.createWebhookEndpoint({
+    url: 'https://smartpay.co',
+    eventSubscriptions: ['merchant_user.created'],
+  });
+
+  const updatedWebhookEndpoint = await smartpay.updateWebhookEndpoint({
+    id: webhookEndpoint.id,
+    description: 'updated',
+  });
+
+  const retrivedWebhookEndpoint = await smartpay.updateWebhookEndpoint({
+    id: updatedWebhookEndpoint.id,
+  });
+
+  t.ok(webhookEndpoint.id);
+  t.ok(webhookEndpoint.id === updatedWebhookEndpoint.id);
+  t.ok(retrivedWebhookEndpoint.description === 'updated');
+
+  const webhookEndpointsCollection = await smartpay.listWebhookEndpoints();
+
+  t.ok(webhookEndpointsCollection.data.length > 0);
+
+  const deleteResult = await smartpay.deleteWebhookEndpoint({
+    id: updatedWebhookEndpoint.id,
+  });
+
+  t.ok(deleteResult === '');
+});

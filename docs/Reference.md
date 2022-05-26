@@ -393,12 +393,8 @@ const refunds = await smartpay.listRefunds({
 
 ```javascript
 const webhookEndpoint = await smartpay.createWebhookEndpoint({
-  order,
-  amount,
-  currency,
-  cancelRemainder,
-  lineitems,
-  reference,
+  url,
+  eventSubscriptions,
   description,
   metadata,
 });
@@ -451,10 +447,8 @@ const webhookEndpoint = await smartpay.getWebhookEndpoint({
 
 ```javascript
 const webhookEndpoint = await smartpay.updateWebhookEndpoint({
-  id,
   url,
   eventSubscriptions,
-  active,
   description,
   metadata,
 });

@@ -92,7 +92,7 @@ const webhooksMixin = <T extends Constructor>(Base: T) => {
         `/webhook-endpoints/${id}`,
         {
           method: PATCH,
-          params: omit(params, ['id']),
+          payload: omit(params, ['id']),
         }
       );
 

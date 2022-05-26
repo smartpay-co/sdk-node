@@ -105,7 +105,7 @@ const paymentsMixin = <T extends Constructor>(Base: T) => {
 
       const req: Promise<Payment> = this.request(`/payments/${id}`, {
         method: PATCH,
-        params: omit(params, ['id']),
+        payload: omit(params, ['id']),
       });
 
       return req;

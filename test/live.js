@@ -209,13 +209,13 @@ test('Create refund', async function testCreateRefunds(t) {
     payment: refundablePayment,
     amount: REFUND_AMOUNT,
     currency: 'JPY',
-    reason: Smartpay.REJECT_REQUEST_BY_CUSTOMER,
+    reason: Smartpay.REFUND_REQUEST_BY_CUSTOMER,
   });
   const refund2 = await smartpay.createRefund({
     payment: refundablePayment,
     amount: REFUND_AMOUNT + 1,
     currency: 'JPY',
-    reason: Smartpay.REJECT_REQUEST_BY_CUSTOMER,
+    reason: Smartpay.REFUND_REQUEST_BY_CUSTOMER,
   });
 
   t.ok(refund1 && refund1.amount === REFUND_AMOUNT);

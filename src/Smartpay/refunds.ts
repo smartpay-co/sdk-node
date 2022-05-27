@@ -15,10 +15,13 @@ import {
 
 import { GET, POST, PATCH, Constructor } from './base';
 
+export const REFUND_REQUEST_BY_CUSTOMER = 'requested_by_customer';
+export const REFUND_FRAUDULENT = 'fraudulent';
+
 const refundsMixin = <T extends Constructor>(Base: T) => {
   return class extends Base {
-    static REFUND_REQUEST_BY_CUSTOMER = 'requested_by_customer';
-    static REFUND_FRAUDULENT = 'fraudulent';
+    static REFUND_REQUEST_BY_CUSTOMER = REFUND_REQUEST_BY_CUSTOMER;
+    static REFUND_FRAUDULENT = REFUND_FRAUDULENT;
 
     createRefund(params: CreateRefundParams = {}) {
       const { payment, amount, currency, reason } = params;
@@ -55,6 +58,13 @@ const refundsMixin = <T extends Constructor>(Base: T) => {
         throw new SmartpayError({
           errorCode: 'request.invalid',
           message: 'Refund Reason is required',
+        });
+      }
+
+      if (![REFUND_REQUEST_BY_CUSTOMER, REFUND_FRAUDULENT].includes(reason)) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Refund Reason is invalid',
         });
       }
 

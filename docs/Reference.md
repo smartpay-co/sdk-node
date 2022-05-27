@@ -447,6 +447,7 @@ const webhookEndpoint = await smartpay.getWebhookEndpoint({
 
 ```javascript
 const webhookEndpoint = await smartpay.updateWebhookEndpoint({
+  active,
   url,
   eventSubscriptions,
   description,
@@ -456,14 +457,14 @@ const webhookEndpoint = await smartpay.updateWebhookEndpoint({
 
 #### Arguments
 
-| Name                   | Type     | Description                                                                                        |
-| ---------------------- | -------- | -------------------------------------------------------------------------------------------------- |
-| id                     | String   | The order id                                                                                       |
-| url                    | String   | The url which will be called when any of the events you subscribed to occur.                       |
-| eventSubscriptions     | String[] | The list of events to subscribe to. If not specified you will be subsribed to all events.          |
-| active (optional)      | Boolean  | Has the value true if the webhook endpoint is active and events are sent to the url specified.     |
-| description (optional) | String   | An arbitrary long form explanation of the Webhook Endpoint, meant to be displayed to the customer. |
-| metadata (optional)    | Object   | Set of up to 20 key-value pairs that you can attach to the object.                                 |
+| Name                          | Type     | Description                                                                                        |
+| ----------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
+| id                            | String   | The order id                                                                                       |
+| active (optional)             | Boolean  | Has the value true if the webhook endpoint is active and events are sent to the url specified.     |
+| url (optional)                | String   | The url which will be called when any of the events you subscribed to occur.                       |
+| eventSubscriptions (optional) | String[] | The list of events to subscribe to. If not specified you will be subsribed to all events.          |
+| description (optional)        | String   | An arbitrary long form explanation of the Webhook Endpoint, meant to be displayed to the customer. |
+| metadata (optional)           | Object   | Set of up to 20 key-value pairs that you can attach to the object.                                 |
 
 #### Return
 

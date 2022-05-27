@@ -9,7 +9,7 @@ import {
   VerifyWebhookSignatureParams,
   CreateWebhookEndpointParams,
   UpdateWebhookEndpointParams,
-  DeleteWebhookEndpointParams,
+  DeleteObjectParams,
   ListParams,
   GetObjectParams,
   WebhookEndpoint,
@@ -49,14 +49,14 @@ const webhooksMixin = <T extends Constructor>(Base: T) => {
       if (!id) {
         throw new SmartpayError({
           errorCode: 'request.invalid',
-          message: 'WebhookEndpoint Id is required',
+          message: 'Webhook Endpoint Id is required',
         });
       }
 
       if (!isValidWebhookEndpointId(id)) {
         throw new SmartpayError({
           errorCode: 'request.invalid',
-          message: 'WebhookEndpoint Id is invalid',
+          message: 'Webhook Endpoint Id is invalid',
         });
       }
 
@@ -77,7 +77,7 @@ const webhooksMixin = <T extends Constructor>(Base: T) => {
       if (!id) {
         throw new SmartpayError({
           errorCode: 'request.invalid',
-          message: 'WebhookEndpoint Id is required',
+          message: 'Webhook Endpoint Id is required',
         });
       }
 
@@ -99,13 +99,13 @@ const webhooksMixin = <T extends Constructor>(Base: T) => {
       return req;
     }
 
-    deleteWebhookEndpoint(params: DeleteWebhookEndpointParams = {}) {
+    deleteWebhookEndpoint(params: DeleteObjectParams = {}) {
       const { id } = params;
 
       if (!id) {
         throw new SmartpayError({
           errorCode: 'request.invalid',
-          message: 'WebhookEndpoint Id is required',
+          message: 'Webhook Endpoint Id is required',
         });
       }
 

@@ -23,6 +23,8 @@ const TEST_PUBLIC_KEY = 'pk_test_1m2ySnST0aYi6QM0GlKP0n';
 
 const FAKE_SESSION = {
   id: 'cs_live_abcdef12345678',
+  // eslint-disable-next-line max-len
+  url: 'https://checkout.smartpay.co/checkout_live_vptIEMeycBuKLNNVRL6kB2.1ntK1e.2Z9eoI1j1KU7Jz7XMA9t9wU6gKI4ByzfUSJcwZAhYDoZWPr46ztb1F1ZcsBc7J4QmifNzmcNm4eVHSO98sMVzg',
 };
 
 test('Create Fake Checkout Session', async function testCreateCheckoutSession(t) {

@@ -269,28 +269,31 @@ export type Refund = {
   metadata?: MetaData;
 };
 
+export type WebhookEndpoint = {
+  id: string;
+  object: string;
+  active: boolean;
+  createdAt: number;
+  description?: string;
+  eventSubscriptions: string[];
+  metadata?: MetaData;
+  test: boolean;
+  url: string;
+  updatedAt: number;
+};
+
 export type JTDError = {
   instancePath: string[];
   schemaPath: string[];
 };
 
-export type GetOrdersParams = {
+export type ListParams = {
   expand?: string;
   pageToken?: string;
   maxResults?: number;
 };
 
-export type GetOrderParams = {
-  id?: string;
-  expand?: string;
-};
-
-export type GetPaymentParams = {
-  id?: string;
-  expand?: string;
-};
-
-export type GetRefundParams = {
+export type GetObjectParams = {
   id?: string;
   expand?: string;
 };
@@ -311,6 +314,13 @@ export type CreatePaymentParams = {
   idempotencyKey?: string;
 };
 
+export type UpdatePaymentParams = {
+  id?: string;
+  reference?: string;
+  description?: string;
+  metadata?: MetaData;
+};
+
 export type CreateRefundParams = {
   payment?: string;
   amount?: number;
@@ -322,13 +332,37 @@ export type CreateRefundParams = {
   idempotencyKey?: string;
 };
 
-export type OrdersCollection = {
+export type UpdateRefundParams = {
+  id?: string;
+  reference?: string;
+  description?: string;
+  metadata?: MetaData;
+};
+
+export type CreateWebhookEndpointParams = {
+  description?: string;
+  eventSubscriptions?: string[];
+  metadata?: MetaData;
+  url?: string;
+  idempotencyKey?: string;
+};
+
+export type UpdateWebhookEndpointParams = CreateWebhookEndpointParams & {
+  id?: string;
+  active?: boolean;
+};
+
+export type DeleteWebhookEndpointParams = {
+  id?: string;
+};
+
+export type Collection<T> = {
   object: string;
   pageToken: string;
   nextPageToken?: string;
   maxResults: number;
   results: number;
-  data: Array<Order>;
+  data: Array<T>;
 };
 
 export type CalculateWebhookSignatureParams = {

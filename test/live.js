@@ -140,7 +140,7 @@ test('Create payment', async function testCreatePayment(t) {
   const orderId = TestSessionData.manualCaptureSession.order.id;
   const PAYMENT_AMOUNT = 150;
 
-  t.plan(5);
+  t.plan(8);
 
   const loginResponse = await fetch(
     `https://${process.env.API_BASE}/consumers/auth/login`,
@@ -185,19 +185,30 @@ test('Create payment', async function testCreatePayment(t) {
   t.ok(payment2.id);
   t.ok(payment2.amount === PAYMENT_AMOUNT + 1);
 
+  const updatedPayment2 = await smartpay.updatePayment({
+    id: payment2.id,
+    reference: 'updated',
+  });
+
   const retrivedPayment2 = await smartpay.getPayment({
     id: payment2.id,
   });
 
   t.ok(payment2.id === retrivedPayment2.id);
+  t.ok(payment2.id === updatedPayment2.id);
   t.ok(payment2.amount === retrivedPayment2.amount);
+  t.ok(retrivedPayment2.reference === 'updated');
+
+  const paymentsCollection = await smartpay.listPayments();
+
+  t.ok(paymentsCollection.data.length > 0);
 });
 
 test('Create refund', async function testCreateRefunds(t) {
   const orderId = TestSessionData.manualCaptureSession.order.id;
   const REFUND_AMOUNT = 1;
 
-  t.plan(4);
+  t.plan(7);
 
   const smartpay = new Smartpay(TEST_SECRET_KEY, {
     publicKey: TEST_PUBLIC_KEY,
@@ -221,12 +232,23 @@ test('Create refund', async function testCreateRefunds(t) {
   t.ok(refund1 && refund1.amount === REFUND_AMOUNT);
   t.ok(refund2 && refund2.amount === REFUND_AMOUNT + 1);
 
+  const updatedRefund2 = await smartpay.updateRefund({
+    id: refund2.id,
+    reference: 'updated',
+  });
+
   const retrivedRefund2 = await smartpay.getRefund({
     id: refund2.id,
   });
 
+  t.ok(refund2.id === updatedRefund2.id);
   t.ok(refund2.id === retrivedRefund2.id);
   t.ok(refund2.amount === retrivedRefund2.amount);
+  t.ok(retrivedRefund2.reference === 'updated');
+
+  const refundsCollection = await smartpay.listRefunds();
+
+  t.ok(refundsCollection.data.length > 0);
 });
 
 test('Create cancel', async function testCancelOrder(t) {
@@ -262,4 +284,40 @@ test('Create cancel', async function testCancelOrder(t) {
   const result = await smartpay.cancelOrder({ id: orderId });
 
   t.ok(result.status === 'canceled');
+});
+
+test('Webhook Endpoint CRUD', async function testWebhookEndpointCRUD(t) {
+  t.plan(5);
+
+  const smartpay = new Smartpay(TEST_SECRET_KEY, {
+    publicKey: TEST_PUBLIC_KEY,
+  });
+
+  const webhookEndpoint = await smartpay.createWebhookEndpoint({
+    url: 'https://smartpay.co',
+    eventSubscriptions: ['merchant_user.created'],
+  });
+
+  const updatedWebhookEndpoint = await smartpay.updateWebhookEndpoint({
+    id: webhookEndpoint.id,
+    description: 'updated',
+  });
+
+  const retrivedWebhookEndpoint = await smartpay.updateWebhookEndpoint({
+    id: updatedWebhookEndpoint.id,
+  });
+
+  t.ok(webhookEndpoint.id);
+  t.ok(webhookEndpoint.id === updatedWebhookEndpoint.id);
+  t.ok(retrivedWebhookEndpoint.description === 'updated');
+
+  const webhookEndpointsCollection = await smartpay.listWebhookEndpoints();
+
+  t.ok(webhookEndpointsCollection.data.length > 0);
+
+  const deleteResult = await smartpay.deleteWebhookEndpoint({
+    id: updatedWebhookEndpoint.id,
+  });
+
+  t.ok(deleteResult === '');
 });

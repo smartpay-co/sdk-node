@@ -1,4 +1,4 @@
-import Smartpay from './smartpay';
+import Smartpay from './Smartpay';
 
 export {
   isValidCheckoutSessionId,

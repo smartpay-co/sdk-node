@@ -1,7 +1,6 @@
 import {
   CreatePromotionCodeParams,
   UpdatePromotionCodeParams,
-  DeleteObjectParams,
   ListParams,
   GetObjectParams,
   PromotionCode,
@@ -14,7 +13,7 @@ import {
   SmartpayError,
 } from '../utils';
 
-import { GET, POST, PATCH, DELETE, Constructor } from './base';
+import { GET, POST, PATCH, Constructor } from './base';
 
 export const COUPON_DISCOUNT_TYPE_AMOUNT = 'amount';
 export const COUPON_DISCOUNT_TYPE_PERCENTAGE = 'percentage';
@@ -109,30 +108,6 @@ const promotionCodesMixin = <T extends Constructor>(Base: T) => {
           payload: omit(params, ['id']),
         }
       );
-
-      return req;
-    }
-
-    deletePromotionCode(params: DeleteObjectParams = {}) {
-      const { id } = params;
-
-      if (!id) {
-        throw new SmartpayError({
-          errorCode: 'request.invalid',
-          message: 'Promotion Code Id is required',
-        });
-      }
-
-      if (!isValidPromotionCodeId(id)) {
-        throw new SmartpayError({
-          errorCode: 'request.invalid',
-          message: 'Promotion Code Id is invalid',
-        });
-      }
-
-      const req: Promise<string> = this.request(`/promotion-codes/${id}`, {
-        method: DELETE,
-      });
 
       return req;
     }

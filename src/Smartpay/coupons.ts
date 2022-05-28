@@ -1,7 +1,6 @@
 import {
   CreateCouponParams,
   UpdateCouponParams,
-  DeleteObjectParams,
   ListParams,
   GetObjectParams,
   Coupon,
@@ -9,7 +8,7 @@ import {
 } from '../types';
 import { isValidCouponId, omit, SmartpayError } from '../utils';
 
-import { GET, POST, PATCH, DELETE, Constructor } from './base';
+import { GET, POST, PATCH, Constructor } from './base';
 
 export const COUPON_DISCOUNT_TYPE_AMOUNT = 'amount';
 export const COUPON_DISCOUNT_TYPE_PERCENTAGE = 'percentage';
@@ -20,7 +19,13 @@ const couponsMixin = <T extends Constructor>(Base: T) => {
     static COUPON_DISCOUNT_TYPE_PERCENTAGE = COUPON_DISCOUNT_TYPE_PERCENTAGE;
 
     createCoupon(params: CreateCouponParams = {}) {
-      const { name, discountType, discountAmount, discountPercentage } = params;
+      const {
+        name,
+        discountType,
+        discountAmount,
+        currency,
+        discountPercentage,
+      } = params;
 
       if (!name) {
         throw new SmartpayError({
@@ -58,6 +63,12 @@ const couponsMixin = <T extends Constructor>(Base: T) => {
         });
       }
 
+      if (discountType === COUPON_DISCOUNT_TYPE_AMOUNT && !currency) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'currency is required',
+        });
+      }
       if (
         discountType === COUPON_DISCOUNT_TYPE_PERCENTAGE &&
         discountPercentage == null
@@ -122,30 +133,6 @@ const couponsMixin = <T extends Constructor>(Base: T) => {
       const req: Promise<Coupon> = this.request(`/coupons/${id}`, {
         method: PATCH,
         payload: omit(params, ['id']),
-      });
-
-      return req;
-    }
-
-    deleteCoupon(params: DeleteObjectParams = {}) {
-      const { id } = params;
-
-      if (!id) {
-        throw new SmartpayError({
-          errorCode: 'request.invalid',
-          message: 'Coupon Id is required',
-        });
-      }
-
-      if (!isValidCouponId(id)) {
-        throw new SmartpayError({
-          errorCode: 'request.invalid',
-          message: 'Coupon Id is invalid',
-        });
-      }
-
-      const req: Promise<string> = this.request(`/coupons/${id}`, {
-        method: DELETE,
       });
 
       return req;

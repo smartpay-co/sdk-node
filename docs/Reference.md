@@ -1,5 +1,40 @@
 # Smartpay NodeJS SDK Reference
 
+- [Class Smartpay](#class-smartpay)
+  - [Constructor](#constructor)
+  - [Create Checkout Session](#create-checkout-session)
+  - [Get Checkout Session URL](#get-checkout-session-url)
+  - [Get Order](#get-order)
+  - [Cancel Order](#cancel-order)
+  - [List Orders](#list-orders)
+  - [Create Payment](#create-payment)
+  - [Get Payment](#get-payment)
+  - [Update Payment](#update-payment)
+  - [List Payments](#list-payments)
+  - [Create Refund](#create-refund)
+  - [Get Refund](#get-refund)
+  - [Update Refund](#update-refund)
+  - [List Refunds](#list-refunds)
+  - [Get Webhook Endpoint](#get-webhook-endpoint)
+  - [Update Webhook Endpoint](#update-webhook-endpoint)
+  - [Delete Webhook Endpoint](#delete-webhook-endpoint)
+  - [List Webhook Endpoints](#list-webhook-endpoints)
+  - [Calculate Webhook Signature](#calculate-webhook-signature)
+  - [Verify Webhook Signature](#verify-webhook-signature)
+  - [Webhook Express Middleware](#webhook-express-middleware)
+  - [Get Coupon](#get-coupon)
+  - [Update Coupon](#update-coupon)
+  - [List Coupons](#list-coupons)
+  - [Get Promotion Code](#get-promotion-code)
+  - [Update Promotion Code](#update-promotion-code)
+  - [List Promotion Codes](#list-promotion-codes)
+- [Collection](#collection)
+  - [Properties](#properties)
+- [Constants](#constants)
+  - [Refund Reason](#refund-reason)
+  - [Discount Type](#discount-type)
+- [Common Exceptions](#common-exceptions)
+
 ## Class Smartpay
 
 The main class.
@@ -77,6 +112,50 @@ The checkout URL of the checkout session. ex:
 https://checkout.smartpay.co/checkout_live_vptIEMeycBuKLNNVRL6kB2.1ntK1e.2Z9eoI1j1KU7Jz7XMA9t9wU6gKI4ByzfUSJcwZAhYDoZWPr46ztb1F1ZcsBc7J4QmifNzmcNm4eVHSO98sMVzg
 ```
 
+### Get Order
+
+**Async** method, get single order object by order id.
+
+```javascript
+const order = await smartpay.getOrder({ id });
+```
+
+#### Arguments
+
+| Name | Type   | Description  |
+| ---- | ------ | ------------ |
+| id   | String | The order id |
+
+#### Return
+
+[Order object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
+### Cancel Order
+
+**Async** method, cancel an order.
+
+```javascript
+await smartpay.cancelOrder({ id: });
+```
+
+#### Arguments
+
+| Name | Type   | Description  |
+| ---- | ------ | ------------ |
+| id   | String | The order id |
+
+#### Return
+
+[Order object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
 ### List Orders
 
 **Static** method, list order objects.
@@ -105,53 +184,7 @@ const ordersCollection = await smartpay.getOrders({
 
 [Common exceptions][]
 
-### Get Order
-
-**Async** method, get single order object by order id.
-
-```javascript
-const order = await smartpay.getOrder({ id });
-```
-
-#### Arguments
-
-| Name | Type   | Description  |
-| ---- | ------ | ------------ |
-| id   | string | The order id |
-
-#### Return
-
-[Order object][]
-
-#### Exceptions
-
-[Common exceptions][]
-
-### Cancel Order
-
-**Async** method, cancel an order.
-
-```javascript
-await smartpay.cancelOrder({ id: });
-```
-
-#### Arguments
-
-| Name | Type   | Description  |
-| ---- | ------ | ------------ |
-| id   | string | The order id |
-
-#### Return
-
-[Order object][]
-
-#### Exceptions
-
-[Common exceptions][]
-
-### Payments
-
-#### Create Payment
+### Create Payment
 
 **Async** method, create a payment object([capture][]) to an order.
 
@@ -189,6 +222,12 @@ const payment = await smartpay.createPayment({
 
 [Common exceptions][]
 
+| Type          | Error Code                 | Description                                                           |
+| ------------- | -------------------------- | --------------------------------------------------------------------- |
+| SmartpayError | `order.not-found`          | No order was found meeting the requirements.                          |
+| SmartpayError | `order.cannot-capture`     | No payment can be created. The error message will include the reason. |
+| SmartpayError | `payment.excessive-amount` | The payment exceeds the order's amount available for capture          |
+
 ### Get Payment
 
 **Async** method, get the payment object by payment id.
@@ -203,7 +242,7 @@ const payment = await smartpay.getPayment({
 
 | Name | Type   | Description    |
 | ---- | ------ | -------------- |
-| id   | string | The payment id |
+| id   | String | The payment id |
 
 #### Return
 
@@ -213,7 +252,7 @@ const payment = await smartpay.getPayment({
 
 [Common exceptions][]
 
-#### Update Payment
+### Update Payment
 
 **Async** method, create a payment object([capture][]) to an order.
 
@@ -243,7 +282,7 @@ const payment = await smartpay.updatePayment({
 
 [Common exceptions][]
 
-### List Payment
+### List Payments
 
 **Async** method, list the payment objects.
 
@@ -309,6 +348,11 @@ const refund = await smartpay.createRefund({
 
 [Common exceptions][]
 
+| Type          | Error Code            | Description                                                        |
+| ------------- | --------------------- | ------------------------------------------------------------------ |
+| SmartpayError | `payment.not-found`   | No payment was found meeting the requirements.                     |
+| SmartpayError | `amount.insufficient` | Available amount on payment is insufficient to handle the request. |
+
 ### Get Refund
 
 **Async** method, get the refund object by refund id.
@@ -333,7 +377,7 @@ const refund = await smartpay.getRefund({
 
 [Common exceptions][]
 
-#### Update Refund
+### Update Refund
 
 **Async** method, update a refund object([capture][]).
 
@@ -363,7 +407,7 @@ const refund = await smartpay.updateRefund({
 
 [Common exceptions][]
 
-### List Refund
+### List Refunds
 
 **Async** method, list refunds.
 
@@ -389,7 +433,7 @@ const refunds = await smartpay.listRefunds({
 
 #### Create Webhook Endpoint
 
-**Async** method, create a webhook endpoint object to an order.
+**Async** method, create a webhook endpoint object.
 
 ```javascript
 const webhookEndpoint = await smartpay.createWebhookEndpoint({
@@ -431,7 +475,7 @@ const webhookEndpoint = await smartpay.getWebhookEndpoint({
 
 | Name | Type   | Description             |
 | ---- | ------ | ----------------------- |
-| id   | string | The webhook endpoint id |
+| id   | String | The webhook endpoint id |
 
 #### Return
 
@@ -441,9 +485,9 @@ const webhookEndpoint = await smartpay.getWebhookEndpoint({
 
 [Common exceptions][]
 
-#### Update Webhook Endpoint
+### Update Webhook Endpoint
 
-**Async** method, create a webhook endpoint.
+**Async** method, update a webhook endpoint.
 
 ```javascript
 const webhookEndpoint = await smartpay.updateWebhookEndpoint({
@@ -488,7 +532,7 @@ const webhookEndpoint = await smartpay.deleteWebhookEndpoint({
 
 | Name | Type   | Description             |
 | ---- | ------ | ----------------------- |
-| id   | string | The webhook endpoint id |
+| id   | String | The webhook endpoint id |
 
 #### Return
 
@@ -498,7 +542,7 @@ Empty response body with 204
 
 [Common exceptions][]
 
-### List Webhook Endpoint
+### List Webhook Endpoints
 
 **Async** method, list the webhook endpoint objects.
 
@@ -600,6 +644,236 @@ app.use(
 
 A `express.json` middleware's verify function.
 
+#### Create Coupon
+
+**Async** method, create a coupon object.
+
+```javascript
+const coupon = await smartpay.createCoupon({
+  name,
+  metadata,
+});
+```
+
+#### Arguments
+
+| Name                          | Type   | Description                                                                                                        |
+| ----------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------ |
+| name                          | String | The coupon's name, meant to be displayable to the customer.                                                        |
+| discountType                  | String | Discount Type. `amount` or `percentage`                                                                            |
+| discountAmount                | Number | Required if discountType is `amount`. The amount of this coupon object.                                            |
+| discountPercentage            | Number | Required if discountType is `percentage`. The discount percentage of this coupon object.                           |
+| currency                      | String | Required if discountType is `amount`. Three-letter ISO currency code, in uppercase. Must be a supported currency.  |
+| expiresAt (optional)          | String | Time at which the Coupon expires. Measured in milliseconds since the Unix epoch.                                   |
+| maxRedemptionCount (optional) | String | Maximum number of times this coupon can be redeemed, in total, across all customers, before it is no longer valid. |
+| metadata (optional)           | Object | Set of up to 20 key-value pairs that you can attach to the object.                                                 |
+
+#### Return
+
+[Coupon object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
+### Get Coupon
+
+**Async** method, get the coupon object by coupon id.
+
+```javascript
+const coupon = await smartpay.getCoupon({
+  id,
+});
+```
+
+#### Arguments
+
+| Name | Type   | Description   |
+| ---- | ------ | ------------- |
+| id   | String | The coupon id |
+
+#### Return
+
+[Coupon object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
+### Update Coupon
+
+**Async** method, update a coupon.
+
+```javascript
+const coupon = await smartpay.updateCoupon({
+  active,
+  metadata,
+});
+```
+
+#### Arguments
+
+| Name                | Type    | Description                                                                          |
+| ------------------- | ------- | ------------------------------------------------------------------------------------ |
+| id                  | String  | The order id                                                                         |
+| name (optional)     | String  | The coupon's name, meant to be displayable to the customer.                          |
+| active (optional)   | Boolean | Has the value true if the coupon is active and events are sent to the url specified. |
+| metadata (optional) | Object  | Set of up to 20 key-value pairs that you can attach to the object.                   |
+
+#### Return
+
+[Coupon object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
+### List Coupons
+
+**Async** method, list the coupon objects.
+
+```javascript
+const coupon = await smartpay.listCoupons({
+  maxResults,
+  pageToken,
+  expand,
+});
+```
+
+#### Arguments
+
+| Name                              | Type   | Description                                                                                |
+| --------------------------------- | ------ | ------------------------------------------------------------------------------------------ |
+| maxResults (optional, defualt=20) | Number | Number of objects to return.                                                               |
+| pageToken (optional)              | String | The token for the page of the collection of objects.                                       |
+| expand (optional, default=no)     | String | Set to `all` if the references within the response need to be expanded to the full objects |
+
+#### Return
+
+[Collection][] of [coupon object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
+#### Create Promotion Code
+
+**Async** method, create a promotion code object of a coupon.
+
+```javascript
+const promotionCode = await smartpay.createPromotionCode({
+  name,
+  metadata,
+});
+```
+
+#### Arguments
+
+| Name                            | Type    | Description                                                                                                                                                    |
+| ------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| coupon                          | String  | The unique identifier for the Coupon object.                                                                                                                   |
+| code                            | String  | The customer-facing code. Regardless of case, this code must be unique across all your promotion codes.                                                        |
+| active (optional)               | Boolean | Has the value true (default) if the promotion code is active and can be used, or the value false if it is not.                                                 |
+| currency (optional)             | String  | Three-letter ISO currency code, in uppercase. Must be a supported currency.                                                                                    |
+| expiresAt (optional)            | Number  | Time at which the Promotion Code expires. Measured in milliseconds since the Unix epoch.                                                                       |
+| firstTimeTransaction (optional) | Boolean | A Boolean indicating if the Promotion Code should only be redeemed for customers without any successful order with the merchant. Defaults to false if not set. |
+| maxRedemptionCount (optional)   | Number  | Maximum number of times this Promotion Code can be redeemed, in total, across all customers, before it is no longer valid.                                     |
+| minimumAmount (optional)        | Number  | The minimum amount required to redeem this Promotion Code (e.g., the amount of the order must be ¥10,000 or more to be applicable).                            |
+| onePerCustomer (optional)       | Boolean | A Boolean indicating if the Promotion Code should only be redeemed once by any given customer. Defaults to false if not set.                                   |
+| metadata (optional)             | Object  | Set of up to 20 key-value pairs that you can attach to the object.                                                                                             |
+
+#### Return
+
+[Promotion Code object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
+| Type          | Error Code              | Description                                                                                               |
+| ------------- | ----------------------- | --------------------------------------------------------------------------------------------------------- |
+| SmartpayError | `coupon.not-found`      | No coupon was found meeting the requirements.                                                             |
+| SmartpayError | `promotion-code.exists` | The promotion code {code} already exists. The code needs to be unique across all of your promotion codes. |
+
+### Get Promotion Code
+
+**Async** method, get the promotion code object by promotion code id.
+
+```javascript
+const promotionCode = await smartpay.getPromotionCode({
+  id,
+});
+```
+
+#### Arguments
+
+| Name | Type   | Description           |
+| ---- | ------ | --------------------- |
+| id   | String | The promotion code id |
+
+#### Return
+
+[Promotion Code object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
+### Update Promotion Code
+
+**Async** method, update a promotion code.
+
+```javascript
+const promotionCode = await smartpay.updatePromotionCode({
+  active,
+  metadata,
+});
+```
+
+#### Arguments
+
+| Name                | Type    | Description                                                                                 |
+| ------------------- | ------- | ------------------------------------------------------------------------------------------- |
+| id                  | String  | The order id                                                                                |
+| active (optional)   | Boolean | Has the value true if the promotion codeis active and events are sent to the url specified. |
+| metadata (optional) | Object  | Set of up to 20 key-value pairs that you can attach to the object.                          |
+
+#### Return
+
+[Promotion Code object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
+### List Promotion Codes
+
+**Async** method, list the promotion code objects.
+
+```javascript
+const promotionCode = await smartpay.listPromotionCodes({
+  maxResults,
+  pageToken,
+  expand,
+});
+```
+
+#### Arguments
+
+| Name                              | Type   | Description                                                                                |
+| --------------------------------- | ------ | ------------------------------------------------------------------------------------------ |
+| maxResults (optional, defualt=20) | Number | Number of objects to return.                                                               |
+| pageToken (optional)              | String | The token for the page of the collection of objects.                                       |
+| expand (optional, default=no)     | String | Set to `all` if the references within the response need to be expanded to the full objects |
+
+#### Return
+
+[Collection][] of [promotion code object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
 ## Collection
 
 Collection of items, a general data structure of collection data.
@@ -617,7 +891,7 @@ Collection of items, a general data structure of collection data.
 
 ## Constants
 
-### Refund reasons
+### Refund Reason
 
 ```
 Smartpay.REFUND_REQUEST_BY_CUSTOMER
@@ -625,6 +899,16 @@ Smartpay.REFUND_REQUEST_BY_CUSTOMER
 
 ```
 Smartpay.REFUND_FRAUDULENT
+```
+
+### Discount Type
+
+```
+Smartpay.COUPON_DISCOUNT_TYPE_AMOUNT
+```
+
+```
+Smartpay.COUPON_DISCOUNT_TYPE_PERCENTAGE
 ```
 
 ## Common Exceptions
@@ -641,6 +925,8 @@ Smartpay.REFUND_FRAUDULENT
 [payment object]: https://en.docs.smartpay.co/reference/the-payment-object
 [refund object]: https://en.docs.smartpay.co/reference/the-refund-object
 [webhook endpoint object]: https://en.docs.smartpay.co/reference/the-webhook-endpoint-object
+[coupon object]: https://en.docs.smartpay.co/reference/the-coupon-object
+[promotion code object]: https://en.docs.smartpay.co/reference/the-promotion-code-object
 [capture]: https://en.docs.smartpay.co/docs/capture-an-order#using-the-smartpay-api
 [refund]: https://en.docs.smartpay.co/docs/refund-a-purchase#using-the-smartpay-api
 [collection]: #collection

@@ -1,4 +1,5 @@
 import SmartpayBase from './base';
+import checkoutSessionsMixin from './checkout-sessions';
 import couponsMixin from './coupons';
 import ordersMixin from './orders';
 import paymentsMixin from './payments';
@@ -7,6 +8,7 @@ import refundsMixin from './refunds';
 import webhooksMixin from './webhooks';
 
 const mixins = [
+  checkoutSessionsMixin,
   ordersMixin,
   paymentsMixin,
   refundsMixin,

@@ -3,6 +3,8 @@
 - [Class Smartpay](#class-smartpay)
   - [Constructor](#constructor)
   - [Create Checkout Session](#create-checkout-session)
+  - [Get Checkout Session](#get-checkout-session)
+  - [List Checkout Sessions](#list-checkout-sessions)
   - [Get Checkout Session URL](#get-checkout-session-url)
   - [Get Order](#get-order)
   - [Cancel Order](#cancel-order)
@@ -86,6 +88,56 @@ const session = await smartpay.createCheckoutSession(payload);
 #### Return
 
 The [checkout session object][]
+
+### Get Checkout Session
+
+**Async** method, get single checkout session object by checkout session id.
+
+```javascript
+const checkoutSession await smartpay.getCheckoutSession({ id });
+```
+
+#### Arguments
+
+| Name | Type   | Description             |
+| ---- | ------ | ----------------------- |
+| id   | String | The checkout session id |
+
+#### Return
+
+[CheckoutSession object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
+### List Checkout Sessions
+
+**Static** method, list checkout session objects.
+
+```javascript
+const checkoutSessionsCollection = await smartpay.getCheckoutSessions({
+  maxResults,
+  pageToken,
+  expand,
+});
+```
+
+#### Arguments
+
+| Name                              | Type   | Description                                                                                |
+| --------------------------------- | ------ | ------------------------------------------------------------------------------------------ |
+| maxResults (optional, defualt=20) | Number | Number of objects to return.                                                               |
+| pageToken (optional)              | String | The token for the page of the collection of objects.                                       |
+| expand (optional, default=no)     | String | Set to `all` if the references within the response need to be expanded to the full objects |
+
+#### Return
+
+[Collection][] of [checkout session object][]
+
+#### Exceptions
+
+[Common exceptions][]
 
 ### Get Checkout Session URL
 
@@ -890,6 +942,28 @@ Collection of items, a general data structure of collection data.
 | data          | Array  | The array of data                                                                                                                  |
 
 ## Constants
+
+### Order Status
+
+```
+Smartpay.ORDER_STATUS_SUCCEEDED
+```
+
+```
+Smartpay.ORDER_STATUS_CANCELED
+```
+
+```
+Smartpay.ORDER_STATUS_REJECTED
+```
+
+```
+Smartpay.ORDER_STATUS_FAILED
+```
+
+```
+Smartpay.ORDER_STATUS_REQUIRES_AUTHORIZATION
+```
 
 ### Refund Reason
 

@@ -37,7 +37,7 @@ const couponsMixin = <T extends Constructor>(Base: T) => {
       if (!discountType) {
         throw new SmartpayError({
           errorCode: 'request.invalid',
-          message: 'discountType is required',
+          message: 'discountType is required.',
         });
       }
 
@@ -49,7 +49,7 @@ const couponsMixin = <T extends Constructor>(Base: T) => {
       ) {
         throw new SmartpayError({
           errorCode: 'request.invalid',
-          message: 'discountType is invalid',
+          message: 'discountType is invalid.',
         });
       }
 
@@ -59,14 +59,14 @@ const couponsMixin = <T extends Constructor>(Base: T) => {
       ) {
         throw new SmartpayError({
           errorCode: 'request.invalid',
-          message: 'discountAmount is invalid',
+          message: 'discount_amount is required if discount_type is amount.',
         });
       }
 
       if (discountType === COUPON_DISCOUNT_TYPE_AMOUNT && !currency) {
         throw new SmartpayError({
           errorCode: 'request.invalid',
-          message: 'currency is required',
+          message: 'currency is required if discount_amount is provided.',
         });
       }
       if (
@@ -75,7 +75,8 @@ const couponsMixin = <T extends Constructor>(Base: T) => {
       ) {
         throw new SmartpayError({
           errorCode: 'request.invalid',
-          message: 'discountPercentage is invalid',
+          message:
+            'discount_percentage is required if discount_type is percentage.',
         });
       }
 

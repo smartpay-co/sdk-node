@@ -24,26 +24,33 @@ const promotionCodesMixin = <T extends Constructor>(Base: T) => {
     static COUPON_DISCOUNT_TYPE_PERCENTAGE = COUPON_DISCOUNT_TYPE_PERCENTAGE;
 
     createPromotionCode(params: CreatePromotionCodeParams = {}) {
-      const { code, coupon } = params;
+      const { code, coupon, currency, minimumAmount } = params;
 
       if (!code) {
         throw new SmartpayError({
           errorCode: 'request.invalid',
-          message: 'name is required',
+          message: 'name is required.',
         });
       }
 
       if (!coupon) {
         throw new SmartpayError({
           errorCode: 'request.invalid',
-          message: 'Coupon Id is required',
+          message: 'Coupon Id is required.',
         });
       }
 
       if (!isValidCouponId(coupon)) {
         throw new SmartpayError({
           errorCode: 'request.invalid',
-          message: 'Coupon Id is invalid',
+          message: 'Coupon Id is invalid.',
+        });
+      }
+
+      if (minimumAmount && !currency) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'CoupCurrency is required if minimum_amount is provided.',
         });
       }
 

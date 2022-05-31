@@ -33,6 +33,10 @@
 - [Collection](#collection)
   - [Properties](#properties)
 - [Constants](#constants)
+  - [Address Type](#address-type)
+  - [Capture Method](#capture-method)
+  - [Order Status](#order-status)
+  - [Cancel Remainder](#cancel-remainder)
   - [Refund Reason](#refund-reason)
   - [Discount Type](#discount-type)
 - [Common Exceptions](#common-exceptions)
@@ -116,7 +120,7 @@ const checkoutSession await smartpay.getCheckoutSession({ id });
 **Static** method, list checkout session objects.
 
 ```javascript
-const checkoutSessionsCollection = await smartpay.getCheckoutSessions({
+const checkoutSessionsCollection = await smartpay.listCheckoutSessions({
   maxResults,
   pageToken,
   expand,
@@ -213,7 +217,7 @@ await smartpay.cancelOrder({ id: });
 **Static** method, list order objects.
 
 ```javascript
-const ordersCollection = await smartpay.getOrders({
+const ordersCollection = await smartpay.listOrders({
   maxResults,
   pageToken,
   expand,
@@ -943,35 +947,44 @@ Collection of items, a general data structure of collection data.
 
 ## Constants
 
+### Address Type
+
+```
+Smartpay.ADDRESS_TYPE_HOME
+Smartpay.ADDRESS_TYPE_GIFT
+Smartpay.ADDRESS_TYPE_LOCKER
+Smartpay.ADDRESS_TYPE_OFFICE
+Smartpay.ADDRESS_TYPE_STORE
+```
+
+### Capture Method
+
+```
+Smartpay.CAPTURE_METHOD_AUTOMATIC
+Smartpay.CAPTURE_METHOD_MANUAL
+```
+
 ### Order Status
 
 ```
 Smartpay.ORDER_STATUS_SUCCEEDED
-```
-
-```
 Smartpay.ORDER_STATUS_CANCELED
-```
-
-```
 Smartpay.ORDER_STATUS_REJECTED
-```
-
-```
 Smartpay.ORDER_STATUS_FAILED
+Smartpay.ORDER_STATUS_REQUIRES_AUTHORIZATION
 ```
 
+### Cancel Remainder
+
 ```
-Smartpay.ORDER_STATUS_REQUIRES_AUTHORIZATION
+Smartpay.CANCEL_REMAINDER_AUTOMATIC
+Smartpay.CANCEL_REMAINDER_MANUAL
 ```
 
 ### Refund Reason
 
 ```
 Smartpay.REFUND_REQUEST_BY_CUSTOMER
-```
-
-```
 Smartpay.REFUND_FRAUDULENT
 ```
 
@@ -979,9 +992,6 @@ Smartpay.REFUND_FRAUDULENT
 
 ```
 Smartpay.COUPON_DISCOUNT_TYPE_AMOUNT
-```
-
-```
 Smartpay.COUPON_DISCOUNT_TYPE_PERCENTAGE
 ```
 

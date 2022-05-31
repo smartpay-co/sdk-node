@@ -137,6 +137,21 @@ const webhooksMixin = <T extends Constructor>(Base: T) => {
 
     static calculateWebhookSignature(params: CalculateWebhookSignatureParams) {
       const { data, secret } = params;
+
+      if (!data) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'data is required',
+        });
+      }
+
+      if (!secret) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'secret is required',
+        });
+      }
+
       const signer = createHmac('sha256', Buffer.from(base62.decode(secret)));
       const result = signer.update(Buffer.from(data, 'utf8')).digest('hex');
 
@@ -145,6 +160,28 @@ const webhooksMixin = <T extends Constructor>(Base: T) => {
 
     static verifyWebhookSignature(params: VerifyWebhookSignatureParams) {
       const { data, secret, signature } = params;
+
+      if (!data) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'data is required',
+        });
+      }
+
+      if (!secret) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'secret is required',
+        });
+      }
+
+      if (!signature) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'signature is required',
+        });
+      }
+
       const calculatedSignature = this.calculateWebhookSignature({
         data,
         secret,

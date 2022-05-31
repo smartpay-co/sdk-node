@@ -154,13 +154,14 @@ export type SimpleChekoutSessionPayload = {
   items: SimpleLineItem[];
   shippingInfo?: ShippingInfo;
   customerInfo?: CustomerInfo;
+  locale?: string;
+
+  successUrl?: string;
+  cancelUrl?: string;
 
   description?: string;
   metadata?: MetaData;
   reference?: string;
-
-  successUrl?: string;
-  cancelUrl?: string;
 
   promotionCode?: string;
 
@@ -378,10 +379,10 @@ export type UpdateRefundParams = {
 };
 
 export type CreateWebhookEndpointParams = {
+  url?: string;
   description?: string;
   eventSubscriptions?: string[];
   metadata?: MetaData;
-  url?: string;
   idempotencyKey?: string;
 };
 

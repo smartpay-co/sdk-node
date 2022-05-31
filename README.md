@@ -63,13 +63,7 @@ If you would like to know how Smartpay payment works, please see the [payment fl
 })();
 ```
 
-We supports two formats of the checkout session payload. The first one is strict format. You will have the
-full control to the session payload if you choose to use strict format. Please checkout the API [document][strict-session] for more information about the strict format.
-
-The second supported format is loose format. This format is a less complexity version of the strict format.
-Our SDK will transform the payload to strict format before sending to our API endpoint.
-
-[strict-session]: https://documenter.getpostman.com/view/16470887/U16dSU8B#8a3538b1-530c-448c-8bae-4a41cdf0b8fd
+The shape of checkout session payload is described in the [docuement](https://en.docs.smartpay.co/reference/create-a-checkout-session).
 
 ### To retreive the session URL
 
@@ -78,3 +72,7 @@ const sessionURL = smartpay.getSessionURL(session);
 ```
 
 We also prepare a more [real-world example](https://github.com/smartpay-co/integration-examples/blob/main/server/node/server.js) for you to refer to.
+
+## Reference
+
+Please check the [reference](docs/Reference.md) document.

@@ -15,8 +15,14 @@ import {
 
 import { GET, POST, PATCH, Constructor } from './base';
 
+export const CANCEL_REMAINDER_AUTOMATIC = 'autommatic';
+export const CANCEL_REMAINDER_MANUAL = 'manual';
+
 const paymentsMixin = <T extends Constructor>(Base: T) => {
   return class extends Base {
+    static CANCEL_REMAINDER_AUTOMATIC = CANCEL_REMAINDER_AUTOMATIC;
+    static CANCEL_REMAINDER_MANUAL = CANCEL_REMAINDER_MANUAL;
+
     createPayment(params: CreatePaymentParams = {}) {
       const { order, amount, currency } = params;
 

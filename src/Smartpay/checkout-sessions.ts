@@ -27,8 +27,26 @@ type SessionURLParams = {
   'promotion-code'?: string;
 };
 
+export const ADDRESS_TYPE_HOME = 'home';
+export const ADDRESS_TYPE_GIFT = 'gift';
+export const ADDRESS_TYPE_LOCKER = 'locker';
+export const ADDRESS_TYPE_OFFICE = 'office';
+export const ADDRESS_TYPE_STORE = 'store';
+
+export const CAPTURE_METHOD_AUTOMATIC = 'autommatic';
+export const CAPTURE_METHOD_MANUAL = 'manual';
+
 const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
   class SmartpayWithCheckoutSession extends Base {
+    static ADDRESS_TYPE_HOME = ADDRESS_TYPE_HOME;
+    static ADDRESS_TYPE_GIFT = ADDRESS_TYPE_GIFT;
+    static ADDRESS_TYPE_LOCKER = ADDRESS_TYPE_LOCKER;
+    static ADDRESS_TYPE_OFFICE = ADDRESS_TYPE_OFFICE;
+    static ADDRESS_TYPE_STORE = ADDRESS_TYPE_STORE;
+
+    static CAPTURE_METHOD_AUTOMATIC = CAPTURE_METHOD_AUTOMATIC;
+    static CAPTURE_METHOD_MANUAL = CAPTURE_METHOD_MANUAL;
+
     static normalizeCheckoutSessionPayload(
       payload: SimpleChekoutSessionPayload
     ): SimpleChekoutSessionPayload {

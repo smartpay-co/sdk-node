@@ -194,11 +194,12 @@ export const normalizeCheckoutSessionPayload = (
     items,
     customerInfo,
     shippingInfo,
+    locale,
+    successUrl,
+    cancelUrl,
     reference,
     description,
     metadata,
-    successUrl,
-    cancelUrl,
   } = payload;
 
   const rest = omit(payload, [
@@ -208,11 +209,12 @@ export const normalizeCheckoutSessionPayload = (
     'items',
     'customerInfo',
     'shippingInfo',
+    'locale',
+    'successUrl',
+    'cancelUrl',
     'reference',
     'metadata',
     'description',
-    'successUrl',
-    'cancelUrl',
   ]);
 
   return {
@@ -223,11 +225,12 @@ export const normalizeCheckoutSessionPayload = (
     items: normalizeItems(items),
     customerInfo: normalizeCustomerInfo(customerInfo),
     shippingInfo: normalizeShippingInfo(shippingInfo),
+    locale,
+    successUrl,
+    cancelUrl,
     reference,
     description,
     metadata,
-    successUrl,
-    cancelUrl,
   };
 };
 

@@ -23,7 +23,6 @@ export interface Params {
 }
 
 const API_PREFIX = 'https://api.smartpay.co/v1';
-const CHECKOUT_URL = 'https://checkout.smartpay.co';
 
 export const GET = 'GET';
 export const POST = 'POST';
@@ -37,9 +36,6 @@ const SMARTPAY_API_PREFIX =
     ? process.env.SMARTPAY_API_PREFIX
     : '';
 
-// eslint-disable-next-line prefer-destructuring
-const SMARTPAY_CHECKOUT_URL = process.env.SMARTPAY_CHECKOUT_URL;
-
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -49,7 +45,6 @@ class SmartpayBase {
   _secretKey: KeyString;
   _publicKey?: KeyString;
   _apiPrefix: string;
-  _checkoutURL: string;
 
   constructor(key: KeyString, options: SmartPayOptions = {}) {
     if (!key) {
@@ -67,8 +62,6 @@ class SmartpayBase {
     this._secretKey = key;
     this._publicKey = options.publicKey;
     this._apiPrefix = options.apiPrefix || SMARTPAY_API_PREFIX || API_PREFIX;
-    this._checkoutURL =
-      options.checkoutURL || SMARTPAY_CHECKOUT_URL || CHECKOUT_URL;
   }
 
   request(

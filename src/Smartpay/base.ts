@@ -3,19 +3,10 @@ import originalFetch from 'isomorphic-unfetch';
 import qs from 'query-string';
 import randomstring from 'randomstring';
 
-import {
-  KeyString,
-  SmartPayOptions,
-  CheckoutSession,
-  SimpleChekoutSessionPayload,
-} from '../types';
+import { KeyString, SmartPayOptions } from '../types';
 import {
   isValidPublicApiKey,
   isValidSecretApiKey,
-  validateCheckoutSessionPayload,
-  normalizeCheckoutSessionPayload,
-  omit,
-  jtdErrorToDetails,
   SmartpayError,
 } from '../utils';
 
@@ -32,7 +23,6 @@ export interface Params {
 }
 
 const API_PREFIX = 'https://api.smartpay.co/v1';
-const CHECKOUT_URL = 'https://checkout.smartpay.co';
 
 export const GET = 'GET';
 export const POST = 'POST';
@@ -40,31 +30,13 @@ export const PUT = 'PUT';
 export const PATCH = 'PATCH';
 export const DELETE = 'DELETE';
 
-export const STATUS_SUCCEEDED = 'succeeded';
-export const STATUS_REJECTED = 'rejected';
-export const STATUS_FAILED = 'failed';
-export const STATUS_REQUIRES_AUTHORIZATION = 'requires_authorization';
-export const STATUS_CANCELED = 'canceled';
-
 // eslint-disable-next-line prefer-destructuring
 const SMARTPAY_API_PREFIX =
   process.env.SMARTPAY_API_PREFIX?.toLowerCase()?.includes('api.smartpay')
     ? process.env.SMARTPAY_API_PREFIX
     : '';
 
-// eslint-disable-next-line prefer-destructuring
-const SMARTPAY_CHECKOUT_URL = process.env.SMARTPAY_CHECKOUT_URL;
-
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-
-type GetSessionURLOptions = {
-  checkoutURL?: string;
-  promotionCode?: string;
-};
-
-type SessionURLParams = {
-  'promotion-code'?: string;
-};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Constructor = new (...args: any[]) => SmartpayBase;
@@ -73,7 +45,6 @@ class SmartpayBase {
   _secretKey: KeyString;
   _publicKey?: KeyString;
   _apiPrefix: string;
-  _checkoutURL: string;
 
   constructor(key: KeyString, options: SmartPayOptions = {}) {
     if (!key) {
@@ -91,8 +62,6 @@ class SmartpayBase {
     this._secretKey = key;
     this._publicKey = options.publicKey;
     this._apiPrefix = options.apiPrefix || SMARTPAY_API_PREFIX || API_PREFIX;
-    this._checkoutURL =
-      options.checkoutURL || SMARTPAY_CHECKOUT_URL || CHECKOUT_URL;
   }
 
   request(
@@ -173,52 +142,6 @@ class SmartpayBase {
     );
   }
 
-  static normalizeCheckoutSessionPayload(
-    payload: SimpleChekoutSessionPayload
-  ): SimpleChekoutSessionPayload {
-    const normalizedPayload = normalizeCheckoutSessionPayload(payload);
-    const errors = validateCheckoutSessionPayload(
-      normalizedPayload as SimpleChekoutSessionPayload
-    );
-
-    if (errors.length) {
-      throw new SmartpayError({
-        errorCode: 'request.invalid',
-        message: 'Payload invalid',
-        details: jtdErrorToDetails(errors, 'payload'),
-      });
-    }
-
-    return normalizedPayload;
-  }
-
-  createCheckoutSession(payload: SimpleChekoutSessionPayload) {
-    const normalizedPayload =
-      SmartpayBase.normalizeCheckoutSessionPayload(payload);
-
-    // Call API to create checkout session
-    const req: Promise<CheckoutSession> = this.request(`/checkout-sessions`, {
-      method: POST,
-      idempotencyKey: payload.idempotencyKey,
-      payload: omit(normalizedPayload, ['idempotencyKey']),
-    });
-
-    return req.then((session) => {
-      if (session) {
-        const sessionURL = SmartpayBase.getSessionURL(session, {
-          promotionCode: payload.promotionCode,
-        });
-
-        if (sessionURL) {
-          // eslint-disable-next-line no-param-reassign
-          session.url = sessionURL;
-        }
-      }
-
-      return session;
-    });
-  }
-
   setPublicKey(publicKey: KeyString) {
     if (!publicKey) {
       throw new SmartpayError({
@@ -237,36 +160,6 @@ class SmartpayBase {
     this._publicKey = publicKey;
 
     return {};
-  }
-
-  static getSessionUrl(
-    session: CheckoutSession,
-    options?: GetSessionURLOptions
-  ): string {
-    if (!session) {
-      throw new SmartpayError({
-        errorCode: 'request.invalid',
-        message: 'Session is invalid',
-      });
-    }
-
-    const checkoutURL = session.url;
-    const params: SessionURLParams = {
-      'promotion-code': options?.promotionCode,
-    };
-
-    return qs.stringifyUrl({
-      url: checkoutURL,
-      query: params,
-    });
-  }
-
-  // Backward compatiable method
-  static getSessionURL(
-    session: CheckoutSession,
-    options?: GetSessionURLOptions
-  ): string {
-    return this.getSessionUrl(session, options);
   }
 }
 

@@ -17,6 +17,8 @@ const orderIdRegExp = /^order_(test|live)_[0-9a-zA-Z]+$/;
 const paymentIdRegExp = /^payment_(test|live)_[0-9a-zA-Z]+$/;
 const refundIdRegExp = /^refund_(test|live)_[0-9a-zA-Z]+$/;
 const webhookEndpointIdRegExp = /^webhookendpoint_(test|live)_[0-9a-zA-Z]+$/;
+const couponIdRegExp = /^coupon_(test|live)_[0-9a-zA-Z]+$/;
+const promotionCodeIdRegExp = /^promotioncode_(test|live)_[0-9a-zA-Z]+$/;
 
 export class SmartpayError extends Error {
   statusCode?: number;
@@ -69,6 +71,14 @@ export const isValidRefundId = (input: string) => {
 
 export const isValidWebhookEndpointId = (input: string) => {
   return webhookEndpointIdRegExp.test(input);
+};
+
+export const isValidCouponId = (input: string) => {
+  return couponIdRegExp.test(input);
+};
+
+export const isValidPromotionCodeId = (input: string) => {
+  return promotionCodeIdRegExp.test(input);
 };
 
 export const validateCheckoutSessionPayload = (

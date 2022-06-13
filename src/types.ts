@@ -154,13 +154,14 @@ export type SimpleChekoutSessionPayload = {
   items: SimpleLineItem[];
   shippingInfo?: ShippingInfo;
   customerInfo?: CustomerInfo;
+  locale?: string;
+
+  successUrl?: string;
+  cancelUrl?: string;
 
   description?: string;
   metadata?: MetaData;
   reference?: string;
-
-  successUrl?: string;
-  cancelUrl?: string;
 
   promotionCode?: string;
 
@@ -282,6 +283,44 @@ export type WebhookEndpoint = {
   updatedAt: number;
 };
 
+export type Coupon = {
+  id: string;
+  object: string;
+  active: boolean;
+  name: string;
+  createdAt: number;
+  currency?: string;
+  description?: string;
+  discountAmount?: number;
+  discountPercentage?: number;
+  discountType: string;
+  expiresAt?: number;
+  maxRedemptionCount?: number;
+  redemptionCount: number;
+  sponsored: boolean;
+  metadata?: MetaData;
+  test: boolean;
+  updatedAt: number;
+};
+
+export type PromotionCode = {
+  id: string;
+  object: string;
+  active: boolean;
+  code: string;
+  createdAt: number;
+  currency?: string;
+  expiresAt?: number;
+  firstTimeTransaction: boolean;
+  onePerCustomer: boolean;
+  maxRedemptionCount?: number;
+  redemptionCount: number;
+  minimumAmount?: number;
+  metadata?: MetaData;
+  test: boolean;
+  updatedAt: number;
+};
+
 export type JTDError = {
   instancePath: string[];
   schemaPath: string[];
@@ -340,10 +379,10 @@ export type UpdateRefundParams = {
 };
 
 export type CreateWebhookEndpointParams = {
+  url?: string;
   description?: string;
   eventSubscriptions?: string[];
   metadata?: MetaData;
-  url?: string;
   idempotencyKey?: string;
 };
 
@@ -352,7 +391,49 @@ export type UpdateWebhookEndpointParams = CreateWebhookEndpointParams & {
   active?: boolean;
 };
 
-export type DeleteWebhookEndpointParams = {
+export type CreateCouponParams = {
+  name?: string;
+  currency?: string;
+  description?: string;
+  discountAmount?: number;
+  discountPercentage?: number;
+  discountType?: string;
+  expiresAt?: number;
+  maxRedemptionCount?: number;
+  metadata?: MetaData;
+  idempotencyKey?: string;
+};
+
+export type UpdateCouponParams = {
+  id?: string;
+  active?: boolean;
+  name?: string;
+  metadata?: MetaData;
+  idempotencyKey?: string;
+};
+
+export type CreatePromotionCodeParams = {
+  active?: boolean;
+  code?: string;
+  coupon?: string;
+  currency?: string;
+  expiresAt?: number;
+  firstTimeTransaction?: boolean;
+  onePerCustomer?: boolean;
+  maxRedemptionCount?: number;
+  minimumAmount?: number;
+  metadata?: MetaData;
+  idempotencyKey?: string;
+};
+
+export type UpdatePromotionCodeParams = {
+  id?: string;
+  active?: boolean;
+  metadata?: MetaData;
+  idempotencyKey?: string;
+};
+
+export type DeleteObjectParams = {
   id?: string;
 };
 

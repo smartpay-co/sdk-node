@@ -57,7 +57,7 @@ test('Create Live Checkout Session Loose Payload 1', async function testCreateCh
 });
 
 test('Create Live Checkout Session Loose Payload 2', async function testCreateCheckoutSession(t) {
-  t.plan(1);
+  t.plan(3);
 
   const smartpay = new Smartpay(TEST_SECRET_KEY, {
     publicKey: TEST_PUBLIC_KEY,
@@ -104,6 +104,18 @@ test('Create Live Checkout Session Loose Payload 2', async function testCreateCh
   TestSessionData.cancelOrderSession = session;
 
   t.ok(session.id.length > 0);
+
+  const retrievedSession = await smartpay.getCheckoutSession({
+    id: session.id,
+  });
+
+  t.ok(session.id === retrievedSession.id);
+
+  const sessionsCollection = await smartpay.listCheckoutSessions({
+    maxResults: 10,
+  });
+
+  t.ok(sessionsCollection.data.length > 0);
 });
 
 test('Get orders', async function testGetOrders(t) {
@@ -113,14 +125,14 @@ test('Get orders', async function testGetOrders(t) {
     publicKey: TEST_PUBLIC_KEY,
   });
 
-  const ordersCollection = await smartpay.getOrders({ maxResults: 10 });
+  const ordersCollection = await smartpay.listOrders({ maxResults: 10 });
 
   t.ok(ordersCollection.data.length > 0);
 
   const { nextPageToken } = ordersCollection;
 
   if (nextPageToken) {
-    const nextOrdersCollection = await smartpay.getOrders({
+    const nextOrdersCollection = await smartpay.listOrders({
       pageToken: nextPageToken,
     });
 
@@ -303,8 +315,8 @@ test('Webhook Endpoint CRUD', async function testWebhookEndpointCRUD(t) {
     description: 'updated',
   });
 
-  const retrivedWebhookEndpoint = await smartpay.updateWebhookEndpoint({
-    id: updatedWebhookEndpoint.id,
+  const retrivedWebhookEndpoint = await smartpay.getWebhookEndpoint({
+    id: webhookEndpoint.id,
   });
 
   t.ok(webhookEndpoint.id);
@@ -320,4 +332,60 @@ test('Webhook Endpoint CRUD', async function testWebhookEndpointCRUD(t) {
   });
 
   t.ok(deleteResult === '');
+});
+
+test('Coupon, Promotion Code CRU', async function testWebhookEndpointCRUD(t) {
+  t.plan(8);
+
+  // Coupon
+  const smartpay = new Smartpay(TEST_SECRET_KEY, {
+    publicKey: TEST_PUBLIC_KEY,
+  });
+
+  const coupon = await smartpay.createCoupon({
+    name: 'E2E Test coupon',
+    discountType: Smartpay.COUPON_DISCOUNT_TYPE_AMOUNT,
+    discountAmount: 100,
+    currency: 'JPY',
+  });
+
+  const updatedCoupon = await smartpay.updateCoupon({
+    id: coupon.id,
+    name: 'updatedCoupon',
+  });
+
+  const retrivedCoupon = await smartpay.updateCoupon({
+    id: updatedCoupon.id,
+  });
+
+  t.ok(coupon.id);
+  t.ok(coupon.id === updatedCoupon.id);
+  t.ok(retrivedCoupon.name === 'updatedCoupon');
+
+  const couponsCollection = await smartpay.listCoupons();
+
+  t.ok(couponsCollection.data.length > 0);
+
+  // Promotion Code
+  const promotionCode = await smartpay.createPromotionCode({
+    coupon: updatedCoupon.id,
+    code: `THECODE${new Date().getTime()}`,
+  });
+
+  const updatedPromotionCode = await smartpay.updatePromotionCode({
+    id: promotionCode.id,
+    active: false,
+  });
+
+  const retrivedPromotionCode = await smartpay.updatePromotionCode({
+    id: updatedPromotionCode.id,
+  });
+
+  t.ok(promotionCode.id);
+  t.ok(promotionCode.id === updatedPromotionCode.id);
+  t.ok(retrivedPromotionCode.active === false);
+
+  const promotionCodesCollection = await smartpay.listPromotionCodes();
+
+  t.ok(promotionCodesCollection.data.length > 0);
 });

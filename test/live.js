@@ -26,6 +26,30 @@ test('Create Live Checkout Session Loose Payload 1', async function testCreateCh
         currency: 'JPY',
         quantity: 1,
       },
+      {
+        kind: 'discount',
+        name: 'discount',
+        amount: 10,
+        currency: 'JPY',
+      },
+      {
+        kind: 'discount',
+        name: 'discount',
+        amount: 10,
+        currency: 'JPY',
+      },
+      {
+        kind: 'tax',
+        name: 'tax',
+        amount: 10,
+        currency: 'JPY',
+      },
+      {
+        kind: 'tax',
+        name: 'tax',
+        amount: 10,
+        currency: 'JPY',
+      },
     ],
 
     shippingInfo: {

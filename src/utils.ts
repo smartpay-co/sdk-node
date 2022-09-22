@@ -148,7 +148,11 @@ export const normalizeCheckoutSessionPayload = (
         }
 
         if (itemCurrency === currency) {
-          return sum + (item.amount ? item.amount * item.quantity : 0);
+          return (
+            sum +
+            (item.kind === 'discount' ? -1 : 1) *
+              (item.amount ? item.amount * (item.quantity || 1) : 0)
+          );
         }
 
         throw new SmartpayError({

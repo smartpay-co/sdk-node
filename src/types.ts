@@ -84,6 +84,7 @@ export type PriceData = {
 };
 
 export type LineItemData = {
+  kind?: string;
   price?: string;
   priceData?: PriceData;
   quantity: number;
@@ -93,10 +94,11 @@ export type LineItemData = {
 };
 
 export type SimpleLineItem = {
+  kind?: string;
   // LineItem
-  quantity: number;
+  quantity?: number;
   // ProductData
-  name: string;
+  name?: string;
   brand?: string;
   categories?: string[];
   gtin?: string;

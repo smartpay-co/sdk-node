@@ -59,6 +59,7 @@ export const normalizeCustomerInfo = (
 
 export const normalizeItem = (item: SimpleLineItem) => {
   const {
+    kind,
     quantity,
     name,
     brand,
@@ -79,6 +80,7 @@ export const normalizeItem = (item: SimpleLineItem) => {
   } = item;
 
   const rest = omit(item, [
+    'kind',
     'quantity',
     'name',
     'brand',
@@ -100,6 +102,7 @@ export const normalizeItem = (item: SimpleLineItem) => {
 
   return {
     ...rest,
+    kind,
     quantity,
     name,
     brand,

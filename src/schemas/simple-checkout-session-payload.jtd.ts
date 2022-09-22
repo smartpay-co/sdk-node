@@ -35,13 +35,14 @@ export default {
       additionalProperties: true,
     },
     lineItem: {
-      properties: {
+      optionalProperties: {
+        kind: { type: 'string' },
+
         name: { type: 'string' },
         quantity: { type: 'uint16' },
         amount: { type: 'uint32' },
         currency: { type: 'string' },
-      },
-      optionalProperties: {
+
         description: { type: 'string' },
         priceDescription: { type: 'string' },
         productDescription: { type: 'string' },

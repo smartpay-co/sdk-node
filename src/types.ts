@@ -148,6 +148,7 @@ export type ChekoutSessionPayload = {
 };
 
 export type SimpleChekoutSessionPayload = {
+  mode?: 'token';
   // OrderData
   amount?: number;
   currency?: string;
@@ -166,6 +167,20 @@ export type SimpleChekoutSessionPayload = {
   reference?: string;
 
   promotionCode?: string;
+
+  idempotencyKey?: string;
+};
+
+export type TokenChekoutSessionPayload = {
+  mode: 'token';
+  customerInfo?: CustomerInfo;
+  locale?: string;
+
+  successUrl?: string;
+  cancelUrl?: string;
+
+  metadata?: MetaData;
+  reference?: string;
 
   idempotencyKey?: string;
 };
@@ -323,6 +338,16 @@ export type PromotionCode = {
   updatedAt: number;
 };
 
+export type Token = {
+  id: string;
+  object: string;
+  createdAt: number;
+  status: string;
+  reference?: string;
+  test: boolean;
+  updatedAt: number;
+};
+
 export type JTDError = {
   instancePath: string[];
   schemaPath: string[];
@@ -339,7 +364,7 @@ export type GetObjectParams = {
   expand?: string;
 };
 
-export type CancelOrderParams = {
+export type CommonUpdateParams = {
   id?: string;
   idempotencyKey?: string;
 };

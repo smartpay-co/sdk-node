@@ -2,9 +2,11 @@ import { validate, Schema } from 'jtd';
 
 import { normalizeCheckoutSessionPayload as fromSimpleCheckoutSessionPayload } from './payload';
 import checkoutSessionPayloadSchema from './schemas/simple-checkout-session-payload.jtd';
+import tokenCheckoutSessionPayloadSchema from './schemas/token-checkout-session-payload.jtd';
 import type {
   KeyString,
   SimpleChekoutSessionPayload,
+  TokenChekoutSessionPayload,
   ErrorDetails,
   LooseObject,
 } from './types';
@@ -19,6 +21,7 @@ const refundIdRegExp = /^refund_(test|live)_[0-9a-zA-Z]+$/;
 const webhookEndpointIdRegExp = /^webhookendpoint_(test|live)_[0-9a-zA-Z]+$/;
 const couponIdRegExp = /^coupon_(test|live)_[0-9a-zA-Z]+$/;
 const promotionCodeIdRegExp = /^promotioncode_(test|live)_[0-9a-zA-Z]+$/;
+const tokenIdRegExp = /^paytok_(test|live)_[0-9a-zA-Z]+$/;
 
 export class SmartpayError extends Error {
   statusCode?: number;
@@ -81,6 +84,10 @@ export const isValidPromotionCodeId = (input: string) => {
   return promotionCodeIdRegExp.test(input);
 };
 
+export const isValidTokenId = (input: string) => {
+  return tokenIdRegExp.test(input);
+};
+
 export const validateCheckoutSessionPayload = (
   payload: SimpleChekoutSessionPayload
 ) => {
@@ -93,6 +100,18 @@ export const validateCheckoutSessionPayload = (
   if (payload.items.length === 0) {
     errors.push('payload.items is required.');
   }
+
+  return errors;
+};
+
+export const validateTokenCheckoutSessionPayload = (
+  payload: TokenChekoutSessionPayload
+) => {
+  const errors = validate(
+    tokenCheckoutSessionPayloadSchema as Schema,
+    JSON.parse(JSON.stringify(payload))
+    // payload
+  ) as ErrorDetails;
 
   return errors;
 };

@@ -2,7 +2,7 @@ import {
   Order,
   ListParams,
   GetObjectParams,
-  CancelOrderParams,
+  CommonUpdateParams,
   Collection,
 } from '../types';
 import { isValidOrderId, omit, SmartpayError } from '../utils';
@@ -49,7 +49,7 @@ const ordersMixin = <T extends Constructor>(Base: T) => {
       return req;
     }
 
-    cancelOrder(params: CancelOrderParams = {}) {
+    cancelOrder(params: CommonUpdateParams = {}) {
       const { id } = params;
 
       if (!id) {

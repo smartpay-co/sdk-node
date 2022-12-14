@@ -61,6 +61,7 @@
 
 | Name                     | Type         | Description                                                                                                                                                             |
 | ------------------------ | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| mode                     | String       | `token` mode of normal mode.                                                                                                                                            |
 | amount                   | Number       | The total amount of the order. If not present. The SDK will calculate the amount based on the line items and shipping fee.                                              |
 | currency                 | String       | Three-letter ISO currency code, in uppercase. Must be a supported currency.                                                                                             |
 | items                    | LineItem[]   | The line items the customer wishes to order.                                                                                                                            |

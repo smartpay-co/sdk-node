@@ -1,3 +1,25 @@
+<div id="top"></div>
+
+<br />
+<div align="center">
+  <a href="https://github.com/smartpay-co/sdk-node">
+		<picture>
+			<source media="(prefers-color-scheme: dark)" srcset="https://assets.smartpay.co/logo/banner/smartpay-logo-dark.png" />
+			<source media="(prefers-color-scheme: light)" srcset="https://assets.smartpay.co/logo/banner/smartpay-logo.png" />
+			<img alt="Smartpay" src="https://assets.smartpay.co/logo/banner/smartpay-logo.png" style="width: 797px;" />
+		</picture>
+  </a>
+
+  <p align="center">
+    <a href="https://docs.smartpay.co/"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/smartpay-co/sdk-node/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/smartpay-co/sdk-node/issues">Request Feature</a>
+  </p>
+</div>
+
 # Smartpay Nodejs SDK
 
 The Smartpay Nodejs SDK offers easy access to Smartpay API from applications written in Nodejs.

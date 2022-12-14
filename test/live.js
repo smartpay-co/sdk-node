@@ -1,7 +1,11 @@
 import fetch from 'isomorphic-unfetch';
 import test from 'tape';
 
-import Smartpay from '../build/esm/index.js';
+import Smartpay, {
+  ORDER_STATUS_CANCELED,
+  TOKEN_STATUS_ACTIVE,
+  TOKEN_STATUS_DISABLED,
+} from '../build/esm/index.js';
 
 const TEST_SECRET_KEY = process.env.SECRET_KEY;
 const TEST_PUBLIC_KEY = process.env.PUBLIC_KEY;
@@ -319,7 +323,7 @@ test('Create cancel', async function testCancelOrder(t) {
 
   const result = await smartpay.cancelOrder({ id: orderId });
 
-  t.ok(result.status === 'canceled');
+  t.ok(result.status === ORDER_STATUS_CANCELED);
 });
 
 test('Webhook Endpoint CRUD', async function testWebhookEndpointCRUD(t) {
@@ -412,4 +416,95 @@ test('Coupon, Promotion Code CRU', async function testWebhookEndpointCRUD(t) {
   const promotionCodesCollection = await smartpay.listPromotionCodes();
 
   t.ok(promotionCodesCollection.data.length > 0);
+});
+
+test('Create Token Checkout Session', async function testCreateCheckoutSession(t) {
+  t.plan(10);
+
+  const smartpay = new Smartpay(TEST_SECRET_KEY, {
+    publicKey: TEST_PUBLIC_KEY,
+  });
+
+  const payload = {
+    mode: 'token',
+    customerInfo: {
+      accountAge: 20,
+      email: 'merchant-support@smartpay.co',
+      firstName: '田中',
+      lastName: '太郎',
+      firstNameKana: 'たなか',
+      lastNameKana: 'たろう',
+      address: {
+        line1: '3-6-7',
+        line2: '青山パラシオタワー 11階',
+        subLocality: '',
+        locality: '港区北青山',
+        administrativeArea: '東京都',
+        postalCode: '107-0061',
+        country: 'JP',
+      },
+      dateOfBirth: '1985-06-30',
+      gender: 'male',
+    },
+
+    reference: 'order_ref_1234567',
+    successUrl: 'https://docs.smartpay.co/example-pages/checkout-successful',
+    cancelUrl: 'https://docs.smartpay.co/example-pages/checkout-canceled',
+  };
+
+  const session = await smartpay.createCheckoutSession(payload);
+
+  console.log(session); // eslint-disable-line no-console
+
+  t.ok(session.id.length > 0);
+  t.ok(session.token.id.length > 0);
+
+  const tokenId = session.token.id;
+
+  const loginResponse = await fetch(
+    `https://${process.env.API_BASE}/consumers/auth/login`,
+    {
+      headers: {},
+      body: `{"emailAddress":"${TEST_USERNAME}","password":"${TEST_PASSWORD}"}`,
+      method: 'POST',
+    }
+  );
+  const { accessToken } = await loginResponse.json();
+
+  await fetch(`https://${process.env.API_BASE}/tokens/${tokenId}/approve`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    method: 'PUT',
+  });
+
+  const tokens = await smartpay.listTokens();
+
+  t.ok(tokens.data.length > 0);
+
+  const tokenA1 = await smartpay.getToken({ id: tokenId });
+
+  t.ok(tokenId === tokenA1.id);
+  t.ok(tokenA1.status === TOKEN_STATUS_ACTIVE);
+
+  await smartpay.disableToken({ id: tokenId });
+
+  const tokenA2 = await smartpay.getToken({ id: tokenId });
+
+  t.ok(tokenId === tokenA2.id);
+  t.ok(tokenA2.status === TOKEN_STATUS_DISABLED);
+
+  await smartpay.enableToken({ id: tokenId });
+
+  const tokenA3 = await smartpay.getToken({ id: tokenId });
+
+  t.ok(tokenId === tokenA3.id);
+  t.ok(tokenA3.status === TOKEN_STATUS_ACTIVE);
+
+  try {
+    await smartpay.deleteToken({ id: tokenId });
+    await smartpay.getToken({ id: tokenId });
+  } catch (error) {
+    t.ok(error.errorCode === 'token.not-found');
+  }
 });

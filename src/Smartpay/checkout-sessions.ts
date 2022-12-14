@@ -3,6 +3,7 @@ import qs from 'query-string';
 import {
   CheckoutSession,
   SimpleChekoutSessionPayload,
+  TokenChekoutSessionPayload,
   ListParams,
   GetObjectParams,
   Collection,
@@ -10,6 +11,7 @@ import {
 import {
   isValidCheckoutSessionId,
   validateCheckoutSessionPayload,
+  validateTokenCheckoutSessionPayload,
   normalizeCheckoutSessionPayload,
   jtdErrorToDetails,
   omit,
@@ -36,6 +38,8 @@ export const ADDRESS_TYPE_STORE = 'store';
 export const CAPTURE_METHOD_AUTOMATIC = 'autommatic';
 export const CAPTURE_METHOD_MANUAL = 'manual';
 
+export const MODE_TOKEN = 'token';
+
 const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
   class SmartpayWithCheckoutSession extends Base {
     static ADDRESS_TYPE_HOME = ADDRESS_TYPE_HOME;
@@ -47,7 +51,7 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
     static CAPTURE_METHOD_AUTOMATIC = CAPTURE_METHOD_AUTOMATIC;
     static CAPTURE_METHOD_MANUAL = CAPTURE_METHOD_MANUAL;
 
-    static normalizeCheckoutSessionPayload(
+    static normalizeNormalCheckoutSessionPayload(
       payload: SimpleChekoutSessionPayload
     ): SimpleChekoutSessionPayload {
       const normalizedPayload = normalizeCheckoutSessionPayload(payload);
@@ -66,9 +70,47 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
       return normalizedPayload;
     }
 
+    static normalizeTokenCheckoutSessionPayload(
+      payload: TokenChekoutSessionPayload
+    ): TokenChekoutSessionPayload {
+      const errors = validateTokenCheckoutSessionPayload(payload);
+
+      if (errors.length) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payload invalid',
+          details: jtdErrorToDetails(errors, 'payload'),
+        });
+      }
+
+      return payload;
+    }
+
     createCheckoutSession(payload: SimpleChekoutSessionPayload) {
+      if (payload.mode === MODE_TOKEN) {
+        return this.createTokenCheckoutSession(
+          payload as TokenChekoutSessionPayload
+        );
+      }
+
+      return this.createNormalCheckoutSession(payload);
+    }
+
+    createTokenCheckoutSession(payload: TokenChekoutSessionPayload) {
+      const req: Promise<CheckoutSession> = this.request(`/checkout-sessions`, {
+        method: POST,
+        idempotencyKey: payload.idempotencyKey,
+        payload: omit(payload, ['idempotencyKey']),
+      });
+
+      return req;
+    }
+
+    createNormalCheckoutSession(payload: SimpleChekoutSessionPayload) {
       const normalizedPayload =
-        SmartpayWithCheckoutSession.normalizeCheckoutSessionPayload(payload);
+        SmartpayWithCheckoutSession.normalizeNormalCheckoutSessionPayload(
+          payload
+        );
 
       // Call API to create checkout session
       const req: Promise<CheckoutSession> = this.request(`/checkout-sessions`, {

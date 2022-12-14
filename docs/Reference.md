@@ -30,6 +30,11 @@
   - [Get Promotion Code](#get-promotion-code)
   - [Update Promotion Code](#update-promotion-code)
   - [List Promotion Codes](#list-promotion-codes)
+  - [Get Token](#get-token)
+  - [List Tokens](#list-tokens)
+  - [Enable Token](#enable-token)
+  - [Disable Token](#disable-token)
+  - [Delete Token](#delete-token)
 - [Collection](#collection)
   - [Properties](#properties)
 - [Constants](#constants)
@@ -109,7 +114,7 @@ const checkoutSession await smartpay.getCheckoutSession({ id });
 
 #### Return
 
-[CheckoutSession object][]
+[Checkout session object][]
 
 #### Exceptions
 
@@ -907,7 +912,7 @@ const promotionCode = await smartpay.updatePromotionCode({
 **Async** method, list the promotion code objects.
 
 ```javascript
-const promotionCode = await smartpay.listPromotionCodes({
+const promotionCodes = await smartpay.listPromotionCodes({
   maxResults,
   pageToken,
   expand,
@@ -929,6 +934,142 @@ const promotionCode = await smartpay.listPromotionCodes({
 #### Exceptions
 
 [Common exceptions][]
+
+### Get Token
+
+**Async** method, get the token object by coupon id.
+
+```javascript
+const token = await smartpay.getToken({
+  id,
+});
+```
+
+#### Arguments
+
+| Name | Type   | Description  |
+| ---- | ------ | ------------ |
+| id   | String | The token id |
+
+#### Return
+
+[Token object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
+### List Tokens
+
+**Async** method, list the token objects.
+
+```javascript
+const tokens = await smartpay.listTokens({
+  maxResults,
+  pageToken,
+  expand,
+});
+```
+
+#### Arguments
+
+| Name                              | Type   | Description                                                                                |
+| --------------------------------- | ------ | ------------------------------------------------------------------------------------------ |
+| maxResults (optional, defualt=20) | Number | Number of objects to return.                                                               |
+| pageToken (optional)              | String | The token for the page of the collection of objects.                                       |
+| expand (optional, default=no)     | String | Set to `all` if the references within the response need to be expanded to the full objects |
+
+#### Return
+
+[Collection][] of [token object][]
+
+#### Exceptions
+
+[Common exceptions][]
+
+### Enable Token
+
+**Async** method, enable the token by token id.
+
+```javascript
+const coupon = await smartpay.enableToken({
+  id,
+});
+```
+
+#### Arguments
+
+| Name | Type   | Description  |
+| ---- | ------ | ------------ |
+| id   | String | The token id |
+
+#### Return
+
+Empty response body with 200
+
+#### Exceptions
+
+[Common exceptions][]
+
+| Type          | Error Code        | Description                                                                                                                   |
+| ------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| SmartpayError | `token.not-found` | No token was found meeting the requirements. Try to enable token under `requires_authorization` status throws this error too. |
+
+### Disable Token
+
+**Async** method, disable the token by token id.
+
+```javascript
+const coupon = await smartpay.disableToken({
+  id,
+});
+```
+
+#### Arguments
+
+| Name | Type   | Description  |
+| ---- | ------ | ------------ |
+| id   | String | The token id |
+
+#### Return
+
+Empty response body with 200
+
+#### Exceptions
+
+[Common exceptions][]
+
+| Type          | Error Code        | Description                                                                                                                    |
+| ------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| SmartpayError | `token.not-found` | No token was found meeting the requirements. Try to disable token under `requires_authorization` status throws this error too. |
+
+### Delete Token
+
+**Async** method, delete the token by token id.
+
+```javascript
+const coupon = await smartpay.deleteToken({
+  id,
+});
+```
+
+#### Arguments
+
+| Name | Type   | Description  |
+| ---- | ------ | ------------ |
+| id   | String | The token id |
+
+#### Return
+
+Empty response body with 204
+
+#### Exceptions
+
+[Common exceptions][]
+
+| Type          | Error Code        | Description                                  |
+| ------------- | ----------------- | -------------------------------------------- |
+| SmartpayError | `token.not-found` | No token was found meeting the requirements. |
 
 ## Collection
 
@@ -974,6 +1115,15 @@ Smartpay.ORDER_STATUS_FAILED
 Smartpay.ORDER_STATUS_REQUIRES_AUTHORIZATION
 ```
 
+### Token Status
+
+```
+Smartpay.TOKEN_STATUS_ACTIVE
+Smartpay.TOKEN_STATUS_DISABLED
+Smartpay.TOKEN_STATUS_REJECTED
+Smartpay.TOKEN_STATUS_REQUIRES_AUTHORIZATION
+```
+
 ### Cancel Remainder
 
 ```
@@ -1005,12 +1155,13 @@ Smartpay.COUPON_DISCOUNT_TYPE_PERCENTAGE
 | SmartpayError | Error code from API response | Unable to parse response body. |
 
 [checkout session object]: https://en.docs.smartpay.co/reference/the-checkout-session-object
-[order object]: https://ja.docs.smartpay.co/reference/the-order-object
+[order object]: https://en.docs.smartpay.co/reference/the-order-object
 [payment object]: https://en.docs.smartpay.co/reference/the-payment-object
 [refund object]: https://en.docs.smartpay.co/reference/the-refund-object
 [webhook endpoint object]: https://en.docs.smartpay.co/reference/the-webhook-endpoint-object
 [coupon object]: https://en.docs.smartpay.co/reference/the-coupon-object
 [promotion code object]: https://en.docs.smartpay.co/reference/the-promotion-code-object
+[token object]: https://en.docs.smartpay.co/reference/the-token-object
 [capture]: https://en.docs.smartpay.co/docs/capture-an-order#using-the-smartpay-api
 [refund]: https://en.docs.smartpay.co/docs/refund-a-purchase#using-the-smartpay-api
 [collection]: #collection

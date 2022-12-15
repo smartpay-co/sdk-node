@@ -56,6 +56,13 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
     static normalizeNormalCheckoutSessionPayload(
       payload: SimpleChekoutSessionPayload
     ): SimpleChekoutSessionPayload {
+      if (!payload) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payload is required',
+        });
+      }
+
       const normalizedPayload = normalizeCheckoutSessionPayload(payload);
       const errors = validateCheckoutSessionPayload(
         normalizedPayload as SimpleChekoutSessionPayload
@@ -75,6 +82,13 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
     static normalizeTokenCheckoutSessionPayload(
       payload: TokenChekoutSessionPayload
     ): TokenChekoutSessionPayload {
+      if (!payload) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payload is required',
+        });
+      }
+
       const errors = validateTokenCheckoutSessionPayload(payload);
 
       if (errors.length) {
@@ -91,7 +105,14 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
     static normalizeCheckoutSessionPayload(
       payload: SimpleChekoutSessionPayload
     ) {
-      if (payload.mode === MODE_TOKEN) {
+      if (!payload) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payload is required',
+        });
+      }
+
+      if (payload.mode === SmartpayWithCheckoutSession.MODE_TOKEN) {
         return SmartpayWithCheckoutSession.normalizeTokenCheckoutSessionPayload(
           payload as TokenChekoutSessionPayload
         );
@@ -102,32 +123,14 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
       );
     }
 
-    createCheckoutSession(payload: SimpleChekoutSessionPayload) {
-      if (payload.mode === MODE_TOKEN) {
-        return this.createTokenCheckoutSession(
-          payload as TokenChekoutSessionPayload
-        );
+    createNormalCheckoutSession(payload: SimpleChekoutSessionPayload) {
+      if (!payload) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payload is required',
+        });
       }
 
-      return this.createNormalCheckoutSession(payload);
-    }
-
-    createTokenCheckoutSession(payload: TokenChekoutSessionPayload) {
-      const normalizedPayload =
-        SmartpayWithCheckoutSession.normalizeTokenCheckoutSessionPayload(
-          payload
-        );
-
-      const req: Promise<CheckoutSession> = this.request(`/checkout-sessions`, {
-        method: POST,
-        idempotencyKey: payload.idempotencyKey,
-        payload: omit(normalizedPayload, ['idempotencyKey']),
-      });
-
-      return req;
-    }
-
-    createNormalCheckoutSession(payload: SimpleChekoutSessionPayload) {
       const normalizedPayload =
         SmartpayWithCheckoutSession.normalizeNormalCheckoutSessionPayload(
           payload
@@ -157,6 +160,45 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
 
         return session;
       });
+    }
+
+    createTokenCheckoutSession(payload: TokenChekoutSessionPayload) {
+      if (!payload) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payload is required',
+        });
+      }
+
+      const normalizedPayload =
+        SmartpayWithCheckoutSession.normalizeTokenCheckoutSessionPayload(
+          payload
+        );
+
+      const req: Promise<CheckoutSession> = this.request(`/checkout-sessions`, {
+        method: POST,
+        idempotencyKey: payload.idempotencyKey,
+        payload: omit(normalizedPayload, ['idempotencyKey']),
+      });
+
+      return req;
+    }
+
+    createCheckoutSession(payload: SimpleChekoutSessionPayload) {
+      if (!payload) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payload is required',
+        });
+      }
+
+      if (payload.mode === MODE_TOKEN) {
+        return this.createTokenCheckoutSession(
+          payload as TokenChekoutSessionPayload
+        );
+      }
+
+      return this.createNormalCheckoutSession(payload);
     }
 
     listCheckoutSessions(params: ListParams = {}) {

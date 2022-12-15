@@ -2,7 +2,7 @@ import qs from 'query-string';
 
 import {
   CheckoutSession,
-  SimpleChekoutSessionPayload,
+  FlatChekoutSessionPayload,
   TokenChekoutSessionPayload,
   ListParams,
   GetObjectParams,
@@ -10,9 +10,9 @@ import {
 } from '../types';
 import {
   isValidCheckoutSessionId,
-  validateNormalCheckoutSessionPayload,
+  validateFlatCheckoutSessionPayload,
   validateTokenCheckoutSessionPayload,
-  normalizeNormalCheckoutSessionPayload,
+  normalizeFlatCheckoutSessionPayload,
   jtdErrorToDetails,
   omit,
   SmartpayError,
@@ -53,9 +53,9 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
 
     static MODE_TOKEN = MODE_TOKEN;
 
-    static normalizeNormalCheckoutSessionPayload(
-      payload: SimpleChekoutSessionPayload
-    ): SimpleChekoutSessionPayload {
+    static normalizeFlatCheckoutSessionPayload(
+      payload: FlatChekoutSessionPayload
+    ): FlatChekoutSessionPayload {
       if (!payload) {
         throw new SmartpayError({
           errorCode: 'request.invalid',
@@ -63,9 +63,9 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
         });
       }
 
-      const normalizedPayload = normalizeNormalCheckoutSessionPayload(payload);
-      const errors = validateNormalCheckoutSessionPayload(
-        normalizedPayload as SimpleChekoutSessionPayload
+      const normalizedPayload = normalizeFlatCheckoutSessionPayload(payload);
+      const errors = validateFlatCheckoutSessionPayload(
+        normalizedPayload as FlatChekoutSessionPayload
       );
 
       if (errors.length) {
@@ -102,9 +102,7 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
       return payload;
     }
 
-    static normalizeCheckoutSessionPayload(
-      payload: SimpleChekoutSessionPayload
-    ) {
+    static normalizeCheckoutSessionPayload(payload: FlatChekoutSessionPayload) {
       if (!payload) {
         throw new SmartpayError({
           errorCode: 'request.invalid',
@@ -118,12 +116,12 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
         );
       }
 
-      return SmartpayWithCheckoutSession.normalizeNormalCheckoutSessionPayload(
+      return SmartpayWithCheckoutSession.normalizeFlatCheckoutSessionPayload(
         payload
       );
     }
 
-    createNormalCheckoutSession(payload: SimpleChekoutSessionPayload) {
+    createFlatCheckoutSession(payload: FlatChekoutSessionPayload) {
       if (!payload) {
         throw new SmartpayError({
           errorCode: 'request.invalid',
@@ -132,7 +130,7 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
       }
 
       const normalizedPayload =
-        SmartpayWithCheckoutSession.normalizeNormalCheckoutSessionPayload(
+        SmartpayWithCheckoutSession.normalizeFlatCheckoutSessionPayload(
           payload
         );
 
@@ -184,7 +182,7 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
       return req;
     }
 
-    createCheckoutSession(payload: SimpleChekoutSessionPayload) {
+    createCheckoutSession(payload: FlatChekoutSessionPayload) {
       if (!payload) {
         throw new SmartpayError({
           errorCode: 'request.invalid',
@@ -198,7 +196,7 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
         );
       }
 
-      return this.createNormalCheckoutSession(payload);
+      return this.createFlatCheckoutSession(payload);
     }
 
     listCheckoutSessions(params: ListParams = {}) {

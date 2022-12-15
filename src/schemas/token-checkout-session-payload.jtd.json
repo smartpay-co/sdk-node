@@ -46,10 +46,7 @@
   "optionalProperties": {
     "description": { "type": "string" },
     "reference": { "type": "string" },
-    "locale": { "type": "string" },
-
-    "successUrl": { "type": "string" },
-    "cancelUrl": { "type": "string" }
+    "locale": { "type": "string" }
   },
   "additionalProperties": true
 }

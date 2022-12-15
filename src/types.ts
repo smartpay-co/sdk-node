@@ -147,7 +147,7 @@ export type ChekoutSessionPayload = {
   reference?: string;
 };
 
-export type SimpleChekoutSessionPayload = {
+export type FlatChekoutSessionPayload = {
   mode?: 'token';
   // OrderData
   amount?: number;
@@ -155,8 +155,8 @@ export type SimpleChekoutSessionPayload = {
   captureMethod?: 'automatic' | 'manual';
 
   items: SimpleLineItem[];
-  shippingInfo?: ShippingInfo;
-  customerInfo?: CustomerInfo;
+  shippingInfo: ShippingInfo;
+  customerInfo: CustomerInfo;
   locale?: string;
 
   successUrl?: string;
@@ -178,6 +178,23 @@ export type TokenChekoutSessionPayload = {
 
   successUrl?: string;
   cancelUrl?: string;
+
+  metadata?: MetaData;
+  reference?: string;
+
+  idempotencyKey?: string;
+};
+
+export type OrderPayload = {
+  token?: string;
+  // OrderData
+  amount: number;
+  currency: string;
+  captureMethod?: 'automatic' | 'manual';
+
+  items: SimpleLineItem[];
+  shippingInfo: ShippingInfo;
+  customerInfo: CustomerInfo;
 
   metadata?: MetaData;
   reference?: string;

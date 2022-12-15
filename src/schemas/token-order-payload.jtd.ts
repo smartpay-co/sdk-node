@@ -34,19 +34,53 @@ export default {
       },
       additionalProperties: true,
     },
+    lineItem: {
+      optionalProperties: {
+        kind: { type: 'string' },
+
+        name: { type: 'string' },
+        quantity: { type: 'uint16' },
+        amount: { type: 'uint32' },
+        currency: { type: 'string' },
+
+        description: { type: 'string' },
+        priceDescription: { type: 'string' },
+        productDescription: { type: 'string' },
+        label: { type: 'string' },
+
+        brand: { type: 'string' },
+        categories: { elements: { type: 'string' } },
+        gtin: { type: 'string' },
+        images: { elements: { type: 'string' } },
+        reference: { type: 'string' },
+        url: { type: 'string' },
+      },
+      additionalProperties: true,
+    },
   },
 
   properties: {
-    mode: { type: 'string' },
-    customerInfo: { ref: 'customer' },
+    token: { type: 'string' },
+    amount: { type: 'uint32' },
+    currency: { type: 'string' },
 
-    successUrl: { type: 'string' },
-    cancelUrl: { type: 'string' },
+    items: { elements: { ref: 'lineItem' } },
+    customerInfo: { ref: 'customer' },
+    shippingInfo: {
+      properties: {
+        address: { ref: 'address' },
+      },
+      optionalProperties: {
+        addressType: { type: 'string' },
+        feeAmount: { type: 'uint32' },
+        feeCurrency: { type: 'string' },
+      },
+      additionalProperties: true,
+    },
   },
   optionalProperties: {
-    description: { type: 'string' },
+    captureMethod: { type: 'string' },
     reference: { type: 'string' },
-    locale: { type: 'string' },
   },
   additionalProperties: true,
 };

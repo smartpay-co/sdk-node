@@ -51,6 +51,8 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
     static CAPTURE_METHOD_AUTOMATIC = CAPTURE_METHOD_AUTOMATIC;
     static CAPTURE_METHOD_MANUAL = CAPTURE_METHOD_MANUAL;
 
+    static MODE_TOKEN = MODE_TOKEN;
+
     static normalizeNormalCheckoutSessionPayload(
       payload: SimpleChekoutSessionPayload
     ): SimpleChekoutSessionPayload {
@@ -111,10 +113,15 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
     }
 
     createTokenCheckoutSession(payload: TokenChekoutSessionPayload) {
+      const normalizedPayload =
+        SmartpayWithCheckoutSession.normalizeTokenCheckoutSessionPayload(
+          payload
+        );
+
       const req: Promise<CheckoutSession> = this.request(`/checkout-sessions`, {
         method: POST,
         idempotencyKey: payload.idempotencyKey,
-        payload: omit(payload, ['idempotencyKey']),
+        payload: omit(normalizedPayload, ['idempotencyKey']),
       });
 
       return req;

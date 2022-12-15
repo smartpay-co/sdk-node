@@ -1,17 +1,22 @@
 name: Node.js CI
 
 on:
-  - push:
-      branches: [main]
-  - pull_request
+  pull_request:
+    paths-ignore:
+      - '**.md'
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     strategy:
+      max-parallel: 1
       matrix:
-        node-version: [12.x, 14.x, 16.x, 18.x, 19.x]
+        node-version: [16.x, 18.x, 19.x]
 
     steps:
       - uses: actions/checkout@v3
@@ -19,5 +24,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - run: yarn install
-      - run: yarn test
+      - name: Install Dependencies
+        run: yarn install
+      - name: Run Test
+        run: yarn test
+        env:
+          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
+          SMARTPAY_API_PREFIX: ${{ secrets.SMARTPAY_API_PREFIX }}

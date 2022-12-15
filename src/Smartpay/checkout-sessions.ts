@@ -86,6 +86,20 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
       return payload;
     }
 
+    static normalizeCheckoutSessionPayload(
+      payload: SimpleChekoutSessionPayload
+    ) {
+      if (payload.mode === MODE_TOKEN) {
+        return SmartpayWithCheckoutSession.normalizeTokenCheckoutSessionPayload(
+          payload as TokenChekoutSessionPayload
+        );
+      }
+
+      return SmartpayWithCheckoutSession.normalizeNormalCheckoutSessionPayload(
+        payload
+      );
+    }
+
     createCheckoutSession(payload: SimpleChekoutSessionPayload) {
       if (payload.mode === MODE_TOKEN) {
         return this.createTokenCheckoutSession(

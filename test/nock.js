@@ -36,7 +36,7 @@ test('Create Fake Checkout Session', async function testCreateCheckoutSession(t)
     },
   })
     .post(`/checkout-sessions?dev-lang=nodejs&sdk-version=${pkg.version}`)
-    .reply(200, JSON.stringify(FAKE_SESSION));
+    .reply(200, FAKE_SESSION);
 
   const smartpay = new Smartpay(TEST_SECRET_KEY, {
     publicKey: TEST_PUBLIC_KEY,

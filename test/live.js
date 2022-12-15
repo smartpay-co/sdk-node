@@ -1,11 +1,7 @@
 import fetch from 'isomorphic-unfetch';
 import test from 'tape';
 
-import Smartpay, {
-  ORDER_STATUS_CANCELED,
-  TOKEN_STATUS_ACTIVE,
-  TOKEN_STATUS_DISABLED,
-} from '../build/esm/index.js';
+import Smartpay from '../build/esm/index.js';
 
 const TEST_SECRET_KEY = process.env.SECRET_KEY;
 const TEST_PUBLIC_KEY = process.env.PUBLIC_KEY;
@@ -323,7 +319,7 @@ test('Create cancel', async function testCancelOrder(t) {
 
   const result = await smartpay.cancelOrder({ id: orderId });
 
-  t.ok(result.status === ORDER_STATUS_CANCELED);
+  t.ok(result.status === Smartpay.ORDER_STATUS_CANCELED);
 });
 
 test('Webhook Endpoint CRUD', async function testWebhookEndpointCRUD(t) {
@@ -485,21 +481,21 @@ test('Create Token Checkout Session', async function testCreateCheckoutSession(t
   const tokenA1 = await smartpay.getToken({ id: tokenId });
 
   t.ok(tokenId === tokenA1.id);
-  t.ok(tokenA1.status === TOKEN_STATUS_ACTIVE);
+  t.ok(tokenA1.status === Smartpay.TOKEN_STATUS_ACTIVE);
 
   await smartpay.disableToken({ id: tokenId });
 
   const tokenA2 = await smartpay.getToken({ id: tokenId });
 
   t.ok(tokenId === tokenA2.id);
-  t.ok(tokenA2.status === TOKEN_STATUS_DISABLED);
+  t.ok(tokenA2.status === Smartpay.TOKEN_STATUS_DISABLED);
 
   await smartpay.enableToken({ id: tokenId });
 
   const tokenA3 = await smartpay.getToken({ id: tokenId });
 
   t.ok(tokenId === tokenA3.id);
-  t.ok(tokenA3.status === TOKEN_STATUS_ACTIVE);
+  t.ok(tokenA3.status === Smartpay.TOKEN_STATUS_ACTIVE);
 
   try {
     await smartpay.deleteToken({ id: tokenId });

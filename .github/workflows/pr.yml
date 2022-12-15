@@ -1,9 +1,9 @@
-name: Integration Test
+name: Unit Test
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    paths-ignore:
+      - '**.md'
   workflow_dispatch:
 
 jobs:
@@ -34,11 +34,8 @@ jobs:
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: yarn install
 
+      - name: Build
+        run: yarn build
+
       - name: Run Test
-        run: yarn test
-        env:
-          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
-          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
-          SMARTPAY_API_PREFIX: ${{ secrets.SMARTPAY_API_PREFIX }}
+        run: yarn test:unit

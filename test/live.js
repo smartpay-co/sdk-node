@@ -7,8 +7,6 @@ const TEST_SECRET_KEY = process.env.SECRET_KEY;
 const TEST_PUBLIC_KEY = process.env.PUBLIC_KEY;
 const { TEST_USERNAME, TEST_PASSWORD } = process.env;
 
-console.log(process.env);
-
 const TestSessionData = {};
 
 test('Create Live Checkout Session Loose Payload 1', async function testCreateCheckoutSession(t) {

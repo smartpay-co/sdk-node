@@ -10,9 +10,9 @@ import {
 } from '../types';
 import {
   isValidCheckoutSessionId,
-  validateCheckoutSessionPayload,
+  validateNormalCheckoutSessionPayload,
   validateTokenCheckoutSessionPayload,
-  normalizeCheckoutSessionPayload,
+  normalizeNormalCheckoutSessionPayload,
   jtdErrorToDetails,
   omit,
   SmartpayError,
@@ -63,8 +63,8 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
         });
       }
 
-      const normalizedPayload = normalizeCheckoutSessionPayload(payload);
-      const errors = validateCheckoutSessionPayload(
+      const normalizedPayload = normalizeNormalCheckoutSessionPayload(payload);
+      const errors = validateNormalCheckoutSessionPayload(
         normalizedPayload as SimpleChekoutSessionPayload
       );
 

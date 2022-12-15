@@ -1,7 +1,7 @@
 import { validate, Schema } from 'jtd';
 
 import { normalizeCheckoutSessionPayload as fromSimpleCheckoutSessionPayload } from './payload';
-import checkoutSessionPayloadSchema from './schemas/simple-checkout-session-payload.jtd';
+import normalCheckoutSessionPayloadSchema from './schemas/simple-checkout-session-payload.jtd';
 import tokenCheckoutSessionPayloadSchema from './schemas/token-checkout-session-payload.jtd';
 import type {
   KeyString,
@@ -88,11 +88,11 @@ export const isValidTokenId = (input: string) => {
   return tokenIdRegExp.test(input);
 };
 
-export const validateCheckoutSessionPayload = (
+export const validateNormalCheckoutSessionPayload = (
   payload: SimpleChekoutSessionPayload
 ) => {
   const errors = validate(
-    checkoutSessionPayloadSchema as Schema,
+    normalCheckoutSessionPayloadSchema as Schema,
     JSON.parse(JSON.stringify(payload))
     // payload
   ) as ErrorDetails;
@@ -129,7 +129,7 @@ export const getCurrency = (payload: SimpleChekoutSessionPayload) => {
   return currency;
 };
 
-export const normalizeCheckoutSessionPayload = (
+export const normalizeNormalCheckoutSessionPayload = (
   input: SimpleChekoutSessionPayload
 ) => {
   const payload = fromSimpleCheckoutSessionPayload(input);

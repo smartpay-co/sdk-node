@@ -113,7 +113,10 @@ class SmartpayBase {
             case 204:
               return Promise.resolve('');
             default:
-              switch (response.headers.get('Content-Type')) {
+              // Content-type might have ext ex: 'application/json; charset=utf-8'
+              switch (
+                (response.headers.get('Content-Type') || '').split(';')[0]
+              ) {
                 case 'application/json':
                 case 'text/json':
                   return (

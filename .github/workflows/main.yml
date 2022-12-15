@@ -1,9 +1,6 @@
-name: Node.js CI
+name: Integration Test
 
 on:
-  pull_request:
-    paths-ignore:
-      - '**.md'
   push:
     branches:
       - main

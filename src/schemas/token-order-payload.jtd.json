@@ -60,6 +60,7 @@
   },
 
   "properties": {
+    "token": { "type": "string" },
     "amount": { "type": "uint32" },
     "currency": { "type": "string" },
 
@@ -79,11 +80,7 @@
   },
   "optionalProperties": {
     "captureMethod": { "type": "string" },
-    "description": { "type": "string" },
-    "reference": { "type": "string" },
-
-    "successUrl": { "type": "string" },
-    "cancelUrl": { "type": "string" }
+    "reference": { "type": "string" }
   },
   "additionalProperties": true
 }

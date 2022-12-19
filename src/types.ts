@@ -147,15 +147,16 @@ export type ChekoutSessionPayload = {
   reference?: string;
 };
 
-export type SimpleChekoutSessionPayload = {
+export type FlatChekoutSessionPayload = {
+  mode?: 'token';
   // OrderData
   amount?: number;
   currency?: string;
   captureMethod?: 'automatic' | 'manual';
 
   items: SimpleLineItem[];
-  shippingInfo?: ShippingInfo;
-  customerInfo?: CustomerInfo;
+  shippingInfo: ShippingInfo;
+  customerInfo: CustomerInfo;
   locale?: string;
 
   successUrl?: string;
@@ -166,6 +167,37 @@ export type SimpleChekoutSessionPayload = {
   reference?: string;
 
   promotionCode?: string;
+
+  idempotencyKey?: string;
+};
+
+export type TokenChekoutSessionPayload = {
+  mode: 'token';
+  customerInfo?: CustomerInfo;
+  locale?: string;
+
+  successUrl?: string;
+  cancelUrl?: string;
+
+  metadata?: MetaData;
+  reference?: string;
+
+  idempotencyKey?: string;
+};
+
+export type OrderPayload = {
+  token?: string;
+  // OrderData
+  amount: number;
+  currency: string;
+  captureMethod?: 'automatic' | 'manual';
+
+  items: SimpleLineItem[];
+  shippingInfo: ShippingInfo;
+  customerInfo: CustomerInfo;
+
+  metadata?: MetaData;
+  reference?: string;
 
   idempotencyKey?: string;
 };
@@ -323,6 +355,16 @@ export type PromotionCode = {
   updatedAt: number;
 };
 
+export type Token = {
+  id: string;
+  object: string;
+  createdAt: number;
+  status: string;
+  reference?: string;
+  test: boolean;
+  updatedAt: number;
+};
+
 export type JTDError = {
   instancePath: string[];
   schemaPath: string[];
@@ -339,7 +381,7 @@ export type GetObjectParams = {
   expand?: string;
 };
 
-export type CancelOrderParams = {
+export type CommonUpdateParams = {
   id?: string;
   idempotencyKey?: string;
 };

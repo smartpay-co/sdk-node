@@ -2,12 +2,19 @@ import {
   Order,
   ListParams,
   GetObjectParams,
-  CancelOrderParams,
+  CommonUpdateParams,
   Collection,
+  OrderPayload,
 } from '../types';
-import { isValidOrderId, omit, SmartpayError } from '../utils';
+import {
+  isValidOrderId,
+  jtdErrorToDetails,
+  omit,
+  SmartpayError,
+  validateTokenOrderPayload,
+} from '../utils';
 
-import { GET, PUT, Constructor } from './base';
+import { GET, PUT, Constructor, POST } from './base';
 
 export const ORDER_STATUS_SUCCEEDED = 'succeeded';
 export const ORDER_STATUS_CANCELED = 'canceled';
@@ -16,13 +23,51 @@ export const ORDER_STATUS_FAILED = 'failed';
 export const ORDER_STATUS_REQUIRES_AUTHORIZATION = 'requires_authorization';
 
 const ordersMixin = <T extends Constructor>(Base: T) => {
-  return class extends Base {
+  return class Orders extends Base {
     static ORDER_STATUS_SUCCEEDED = ORDER_STATUS_SUCCEEDED;
     static ORDER_STATUS_CANCELED = ORDER_STATUS_CANCELED;
     static ORDER_STATUS_REJECTED = ORDER_STATUS_REJECTED;
     static ORDER_STATUS_FAILED = ORDER_STATUS_FAILED;
     static ORDER_STATUS_REQUIRES_AUTHORIZATION =
       ORDER_STATUS_REQUIRES_AUTHORIZATION;
+
+    static normalizeOrderPayload(payload: OrderPayload) {
+      if (!payload) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payload is required',
+        });
+      }
+
+      const errors = validateTokenOrderPayload(payload);
+
+      if (errors.length) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payload invalid',
+          details: jtdErrorToDetails(errors, 'payload'),
+        });
+      }
+
+      return payload;
+    }
+
+    createOrder(payload: OrderPayload) {
+      if (!payload) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payload is required',
+        });
+      }
+      const normalizedPayload = Orders.normalizeOrderPayload(payload);
+      const req: Promise<Order> = this.request(`/orders`, {
+        method: POST,
+        idempotencyKey: payload.idempotencyKey,
+        payload: omit(normalizedPayload, ['idempotencyKey']),
+      });
+
+      return req;
+    }
 
     getOrder(params: GetObjectParams = {}) {
       const { id } = params;
@@ -49,7 +94,7 @@ const ordersMixin = <T extends Constructor>(Base: T) => {
       return req;
     }
 
-    cancelOrder(params: CancelOrderParams = {}) {
+    cancelOrder(params: CommonUpdateParams = {}) {
       const { id } = params;
 
       if (!id) {

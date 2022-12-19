@@ -2,15 +2,17 @@ import qs from 'query-string';
 
 import {
   CheckoutSession,
-  SimpleChekoutSessionPayload,
+  FlatChekoutSessionPayload,
+  TokenChekoutSessionPayload,
   ListParams,
   GetObjectParams,
   Collection,
 } from '../types';
 import {
   isValidCheckoutSessionId,
-  validateCheckoutSessionPayload,
-  normalizeCheckoutSessionPayload,
+  validateFlatCheckoutSessionPayload,
+  validateTokenCheckoutSessionPayload,
+  normalizeFlatCheckoutSessionPayload,
   jtdErrorToDetails,
   omit,
   SmartpayError,
@@ -36,6 +38,8 @@ export const ADDRESS_TYPE_STORE = 'store';
 export const CAPTURE_METHOD_AUTOMATIC = 'autommatic';
 export const CAPTURE_METHOD_MANUAL = 'manual';
 
+export const MODE_TOKEN = 'token';
+
 const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
   class SmartpayWithCheckoutSession extends Base {
     static ADDRESS_TYPE_HOME = ADDRESS_TYPE_HOME;
@@ -47,12 +51,21 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
     static CAPTURE_METHOD_AUTOMATIC = CAPTURE_METHOD_AUTOMATIC;
     static CAPTURE_METHOD_MANUAL = CAPTURE_METHOD_MANUAL;
 
-    static normalizeCheckoutSessionPayload(
-      payload: SimpleChekoutSessionPayload
-    ): SimpleChekoutSessionPayload {
-      const normalizedPayload = normalizeCheckoutSessionPayload(payload);
-      const errors = validateCheckoutSessionPayload(
-        normalizedPayload as SimpleChekoutSessionPayload
+    static MODE_TOKEN = MODE_TOKEN;
+
+    static normalizeFlatCheckoutSessionPayload(
+      payload: FlatChekoutSessionPayload
+    ): FlatChekoutSessionPayload {
+      if (!payload) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payload is required',
+        });
+      }
+
+      const normalizedPayload = normalizeFlatCheckoutSessionPayload(payload);
+      const errors = validateFlatCheckoutSessionPayload(
+        normalizedPayload as FlatChekoutSessionPayload
       );
 
       if (errors.length) {
@@ -66,9 +79,60 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
       return normalizedPayload;
     }
 
-    createCheckoutSession(payload: SimpleChekoutSessionPayload) {
+    static normalizeTokenCheckoutSessionPayload(
+      payload: TokenChekoutSessionPayload
+    ): TokenChekoutSessionPayload {
+      if (!payload) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payload is required',
+        });
+      }
+
+      const errors = validateTokenCheckoutSessionPayload(payload);
+
+      if (errors.length) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payload invalid',
+          details: jtdErrorToDetails(errors, 'payload'),
+        });
+      }
+
+      return payload;
+    }
+
+    static normalizeCheckoutSessionPayload(payload: FlatChekoutSessionPayload) {
+      if (!payload) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payload is required',
+        });
+      }
+
+      if (payload.mode === SmartpayWithCheckoutSession.MODE_TOKEN) {
+        return SmartpayWithCheckoutSession.normalizeTokenCheckoutSessionPayload(
+          payload as TokenChekoutSessionPayload
+        );
+      }
+
+      return SmartpayWithCheckoutSession.normalizeFlatCheckoutSessionPayload(
+        payload
+      );
+    }
+
+    createFlatCheckoutSession(payload: FlatChekoutSessionPayload) {
+      if (!payload) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payload is required',
+        });
+      }
+
       const normalizedPayload =
-        SmartpayWithCheckoutSession.normalizeCheckoutSessionPayload(payload);
+        SmartpayWithCheckoutSession.normalizeFlatCheckoutSessionPayload(
+          payload
+        );
 
       // Call API to create checkout session
       const req: Promise<CheckoutSession> = this.request(`/checkout-sessions`, {
@@ -94,6 +158,45 @@ const checkoutSessionsMixin = <T extends Constructor>(Base: T) => {
 
         return session;
       });
+    }
+
+    createTokenCheckoutSession(payload: TokenChekoutSessionPayload) {
+      if (!payload) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payload is required',
+        });
+      }
+
+      const normalizedPayload =
+        SmartpayWithCheckoutSession.normalizeTokenCheckoutSessionPayload(
+          payload
+        );
+
+      const req: Promise<CheckoutSession> = this.request(`/checkout-sessions`, {
+        method: POST,
+        idempotencyKey: payload.idempotencyKey,
+        payload: omit(normalizedPayload, ['idempotencyKey']),
+      });
+
+      return req;
+    }
+
+    createCheckoutSession(payload: FlatChekoutSessionPayload) {
+      if (!payload) {
+        throw new SmartpayError({
+          errorCode: 'request.invalid',
+          message: 'Payload is required',
+        });
+      }
+
+      if (payload.mode === MODE_TOKEN) {
+        return this.createTokenCheckoutSession(
+          payload as TokenChekoutSessionPayload
+        );
+      }
+
+      return this.createFlatCheckoutSession(payload);
     }
 
     listCheckoutSessions(params: ListParams = {}) {

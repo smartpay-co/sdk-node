@@ -5,6 +5,7 @@ import ordersMixin from './orders';
 import paymentsMixin from './payments';
 import promotionCodesMixin from './promotion-codes';
 import refundsMixin from './refunds';
+import tokensMixin from './tokens';
 import webhooksMixin from './webhooks';
 
 const mixins = [
@@ -15,6 +16,7 @@ const mixins = [
   webhooksMixin,
   couponsMixin,
   promotionCodesMixin,
+  tokensMixin,
 ];
 
 const Smartpay = mixins.reduce(

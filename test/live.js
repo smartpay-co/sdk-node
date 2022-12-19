@@ -133,7 +133,7 @@ test('Create Live Checkout Session Loose Payload 2', async function testCreateCh
     id: session.id,
   });
 
-  t.ok(session.id === retrievedSession.id);
+  t.equal(session.id, retrievedSession.id);
 
   const sessionsCollection = await smartpay.listCheckoutSessions({
     maxResults: 10,
@@ -169,7 +169,7 @@ test('Get orders', async function testGetOrders(t) {
 
   const order = await smartpay.getOrder({ id: firstOrder.id });
 
-  t.ok(order.id === firstOrder.id);
+  t.equal(order.id, firstOrder.id);
 });
 
 test('Create payment', async function testCreatePayment(t) {
@@ -219,7 +219,7 @@ test('Create payment', async function testCreatePayment(t) {
 
   t.ok(payment1.id);
   t.ok(payment2.id);
-  t.ok(payment2.amount === PAYMENT_AMOUNT + 1);
+  t.equal(payment2.amount, PAYMENT_AMOUNT + 1);
 
   const updatedPayment2 = await smartpay.updatePayment({
     id: payment2.id,
@@ -230,10 +230,10 @@ test('Create payment', async function testCreatePayment(t) {
     id: payment2.id,
   });
 
-  t.ok(payment2.id === retrivedPayment2.id);
-  t.ok(payment2.id === updatedPayment2.id);
-  t.ok(payment2.amount === retrivedPayment2.amount);
-  t.ok(retrivedPayment2.reference === 'updated');
+  t.equal(payment2.id, retrivedPayment2.id);
+  t.equal(payment2.id, updatedPayment2.id);
+  t.equal(payment2.amount, retrivedPayment2.amount);
+  t.equal(retrivedPayment2.reference, 'updated');
 
   const paymentsCollection = await smartpay.listPayments();
 
@@ -244,7 +244,7 @@ test('Create refund', async function testCreateRefunds(t) {
   const orderId = TestSessionData.manualCaptureSession.order.id;
   const REFUND_AMOUNT = 1;
 
-  t.plan(7);
+  t.plan(9);
 
   const smartpay = new Smartpay(TEST_SECRET_KEY, {
     publicKey: TEST_PUBLIC_KEY,
@@ -265,8 +265,10 @@ test('Create refund', async function testCreateRefunds(t) {
     reason: Smartpay.REFUND_REQUEST_BY_CUSTOMER,
   });
 
-  t.ok(refund1 && refund1.amount === REFUND_AMOUNT);
-  t.ok(refund2 && refund2.amount === REFUND_AMOUNT + 1);
+  t.ok(refund1);
+  t.ok(refund2);
+  t.equal(refund1.amount, REFUND_AMOUNT);
+  t.equal(refund2.amount, REFUND_AMOUNT + 1);
 
   const updatedRefund2 = await smartpay.updateRefund({
     id: refund2.id,
@@ -277,10 +279,10 @@ test('Create refund', async function testCreateRefunds(t) {
     id: refund2.id,
   });
 
-  t.ok(refund2.id === updatedRefund2.id);
-  t.ok(refund2.id === retrivedRefund2.id);
-  t.ok(refund2.amount === retrivedRefund2.amount);
-  t.ok(retrivedRefund2.reference === 'updated');
+  t.equal(refund2.id, updatedRefund2.id);
+  t.equal(refund2.id, retrivedRefund2.id);
+  t.equal(refund2.amount, retrivedRefund2.amount);
+  t.equal(retrivedRefund2.reference, 'updated');
 
   const refundsCollection = await smartpay.listRefunds();
 
@@ -319,7 +321,7 @@ test('Create cancel', async function testCancelOrder(t) {
 
   const result = await smartpay.cancelOrder({ id: orderId });
 
-  t.ok(result.status === 'canceled');
+  t.ok(result.status === Smartpay.ORDER_STATUS_CANCELED);
 });
 
 test('Webhook Endpoint CRUD', async function testWebhookEndpointCRUD(t) {
@@ -344,8 +346,8 @@ test('Webhook Endpoint CRUD', async function testWebhookEndpointCRUD(t) {
   });
 
   t.ok(webhookEndpoint.id);
-  t.ok(webhookEndpoint.id === updatedWebhookEndpoint.id);
-  t.ok(retrivedWebhookEndpoint.description === 'updated');
+  t.equal(webhookEndpoint.id, updatedWebhookEndpoint.id);
+  t.equal(retrivedWebhookEndpoint.description, 'updated');
 
   const webhookEndpointsCollection = await smartpay.listWebhookEndpoints();
 
@@ -355,7 +357,7 @@ test('Webhook Endpoint CRUD', async function testWebhookEndpointCRUD(t) {
     id: updatedWebhookEndpoint.id,
   });
 
-  t.ok(deleteResult === '');
+  t.equal(deleteResult, '');
 });
 
 test('Coupon, Promotion Code CRU', async function testWebhookEndpointCRUD(t) {
@@ -383,8 +385,8 @@ test('Coupon, Promotion Code CRU', async function testWebhookEndpointCRUD(t) {
   });
 
   t.ok(coupon.id);
-  t.ok(coupon.id === updatedCoupon.id);
-  t.ok(retrivedCoupon.name === 'updatedCoupon');
+  t.equal(coupon.id, updatedCoupon.id);
+  t.equal(retrivedCoupon.name, 'updatedCoupon');
 
   const couponsCollection = await smartpay.listCoupons();
 
@@ -406,10 +408,143 @@ test('Coupon, Promotion Code CRU', async function testWebhookEndpointCRUD(t) {
   });
 
   t.ok(promotionCode.id);
-  t.ok(promotionCode.id === updatedPromotionCode.id);
-  t.ok(retrivedPromotionCode.active === false);
+  t.equal(promotionCode.id, updatedPromotionCode.id);
+  t.equal(retrivedPromotionCode.active, false);
 
   const promotionCodesCollection = await smartpay.listPromotionCodes();
 
   t.ok(promotionCodesCollection.data.length > 0);
+});
+
+test('Create Token Checkout Session', async function testCreateCheckoutSession(t) {
+  t.plan(12);
+
+  const smartpay = new Smartpay(TEST_SECRET_KEY, {
+    publicKey: TEST_PUBLIC_KEY,
+  });
+
+  const payload = {
+    mode: 'token',
+    customerInfo: {
+      accountAge: 20,
+      email: 'merchant-support@smartpay.co',
+      firstName: '田中',
+      lastName: '太郎',
+      firstNameKana: 'たなか',
+      lastNameKana: 'たろう',
+      address: {
+        line1: '3-6-7',
+        line2: '青山パラシオタワー 11階',
+        subLocality: '',
+        locality: '港区北青山',
+        administrativeArea: '東京都',
+        postalCode: '107-0061',
+        country: 'JP',
+      },
+      dateOfBirth: '1985-06-30',
+      gender: 'male',
+    },
+
+    reference: 'order_ref_1234567',
+    successUrl: 'https://docs.smartpay.co/example-pages/checkout-successful',
+    cancelUrl: 'https://docs.smartpay.co/example-pages/checkout-canceled',
+  };
+
+  const session = await smartpay.createCheckoutSession(payload);
+
+  console.log(session); // eslint-disable-line no-console
+
+  t.ok(session.id.length > 0);
+  t.ok(session.token.id.length > 0);
+
+  const tokenId = session.token.id;
+
+  const loginResponse = await fetch(
+    `https://${process.env.API_BASE}/consumers/auth/login`,
+    {
+      headers: {},
+      body: `{"emailAddress":"${TEST_USERNAME}","password":"${TEST_PASSWORD}"}`,
+      method: 'POST',
+    }
+  );
+  const { accessToken } = await loginResponse.json();
+
+  await fetch(`https://${process.env.API_BASE}/tokens/${tokenId}/approve`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    method: 'PUT',
+  });
+
+  const tokens = await smartpay.listTokens();
+
+  t.ok(tokens.data.length > 0);
+
+  const tokenA1 = await smartpay.getToken({ id: tokenId });
+
+  t.equal(tokenId, tokenA1.id);
+  t.equal(tokenA1.status, Smartpay.TOKEN_STATUS_ACTIVE);
+
+  const orderPayload = {
+    token: tokenId,
+    amount: 350,
+    currency: 'JPY',
+
+    items: [
+      {
+        name: 'レブロン 18 LOW',
+        amount: 250,
+        currency: 'JPY',
+        quantity: 1,
+      },
+    ],
+
+    shippingInfo: {
+      address: {
+        line1: 'line1',
+        locality: 'locality',
+        postalCode: '123',
+        country: 'JP',
+      },
+
+      feeAmount: 100,
+      feeCurrency: 'JPY',
+    },
+
+    customerInfo: {
+      email: 'john@smartpay.co',
+      firstName: 'John',
+      lastName: 'Doe',
+    },
+
+    captureMethod: 'manual',
+
+    reference: 'order_ref_1234567',
+  };
+
+  const order = await smartpay.createOrder(orderPayload);
+
+  t.ok(order.id);
+  t.equal(order.tokenId, tokenId);
+
+  await smartpay.disableToken({ id: tokenId });
+
+  const tokenA2 = await smartpay.getToken({ id: tokenId });
+
+  t.equal(tokenId, tokenA2.id);
+  t.equal(tokenA2.status, Smartpay.TOKEN_STATUS_DISABLED);
+
+  await smartpay.enableToken({ id: tokenId });
+
+  const tokenA3 = await smartpay.getToken({ id: tokenId });
+
+  t.equal(tokenId, tokenA3.id);
+  t.equal(tokenA3.status, Smartpay.TOKEN_STATUS_ACTIVE);
+
+  try {
+    await smartpay.deleteToken({ id: tokenId });
+    await smartpay.getToken({ id: tokenId });
+  } catch (error) {
+    t.equal(error.errorCode, 'token.not-found');
+  }
 });

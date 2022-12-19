@@ -4,7 +4,7 @@ import type {
   CustomerInfo,
   CustomerInfoLoose,
   SimpleLineItem,
-  SimpleChekoutSessionPayload,
+  FlatChekoutSessionPayload,
   ShippingInfo,
   Address,
 } from './types';
@@ -188,7 +188,7 @@ export const normalizeShippingInfo = (shipping: Partial<ShippingInfo> = {}) => {
 };
 
 export const normalizeCheckoutSessionPayload = (
-  payload: SimpleChekoutSessionPayload
+  payload: FlatChekoutSessionPayload
 ) => {
   const {
     amount,

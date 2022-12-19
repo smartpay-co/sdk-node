@@ -1,12 +1,16 @@
 import { validate, Schema } from 'jtd';
 
 import { normalizeCheckoutSessionPayload as fromSimpleCheckoutSessionPayload } from './payload';
-import checkoutSessionPayloadSchema from './schemas/simple-checkout-session-payload.jtd';
+import flatCheckoutSessionPayloadSchema from './schemas/flat-checkout-session-payload.jtd';
+import tokenCheckoutSessionPayloadSchema from './schemas/token-checkout-session-payload.jtd';
+import tokenOrderPayloadSchema from './schemas/token-order-payload.jtd';
 import type {
   KeyString,
-  SimpleChekoutSessionPayload,
+  FlatChekoutSessionPayload,
+  TokenChekoutSessionPayload,
   ErrorDetails,
   LooseObject,
+  OrderPayload,
 } from './types';
 
 const publicKeyRegExp = /^pk_(test|live)_[0-9a-zA-Z]+$/;
@@ -19,6 +23,7 @@ const refundIdRegExp = /^refund_(test|live)_[0-9a-zA-Z]+$/;
 const webhookEndpointIdRegExp = /^webhookendpoint_(test|live)_[0-9a-zA-Z]+$/;
 const couponIdRegExp = /^coupon_(test|live)_[0-9a-zA-Z]+$/;
 const promotionCodeIdRegExp = /^promotioncode_(test|live)_[0-9a-zA-Z]+$/;
+const tokenIdRegExp = /^paytok_(test|live)_[0-9a-zA-Z]+$/;
 
 export class SmartpayError extends Error {
   statusCode?: number;
@@ -81,11 +86,15 @@ export const isValidPromotionCodeId = (input: string) => {
   return promotionCodeIdRegExp.test(input);
 };
 
-export const validateCheckoutSessionPayload = (
-  payload: SimpleChekoutSessionPayload
+export const isValidTokenId = (input: string) => {
+  return tokenIdRegExp.test(input);
+};
+
+export const validateFlatCheckoutSessionPayload = (
+  payload: FlatChekoutSessionPayload
 ) => {
   const errors = validate(
-    checkoutSessionPayloadSchema as Schema,
+    flatCheckoutSessionPayloadSchema as Schema,
     JSON.parse(JSON.stringify(payload))
     // payload
   ) as ErrorDetails;
@@ -97,10 +106,31 @@ export const validateCheckoutSessionPayload = (
   return errors;
 };
 
+export const validateTokenCheckoutSessionPayload = (
+  payload: TokenChekoutSessionPayload
+) => {
+  const errors = validate(
+    tokenCheckoutSessionPayloadSchema as Schema,
+    JSON.parse(JSON.stringify(payload))
+    // payload
+  ) as ErrorDetails;
+
+  return errors;
+};
+
+export const validateTokenOrderPayload = (payload: OrderPayload) => {
+  const errors = validate(
+    tokenOrderPayloadSchema as Schema,
+    JSON.parse(JSON.stringify(payload))
+    // payload
+  ) as ErrorDetails;
+
+  return errors;
+};
 /**
  * Try to get the currency of this checkout
  */
-export const getCurrency = (payload: SimpleChekoutSessionPayload) => {
+export const getCurrency = (payload: FlatChekoutSessionPayload) => {
   let { currency } = payload;
 
   if (!currency) {
@@ -110,8 +140,8 @@ export const getCurrency = (payload: SimpleChekoutSessionPayload) => {
   return currency;
 };
 
-export const normalizeCheckoutSessionPayload = (
-  input: SimpleChekoutSessionPayload
+export const normalizeFlatCheckoutSessionPayload = (
+  input: FlatChekoutSessionPayload
 ) => {
   const payload = fromSimpleCheckoutSessionPayload(input);
   const { shippingInfo } = payload;

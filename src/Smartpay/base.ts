@@ -113,30 +113,41 @@ class SmartpayBase {
             case 204:
               return Promise.resolve('');
             default:
-              return (
-                response
-                  .json()
-                  // Parse body failed
-                  .catch((error) => {
-                    throw new SmartpayError({
-                      errorCode: 'unexpected_error',
-                      statusCode: response.status,
-                      message: `${response.status} ${error.message}`,
-                    });
-                  })
-                  .then((data) => {
-                    if (response.ok) {
-                      return data;
-                    }
+              // Content-type might have ext ex: 'application/json; charset=utf-8'
+              switch (
+                (response.headers.get('Content-Type') || '').split(';')[0]
+              ) {
+                case 'application/json':
+                case 'text/json':
+                  return (
+                    response
+                      .json()
+                      // Parse body failed
+                      .catch((error) => {
+                        throw new SmartpayError({
+                          errorCode: 'unexpected_error',
+                          statusCode: response.status,
+                          message: `${response.status} ${error.message}`,
+                        });
+                      })
+                      .then((data) => {
+                        if (response.ok) {
+                          return data;
+                        }
 
-                    throw new SmartpayError({
-                      errorCode: data.errorCode,
-                      statusCode: response.status,
-                      message: `${response.status} ${data.message}`,
-                      details: data.details,
-                    });
-                  })
-              );
+                        throw new SmartpayError({
+                          errorCode: data.errorCode,
+                          statusCode: response.status,
+                          message: `${response.status} ${data.message}`,
+                          details: data.details,
+                        });
+                      })
+                  );
+                default:
+                  return Promise.resolve('');
+              }
+
+              return Promise.resolve('');
           }
         })
     );

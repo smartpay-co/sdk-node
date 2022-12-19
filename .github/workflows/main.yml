@@ -37,6 +37,7 @@ jobs:
       - name: Run Test
         run: yarn test
         env:
+          API_BASE: ${{ secrets.API_BASE }}
           TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}

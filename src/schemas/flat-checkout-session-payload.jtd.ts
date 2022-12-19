@@ -76,14 +76,15 @@ export default {
       },
       additionalProperties: true,
     },
+
+    successUrl: { type: 'string' },
+    cancelUrl: { type: 'string' },
   },
   optionalProperties: {
     captureMethod: { type: 'string' },
     description: { type: 'string' },
     reference: { type: 'string' },
-
-    successUrl: { type: 'string' },
-    cancelUrl: { type: 'string' },
+    locale: { type: 'string' },
   },
   additionalProperties: true,
 };

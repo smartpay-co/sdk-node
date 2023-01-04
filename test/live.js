@@ -417,7 +417,7 @@ test('Coupon, Promotion Code CRU', async function testWebhookEndpointCRUD(t) {
 });
 
 test('Create Token Checkout Session', async function testCreateCheckoutSession(t) {
-  t.plan(12);
+  t.plan(14);
 
   const smartpay = new Smartpay(TEST_SECRET_KEY, {
     publicKey: TEST_PUBLIC_KEY,
@@ -456,6 +456,19 @@ test('Create Token Checkout Session', async function testCreateCheckoutSession(t
 
   t.ok(session.id.length > 0);
   t.ok(session.token.id.length > 0);
+
+  const retrievedSession = await smartpay.getCheckoutSession({
+    id: session.id,
+  });
+
+  t.assert(retrievedSession.token, session.id);
+
+  const retrievedExpandedSession = await smartpay.getCheckoutSession({
+    id: session.id,
+    expand: 'all',
+  });
+
+  t.assert(retrievedExpandedSession.token.id, session.id);
 
   const tokenId = session.token.id;
 

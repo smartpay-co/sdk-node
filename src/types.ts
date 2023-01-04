@@ -265,7 +265,8 @@ export type CheckoutSession = {
   expiresAt: number;
   updatedAt: number;
   customerInfo: CustomerInfo;
-  order: Order;
+  order?: string | Order;
+  token?: string | Token;
   successUrl: string;
   cancelUrl: string;
   reference?: string;

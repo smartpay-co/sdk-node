@@ -10,6 +10,19 @@ import {
   SmartpayError,
 } from '../utils';
 
+// https://github.com/jonbern/fetch-retry/blob/master/index.d.ts
+type RequestDelayFunction = (
+  attempt: number,
+  error: Error | null,
+  response: Response | null
+) => number;
+
+type RequestRetryOnFunction = (
+  attempt: number,
+  error: Error | null,
+  response: Response | null
+) => boolean | Promise<boolean>;
+
 const fetch = fetchRetry(originalFetch, {
   retries: 1,
   retryOn: [500, 501, 502, 503, 504],
@@ -71,6 +84,9 @@ class SmartpayBase {
       params?: Params;
       payload?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
       idempotencyKey?: string;
+      retries?: number;
+      retryOn?: number[] | RequestRetryOnFunction;
+      retryDelay?: number | RequestDelayFunction;
     } = {}
   ) {
     const {
@@ -78,6 +94,9 @@ class SmartpayBase {
       params,
       payload,
       idempotencyKey: customIdempotencyKey,
+      retries,
+      retryOn,
+      retryDelay,
     } = options;
     const idempotencyKey = customIdempotencyKey || randomstring.generate();
     const url = qs.stringifyUrl({
@@ -99,6 +118,9 @@ class SmartpayBase {
           'Idempotency-Key': idempotencyKey,
         },
         body: payload ? JSON.stringify(payload) : null,
+        retries,
+        retryOn,
+        retryDelay,
       })
         // Netowork issue
         .catch((error) => {

@@ -49,6 +49,11 @@ const SMARTPAY_API_PREFIX =
     ? process.env.SMARTPAY_API_PREFIX
     : '';
 
+// eslint-disable-next-line prefer-destructuring
+const SMARTPAY_SECRET_KEY = process.env.SMARTPAY_SECRET_KEY;
+// eslint-disable-next-line prefer-destructuring
+const SMARTPAY_PUBLIC_KEY = process.env.SMARTPAY_PUBLIC_KEY;
+
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -59,7 +64,9 @@ class SmartpayBase {
   _publicKey?: KeyString;
   _apiPrefix: string;
 
-  constructor(key: KeyString, options: SmartPayOptions = {}) {
+  constructor(customKey: KeyString, options: SmartPayOptions = {}) {
+    const key = customKey || SMARTPAY_SECRET_KEY;
+
     if (!key) {
       throw new Error('Secret Key is required.');
     }
@@ -73,7 +80,7 @@ class SmartpayBase {
     }
 
     this._secretKey = key;
-    this._publicKey = options.publicKey;
+    this._publicKey = options.publicKey || SMARTPAY_PUBLIC_KEY;
     this._apiPrefix = options.apiPrefix || SMARTPAY_API_PREFIX || API_PREFIX;
   }
 
@@ -168,8 +175,6 @@ class SmartpayBase {
                 default:
                   return Promise.resolve('');
               }
-
-              return Promise.resolve('');
           }
         })
     );

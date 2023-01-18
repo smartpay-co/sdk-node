@@ -10,6 +10,19 @@ import {
   SmartpayError,
 } from '../utils';
 
+// https://github.com/jonbern/fetch-retry/blob/master/index.d.ts
+type RequestDelayFunction = (
+  attempt: number,
+  error: Error | null,
+  response: Response | null
+) => number;
+
+type RequestRetryOnFunction = (
+  attempt: number,
+  error: Error | null,
+  response: Response | null
+) => boolean | Promise<boolean>;
+
 const fetch = fetchRetry(originalFetch, {
   retries: 1,
   retryOn: [500, 501, 502, 503, 504],
@@ -36,6 +49,11 @@ const SMARTPAY_API_PREFIX =
     ? process.env.SMARTPAY_API_PREFIX
     : '';
 
+// eslint-disable-next-line prefer-destructuring
+const SMARTPAY_SECRET_KEY = process.env.SMARTPAY_SECRET_KEY;
+// eslint-disable-next-line prefer-destructuring
+const SMARTPAY_PUBLIC_KEY = process.env.SMARTPAY_PUBLIC_KEY;
+
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -46,7 +64,9 @@ class SmartpayBase {
   _publicKey?: KeyString;
   _apiPrefix: string;
 
-  constructor(key: KeyString, options: SmartPayOptions = {}) {
+  constructor(customKey: KeyString, options: SmartPayOptions = {}) {
+    const key = customKey || SMARTPAY_SECRET_KEY;
+
     if (!key) {
       throw new Error('Secret Key is required.');
     }
@@ -60,7 +80,7 @@ class SmartpayBase {
     }
 
     this._secretKey = key;
-    this._publicKey = options.publicKey;
+    this._publicKey = options.publicKey || SMARTPAY_PUBLIC_KEY;
     this._apiPrefix = options.apiPrefix || SMARTPAY_API_PREFIX || API_PREFIX;
   }
 
@@ -71,6 +91,9 @@ class SmartpayBase {
       params?: Params;
       payload?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
       idempotencyKey?: string;
+      retries?: number;
+      retryOn?: number[] | RequestRetryOnFunction;
+      retryDelay?: number | RequestDelayFunction;
     } = {}
   ) {
     const {
@@ -78,6 +101,9 @@ class SmartpayBase {
       params,
       payload,
       idempotencyKey: customIdempotencyKey,
+      retries,
+      retryOn,
+      retryDelay,
     } = options;
     const idempotencyKey = customIdempotencyKey || randomstring.generate();
     const url = qs.stringifyUrl({
@@ -99,6 +125,9 @@ class SmartpayBase {
           'Idempotency-Key': idempotencyKey,
         },
         body: payload ? JSON.stringify(payload) : null,
+        retries,
+        retryOn,
+        retryDelay,
       })
         // Netowork issue
         .catch((error) => {
@@ -146,8 +175,6 @@ class SmartpayBase {
                 default:
                   return Promise.resolve('');
               }
-
-              return Promise.resolve('');
           }
         })
     );

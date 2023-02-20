@@ -1,8 +1,11 @@
 import test from 'tape';
 
+import mockServer from './utils/retry-server.js';
 import Smartpay from '../build/esm/index.js';
 
 const CHECKOUT_URL = 'https://checkout.smartpay.co';
+const TEST_SECRET_KEY = process.env.SECRET_KEY;
+const TEST_PUBLIC_KEY = process.env.PUBLIC_KEY;
 
 const FAKE_SESSION = {
   id: 'checkout_test_hm3tau0XY7r3ULm06pHtr8.1nsIwu',
@@ -149,4 +152,35 @@ test('Verify Webhook Signature Verification function', function testWebhookSigna
   const secret = 'gybcsjixKyBW2d4z6iNPlaYzHUMtawnodwZt3W0q';
 
   t.ok(Smartpay.verifyWebhookSignature({ data, signature, secret }));
+});
+
+test('Test retry policy', async function testRetryPolicy(t) {
+  t.plan(2);
+
+  mockServer.init();
+
+  const smartpay = new Smartpay(TEST_SECRET_KEY, {
+    publicKey: TEST_PUBLIC_KEY,
+    apiPrefix: 'http://127.0.0.1:3001',
+  });
+
+  const res = await smartpay.request('/', {
+    method: 'GET',
+    retries: 5,
+    retryOn: [500],
+    retryDelay: 5,
+  });
+
+  t.equal(res, 'ok');
+
+  const res2 = await smartpay.request('/', {
+    method: 'GET',
+    retries: 1,
+    retryOn: [500],
+    retryDelay: 5,
+  });
+
+  t.equal(res2, '');
+
+  mockServer.close();
 });

@@ -173,7 +173,7 @@ class SmartpayBase {
                       })
                   );
                 default:
-                  return Promise.resolve('');
+                  return response.text();
               }
           }
         })

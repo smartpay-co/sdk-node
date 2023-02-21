@@ -1,11 +1,12 @@
 import test from 'tape';
 
-import mockServer from './utils/retry-server.js';
 import Smartpay from '../build/esm/index.js';
 
+import mockServer from './utils/retry-server.js';
+
 const CHECKOUT_URL = 'https://checkout.smartpay.co';
-const TEST_SECRET_KEY = process.env.SECRET_KEY;
-const TEST_PUBLIC_KEY = process.env.PUBLIC_KEY;
+const TEST_SECRET_KEY = 'sk_live_abcdefg';
+const TEST_PUBLIC_KEY = 'pk_live_abcdefg';
 
 const FAKE_SESSION = {
   id: 'checkout_test_hm3tau0XY7r3ULm06pHtr8.1nsIwu',

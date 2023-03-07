@@ -103,7 +103,7 @@ The [checkout session object][]
 **Async** method, get single checkout session object by checkout session id.
 
 ```javascript
-const checkoutSession await smartpay.getCheckoutSession({ id });
+const checkoutSession = await smartpay.getCheckoutSession({ id });
 ```
 
 #### Arguments
@@ -122,7 +122,7 @@ const checkoutSession await smartpay.getCheckoutSession({ id });
 
 ### List Checkout Sessions
 
-**Static** method, list checkout session objects.
+**Async** method, list checkout session objects.
 
 ```javascript
 const checkoutSessionsCollection = await smartpay.listCheckoutSessions({
@@ -219,7 +219,7 @@ await smartpay.cancelOrder({ id: });
 
 ### List Orders
 
-**Static** method, list order objects.
+**Async** method, list order objects.
 
 ```javascript
 const ordersCollection = await smartpay.listOrders({
@@ -255,7 +255,7 @@ const payment = await smartpay.createPayment({
   amount,
   currency,
   cancelRemainder,
-  lineitems,
+  lineItems,
   reference,
   description,
   metadata,
@@ -270,7 +270,7 @@ const payment = await smartpay.createPayment({
 | amount                                        | Number   | The amount of the payment                                                                                |
 | currency                                      | String   | Three-letter ISO currency code, in uppercase. Must be a supported currency.                              |
 | cancelRemainder (optional, default=automatic) | Stirng   | Whether to cancel remaining amount in case of a partial capture. `automatic` or `manual`.                |
-| lineitems (optional)                          | String[] | A list of the IDs of the Line Items of the original Payment this Refund is on.                           |
+| lineItems (optional)                          | String[] | A list of the IDs of the Line Items of the original Payment this Refund is on.                           |
 | reference (optional)                          | String   | A string to reference the Payment which can be used to reconcile the Payment with your internal systems. |
 | description (optional)                        | String   | An arbitrary long form explanation of the Payment, meant to be displayed to the customer.                |
 | metadata (optional)                           | Object   | Set of up to 20 key-value pairs that you can attach to the object.                                       |
@@ -348,7 +348,7 @@ const payment = await smartpay.updatePayment({
 **Async** method, list the payment objects.
 
 ```javascript
-const payment = await smartpay.listPayments({
+const payments = await smartpay.listPayments({
   maxResults,
   pageToken,
   expand,
@@ -381,7 +381,7 @@ const refund = await smartpay.createRefund({
   amount,
   currency,
   reason,
-  lineitems,
+  lineItems,
   reference,
   description,
   metadata,
@@ -396,7 +396,7 @@ const refund = await smartpay.createRefund({
 | amount                 | Number   | The amount of the refund                                                                                 |
 | currency               | String   | The order id                                                                                             |
 | reason                 | Stirng   | The reason of the Refund. `requested_by_customer` or `fraudulent`                                        |
-| lineitems (optional)   | String[] | A list of the IDs of the Line Items of the original Payment this Refund is on.                           |
+| lineItems (optional)   | String[] | A list of the IDs of the Line Items of the original Payment this Refund is on.                           |
 | reference (optional)   | String   | A string to reference the Payment which can be used to reconcile the Payment with your internal systems. |
 | description (optional) | String   | An arbitrary long form explanation of the Payment, meant to be displayed to the customer.                |
 | metadata (optional)    | Object   | Set of up to 20 key-value pairs that you can attach to the object.                                       |
@@ -608,7 +608,7 @@ Empty response body with 204
 **Async** method, list the webhook endpoint objects.
 
 ```javascript
-const webhookEndpoint = await smartpay.listWebhookEndpoints({
+const webhookEndpoints = await smartpay.listWebhookEndpoints({
   maxResults,
   pageToken,
   expand,
@@ -655,10 +655,10 @@ Signature of the data.
 
 ### Verify Webhook Signature
 
-**Static** method, calculate the signature of the given data.
+**Static** method, verify the signature of the given data.
 
 ```javascript
-const signature = Smartpay.calculateWebhookSignature({
+const signature = Smartpay.verifyWebhookSignature({
   data,
   secret,
   signature,
@@ -712,6 +712,12 @@ A `express.json` middleware's verify function.
 ```javascript
 const coupon = await smartpay.createCoupon({
   name,
+  currency,
+  discountType,
+  discountAmount,
+  discountPercentage,
+  expiresAt,
+  maxRedemptionCount,
   metadata,
 });
 ```
@@ -794,7 +800,7 @@ const coupon = await smartpay.updateCoupon({
 **Async** method, list the coupon objects.
 
 ```javascript
-const coupon = await smartpay.listCoupons({
+const coupons = await smartpay.listCoupons({
   maxResults,
   pageToken,
   expand,
@@ -886,6 +892,7 @@ const promotionCode = await smartpay.getPromotionCode({
 
 ```javascript
 const promotionCode = await smartpay.updatePromotionCode({
+  id,
   active,
   metadata,
 });
@@ -992,7 +999,7 @@ const tokens = await smartpay.listTokens({
 **Async** method, enable the token by token id.
 
 ```javascript
-const coupon = await smartpay.enableToken({
+const result = await smartpay.enableToken({
   id,
 });
 ```
@@ -1020,7 +1027,7 @@ Empty response body with 200
 **Async** method, disable the token by token id.
 
 ```javascript
-const coupon = await smartpay.disableToken({
+const result = await smartpay.disableToken({
   id,
 });
 ```
@@ -1048,7 +1055,7 @@ Empty response body with 200
 **Async** method, delete the token by token id.
 
 ```javascript
-const coupon = await smartpay.deleteToken({
+const result = await smartpay.deleteToken({
   id,
 });
 ```

@@ -93,9 +93,7 @@ export type LineItemData = {
   metadata?: MetaData;
 };
 
-export type ExpandableLineItemData = LineItemData | string;
-
-export type SimpleLineItem = {
+export type FlatLineItemData = {
   kind?: string;
   // LineItem
   quantity?: number;
@@ -134,7 +132,7 @@ export type OrderData = {
   currency?: string;
   captureMethod?: 'automatic' | 'manual';
   coupons?: string[];
-  lineItemData: ExpandableLineItemData[];
+  lineItemData: LineItemData[];
   shippingInfo?: ShippingInfo;
   reference?: string;
   description?: string;
@@ -156,7 +154,7 @@ export type FlatChekoutSessionPayload = {
   currency?: string;
   captureMethod?: 'automatic' | 'manual';
 
-  items: SimpleLineItem[];
+  items: FlatLineItemData[];
   shippingInfo: ShippingInfo;
   customerInfo: CustomerInfo;
   locale?: string;
@@ -194,7 +192,7 @@ export type OrderPayload = {
   currency: string;
   captureMethod?: 'automatic' | 'manual';
 
-  items: SimpleLineItem[];
+  items: FlatLineItemData[];
   shippingInfo: ShippingInfo;
   customerInfo: CustomerInfo;
 
@@ -212,7 +210,9 @@ export type RefundPayload = {
   metadata?: MetaData;
 };
 
+//
 // Response Types
+//
 
 export type Product = {
   name: string;
@@ -243,6 +243,8 @@ export type LineItem = {
   metadata?: MetaData;
 };
 
+export type ExpandableLineItem = LineItem | string;
+
 export type Order = {
   id: string;
   status: string;
@@ -254,10 +256,24 @@ export type Order = {
   amount: number;
   currency: string;
   description?: string;
-  lineItems: LineItem[];
+  lineItems: ExpandableLineItem[];
   shippingInfo: ShippingInfo;
   metadata?: MetaData;
 };
+
+export type ExpandableOrder = Order | string;
+
+export type Token = {
+  id: string;
+  object: string;
+  createdAt: number;
+  status: string;
+  reference?: string;
+  test: boolean;
+  updatedAt: number;
+};
+
+export type ExpandableToken = Token | string;
 
 export type CheckoutSession = {
   id: string;
@@ -267,8 +283,8 @@ export type CheckoutSession = {
   expiresAt: number;
   updatedAt: number;
   customerInfo: CustomerInfo;
-  order?: string | Order;
-  token?: string | Token;
+  order?: ExpandableOrder;
+  token?: ExpandableToken;
   successUrl: string;
   cancelUrl: string;
   reference?: string;
@@ -286,7 +302,7 @@ export type Payment = {
   amount: number;
   currency: string;
   description?: string;
-  lineItems: ExpandableLineItemData[];
+  lineItems: LineItem[];
   order: string;
   refunds: string[];
   metadata?: MetaData;
@@ -298,7 +314,7 @@ export type Refund = {
   object: string;
   amount: number;
   currency: string;
-  lineItems: ExpandableLineItemData[];
+  lineItems: ExpandableLineItem[];
   reason: RefundReason;
   test: boolean;
   createdAt: number;
@@ -354,16 +370,6 @@ export type PromotionCode = {
   redemptionCount: number;
   minimumAmount?: number;
   metadata?: MetaData;
-  test: boolean;
-  updatedAt: number;
-};
-
-export type Token = {
-  id: string;
-  object: string;
-  createdAt: number;
-  status: string;
-  reference?: string;
   test: boolean;
   updatedAt: number;
 };

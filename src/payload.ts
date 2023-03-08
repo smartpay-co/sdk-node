@@ -3,7 +3,7 @@
 import type {
   CustomerInfo,
   CustomerInfoLoose,
-  SimpleLineItem,
+  FlatLineItemData,
   FlatChekoutSessionPayload,
   ShippingInfo,
   Address,
@@ -57,7 +57,7 @@ export const normalizeCustomerInfo = (
   };
 };
 
-export const normalizeItem = (item: SimpleLineItem) => {
+export const normalizeItem = (item: FlatLineItemData) => {
   const {
     kind,
     quantity,
@@ -123,7 +123,7 @@ export const normalizeItem = (item: SimpleLineItem) => {
   };
 };
 
-export const normalizeItems = (list: SimpleLineItem[] = []) =>
+export const normalizeItems = (list: FlatLineItemData[] = []) =>
   Array.isArray(list) ? list.map((item) => normalizeItem(item)) : [];
 
 export const normalizeAddress = (address: Partial<Address> = {}) => {

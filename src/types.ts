@@ -93,6 +93,8 @@ export type LineItemData = {
   metadata?: MetaData;
 };
 
+export type ExpandableLineItemData = LineItemData | string;
+
 export type SimpleLineItem = {
   kind?: string;
   // LineItem
@@ -132,7 +134,7 @@ export type OrderData = {
   currency?: string;
   captureMethod?: 'automatic' | 'manual';
   coupons?: string[];
-  lineItemData: LineItemData[];
+  lineItemData: ExpandableLineItemData[];
   shippingInfo?: ShippingInfo;
   reference?: string;
   description?: string;
@@ -284,7 +286,7 @@ export type Payment = {
   amount: number;
   currency: string;
   description?: string;
-  lineItems: string[];
+  lineItems: ExpandableLineItemData[];
   order: string;
   refunds: string[];
   metadata?: MetaData;
@@ -296,7 +298,7 @@ export type Refund = {
   object: string;
   amount: number;
   currency: string;
-  lineItems: LineItemData[];
+  lineItems: ExpandableLineItemData[];
   reason: RefundReason;
   test: boolean;
   createdAt: number;
@@ -394,6 +396,7 @@ export type CreatePaymentParams = {
   cancelRemainder?: 'automatic' | 'manual';
   reference?: string;
   description?: string;
+  lineItems?: string[];
   metadata?: MetaData;
   idempotencyKey?: string;
 };
@@ -412,6 +415,7 @@ export type CreateRefundParams = {
   reason?: RefundReason;
   reference?: string;
   description?: string;
+  lineItems?: string[];
   metadata?: MetaData;
   idempotencyKey?: string;
 };

@@ -7,6 +7,7 @@
   - [List Checkout Sessions](#list-checkout-sessions)
   - [Get Checkout Session URL](#get-checkout-session-url)
   - [Get Order](#get-order)
+  - [Create Order With Token](#create-order)
   - [Cancel Order](#cancel-order)
   - [List Orders](#list-orders)
   - [Create Payment](#create-payment)
@@ -17,6 +18,7 @@
   - [Get Refund](#get-refund)
   - [Update Refund](#update-refund)
   - [List Refunds](#list-refunds)
+  - [Create Webhook Endpoint](#create-webhook-endpoint)
   - [Get Webhook Endpoint](#get-webhook-endpoint)
   - [Update Webhook Endpoint](#update-webhook-endpoint)
   - [Delete Webhook Endpoint](#delete-webhook-endpoint)
@@ -24,9 +26,11 @@
   - [Calculate Webhook Signature](#calculate-webhook-signature)
   - [Verify Webhook Signature](#verify-webhook-signature)
   - [Webhook Express Middleware](#webhook-express-middleware)
+  - [Create Coupon](#create-coupon)
   - [Get Coupon](#get-coupon)
   - [Update Coupon](#update-coupon)
   - [List Coupons](#list-coupons)
+  - [Create Promotion Code](#create-promotion-code)
   - [Get Promotion Code](#get-promotion-code)
   - [Update Promotion Code](#update-promotion-code)
   - [List Promotion Codes](#list-promotion-codes)
@@ -195,6 +199,27 @@ const order = await smartpay.getOrder({ id });
 
 [Common exceptions][]
 
+### Create Order
+
+Create an order using a token.
+
+```javascript
+const order = await smartpay.createOrder(payload);
+```
+
+#### Arguments
+
+| Name                   | Type             | Description                |
+| ---------------------- | ---------------- | -------------------------- |
+| payload                | Array            | The [order payload][]      |
+| payload.idempotencyKey | String, optional | The custom idempotency key |
+
+[order payload]: https://en.docs.smartpay.co/reference/create-order
+
+#### Return
+
+[Order object][]
+
 ### Cancel Order
 
 **Async** method, cancel an order.
@@ -330,7 +355,7 @@ const payment = await smartpay.updatePayment({
 
 | Name                   | Type   | Description                                                                                              |
 | ---------------------- | ------ | -------------------------------------------------------------------------------------------------------- |
-| id                     | String | The order id                                                                                             |
+| id                     | String | The payment id                                                                                           |
 | reference (optional)   | String | A string to reference the Payment which can be used to reconcile the Payment with your internal systems. |
 | description (optional) | String | An arbitrary long form explanation of the Payment, meant to be displayed to the customer.                |
 | metadata (optional)    | Object | Set of up to 20 key-value pairs that you can attach to the object.                                       |
@@ -392,9 +417,9 @@ const refund = await smartpay.createRefund({
 
 | Name                   | Type     | Description                                                                                              |
 | ---------------------- | -------- | -------------------------------------------------------------------------------------------------------- |
-| id                     | String   | The payment id                                                                                           |
+| payment                | String   | The payment id                                                                                           |
 | amount                 | Number   | The amount of the refund                                                                                 |
-| currency               | String   | The order id                                                                                             |
+| currency               | String   | Three-letter ISO currency code, in uppercase. Must be a supported currency.                              |
 | reason                 | Stirng   | The reason of the Refund. `requested_by_customer` or `fraudulent`                                        |
 | lineItems (optional)   | String[] | A list of the IDs of the Line Items of the original Payment this Refund is on.                           |
 | reference (optional)   | String   | A string to reference the Payment which can be used to reconcile the Payment with your internal systems. |
@@ -492,7 +517,7 @@ const refunds = await smartpay.listRefunds({
 
 [Collection][] of [refund object][]
 
-#### Create Webhook Endpoint
+### Create Webhook Endpoint
 
 **Async** method, create a webhook endpoint object.
 
@@ -564,7 +589,7 @@ const webhookEndpoint = await smartpay.updateWebhookEndpoint({
 
 | Name                          | Type     | Description                                                                                        |
 | ----------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
-| id                            | String   | The order id                                                                                       |
+| id                            | String   | The webhook endpoint id                                                                            |
 | active (optional)             | Boolean  | Has the value true if the webhook endpoint is active and events are sent to the url specified.     |
 | url (optional)                | String   | The url which will be called when any of the events you subscribed to occur.                       |
 | eventSubscriptions (optional) | String[] | The list of events to subscribe to. If not specified you will be subsribed to all events.          |
@@ -581,10 +606,10 @@ const webhookEndpoint = await smartpay.updateWebhookEndpoint({
 
 ### Delete Webhook Endpoint
 
-**Async** method, get the webhook endpoint object by webhook endpoint id.
+**Async** method, delete the webhook endpoint by webhook endpoint id.
 
 ```javascript
-const webhookEndpoint = await smartpay.deleteWebhookEndpoint({
+await smartpay.deleteWebhookEndpoint({
   id,
 });
 ```
@@ -705,7 +730,7 @@ app.use(
 
 A `express.json` middleware's verify function.
 
-#### Create Coupon
+### Create Coupon
 
 **Async** method, create a coupon object.
 
@@ -782,7 +807,7 @@ const coupon = await smartpay.updateCoupon({
 
 | Name                | Type    | Description                                                                          |
 | ------------------- | ------- | ------------------------------------------------------------------------------------ |
-| id                  | String  | The order id                                                                         |
+| id                  | String  | The coupon id                                                                        |
 | name (optional)     | String  | The coupon's name, meant to be displayable to the customer.                          |
 | active (optional)   | Boolean | Has the value true if the coupon is active and events are sent to the url specified. |
 | metadata (optional) | Object  | Set of up to 20 key-value pairs that you can attach to the object.                   |
@@ -823,7 +848,7 @@ const coupons = await smartpay.listCoupons({
 
 [Common exceptions][]
 
-#### Create Promotion Code
+### Create Promotion Code
 
 **Async** method, create a promotion code object of a coupon.
 
@@ -902,7 +927,7 @@ const promotionCode = await smartpay.updatePromotionCode({
 
 | Name                | Type    | Description                                                                                 |
 | ------------------- | ------- | ------------------------------------------------------------------------------------------- |
-| id                  | String  | The order id                                                                                |
+| id                  | String  | The promotion code id                                                                       |
 | active (optional)   | Boolean | Has the value true if the promotion codeis active and events are sent to the url specified. |
 | metadata (optional) | Object  | Set of up to 20 key-value pairs that you can attach to the object.                          |
 

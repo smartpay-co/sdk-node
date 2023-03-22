@@ -355,7 +355,7 @@ const payment = await smartpay.updatePayment({
 
 | Name                   | Type   | Description                                                                                              |
 | ---------------------- | ------ | -------------------------------------------------------------------------------------------------------- |
-| id                     | String | The order id                                                                                             |
+| id                     | String | The payment id                                                                                           |
 | reference (optional)   | String | A string to reference the Payment which can be used to reconcile the Payment with your internal systems. |
 | description (optional) | String | An arbitrary long form explanation of the Payment, meant to be displayed to the customer.                |
 | metadata (optional)    | Object | Set of up to 20 key-value pairs that you can attach to the object.                                       |
@@ -419,7 +419,7 @@ const refund = await smartpay.createRefund({
 | ---------------------- | -------- | -------------------------------------------------------------------------------------------------------- |
 | payment                | String   | The payment id                                                                                           |
 | amount                 | Number   | The amount of the refund                                                                                 |
-| currency               | String   | The order id                                                                                             |
+| currency               | String   | Three-letter ISO currency code, in uppercase. Must be a supported currency.                              |
 | reason                 | Stirng   | The reason of the Refund. `requested_by_customer` or `fraudulent`                                        |
 | lineItems (optional)   | String[] | A list of the IDs of the Line Items of the original Payment this Refund is on.                           |
 | reference (optional)   | String   | A string to reference the Payment which can be used to reconcile the Payment with your internal systems. |
@@ -589,7 +589,7 @@ const webhookEndpoint = await smartpay.updateWebhookEndpoint({
 
 | Name                          | Type     | Description                                                                                        |
 | ----------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
-| id                            | String   | The order id                                                                                       |
+| id                            | String   | The webhook endpoint id                                                                            |
 | active (optional)             | Boolean  | Has the value true if the webhook endpoint is active and events are sent to the url specified.     |
 | url (optional)                | String   | The url which will be called when any of the events you subscribed to occur.                       |
 | eventSubscriptions (optional) | String[] | The list of events to subscribe to. If not specified you will be subsribed to all events.          |
@@ -927,7 +927,7 @@ const promotionCode = await smartpay.updatePromotionCode({
 
 | Name                | Type    | Description                                                                                 |
 | ------------------- | ------- | ------------------------------------------------------------------------------------------- |
-| id                  | String  | The order id                                                                                |
+| id                  | String  | The promotion code id                                                                       |
 | active (optional)   | Boolean | Has the value true if the promotion codeis active and events are sent to the url specified. |
 | metadata (optional) | Object  | Set of up to 20 key-value pairs that you can attach to the object.                          |
 
